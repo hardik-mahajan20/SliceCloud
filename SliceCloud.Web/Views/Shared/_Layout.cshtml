@@ -70,7 +70,7 @@
     <script src="~/js/site.js"></script>
 
 
-    @if (TempData.Peek(key: "Toast") != null)
+    @if (TempData[key: "Toast"] != null)
     {
         <script>
             const toast = JSON.parse('@Html.Raw(TempData.Peek(key: "Toast"))');

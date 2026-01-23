@@ -115,13 +115,4 @@ $(document).ready(function () {
       $('.dropdown-toggle').attr('aria-expanded', 'false')
     }
   })
-
-  var deleteModal = document.getElementById('delete-user-modal')
-  if (deleteModal) {
-    deleteModal.addEventListener('show.bs.modal', function (event) {
-      var button = event.relatedTarget
-      var userId = button.getAttribute('data-userid')
-      document.getElementById('deleteUserId').value = userId
-    })
-  }
 })

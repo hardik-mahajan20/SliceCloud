@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
+using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
 
@@ -40,6 +42,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region AddNewUser
 
+    [CustomAuthorize("CanAddEdit", "Admin", "Manager", "Chef")]
     [HttpGet]
     public async Task<IActionResult> AddNewUser()
     {
@@ -48,7 +51,7 @@ public class UsersController(IUsersService usersService, ICountryService country
             CreateUserViewModel createUserViewModel = new()
             {
                 Countries = await _countryService.GetAllCountriesAsync(),
-                Roles = await _rolesService.GetAllRolesAsync()
+                Roles = await _usersService.GetAllowedRolesAsync(User)
             };
 
             return View(createUserViewModel);
@@ -101,6 +104,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region AddNewUser
 
+    [CustomAuthorize("CanAddEdit", "Admin", "Manager", "Chef")]
     [HttpPost]
     public async Task<IActionResult> AddNewUser(CreateUserViewModel createUserViewModel, IFormFile? itemImage)
     {
@@ -136,7 +140,7 @@ public class UsersController(IUsersService usersService, ICountryService country
                         ? await _cityService.GetCitiesByStateIdAsync(createUserViewModel.StateId)
                         : [];
 
-                createUserViewModel.Roles = await _rolesService.GetAllRolesAsync();
+                createUserViewModel.Roles = await _usersService.GetAllowedRolesAsync(User);
                 TempData.SetToast("warn", "Please submit the valid form");
 
                 return View(createUserViewModel);
@@ -172,6 +176,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region UpdateUser
 
+    [CustomAuthorize("CanAddEdit", "Admin", "Manager", "Chef")]
     [HttpGet]
     public async Task<IActionResult> UpdateUser(int id)
     {
@@ -213,6 +218,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region UpdateUser
 
+    [CustomAuthorize("CanAddEdit", "Admin", "Manager", "Chef")]
     [HttpPost]
     public async Task<IActionResult> UpdateUser(UpdateUserViewModel updateUserViewModel, int id, IFormFile? itemImage)
     {
@@ -284,6 +290,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region DeleteUser
 
+    [CustomAuthorize("CanDelete", "Admin", "Manager", "Chef")]
     [HttpPost]
     public async Task<IActionResult> DeleteUser(int id)
     {
