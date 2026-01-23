@@ -59,6 +59,8 @@ $(document).ready(function () {
 
   // Image Handling
   handleImageUpload = function (input) {
+    if (!file) return
+
     const file = input.files[0]
     const $preview = $('#imagePreview')
     const $container = $('#imagePreviewContainer')
@@ -72,17 +74,25 @@ $(document).ready(function () {
         $uploadBtn.addClass('d-none')
 
         $('#RemoveImage').val('false')
+        $('#profileImagePath').val('') 
+        $profileImagePath.val('')
       }
       reader.readAsDataURL(file)
     }
   }
 
   editImage = function () {
-    $('#inputGroupFile01').click()
+    console.log("hi");
+    
+    $('#imageInput').click()
+    $input.val('')
+    $input.click()
+    $('#RemoveImage').val('false') 
   }
 
+  // Delete image 
   removeImage = function () {
-    const $input = $('#inputGroupFile01')
+    const $input = $('#imageInput')
     const $preview = $('#imagePreview')
     const $container = $('#imagePreviewContainer')
     const $uploadBtn = $('#uploadButton')

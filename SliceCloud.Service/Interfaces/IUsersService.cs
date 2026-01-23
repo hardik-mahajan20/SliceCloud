@@ -63,4 +63,6 @@ public interface IUsersService
     /// <param name="claimsPrincipal">THe claimsPrincipal of the user.</param>
     /// <returns>A task that returns list of role a user allow to add.</returns>
     Task<List<Role>> GetAllowedRolesAsync(ClaimsPrincipal claimsPrincipal);
+
+    public bool DeleteProfileImage(string imageName);
 }

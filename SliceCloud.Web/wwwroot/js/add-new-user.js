@@ -79,11 +79,11 @@ $(document).ready(function () {
   }
 
   editImage = function () {
-    $('#inputGroupFile01').click()
+    $('#imageInput').click()
   }
 
   removeImage = function () {
-    const $input = $('#inputGroupFile01')
+    const $input = $('#imageInput')
     const $preview = $('#imagePreview')
     const $container = $('#imagePreviewContainer')
     const $uploadBtn = $('#uploadButton')

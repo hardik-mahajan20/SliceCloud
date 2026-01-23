@@ -93,19 +93,19 @@
                             <img id="imagePreview" class="rounded-circle mb-2"
                                 style="width: 100px; height: 100px; object-fit: cover;" src="@imagePath" />
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-sm btn-primary" onclick="editImage()">Edit</button>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="editImage()">New</button>
                                 <button type="button" class="btn btn-sm btn-outline-primary"
                                     onclick="removeImage()">Delete</button>
                             </div>
                         </div>
                         <button type="button" class="btn d-flex align-items-center gap-2 @(hasImage ? "d-none" : "")"
-                            id="uploadButton" onclick="$('#inputGroupFile01').click();">
+                            id="uploadButton" onclick="$('#imageInput').click();">
                             <i class="bi bi-cloud-upload-fill"></i> Drag and Drop Or Browse files
                             <div>Browse files</div>
                         </button>
 
                         
-                        <input type="file" class="form-control" name="itemImage" id="inputGroupFile01"
+                        <input type="file" class="form-control" name="itemImage" id="imageInput"
                             style="display: none;" accept="image/*" onchange="handleImageUpload(this)">
                  </div>
             </div>

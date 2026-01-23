@@ -262,7 +262,7 @@ public class UsersController(IUsersService usersService, ICountryService country
                 TempData.SetToast("warn", "Please submit the valid form.");
                 return View(updateUserViewModel);
             }
-            var updatedModal = updateUserViewModel;
+            UpdateUserViewModel updatedModal = updateUserViewModel;
             updatedModal.Email = updateUserViewModel.Email;
             Role? role = await _rolesService.GetRoleByIdAsync(updatedModal.RoleId);
             if (role is not null)
@@ -313,6 +313,22 @@ public class UsersController(IUsersService usersService, ICountryService country
             TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
             return View();
         }
+    }
+
+    #endregion
+
+
+    #region DeleteProfileImage
+
+    [HttpPost]
+    public IActionResult DeleteProfileImage(string imageName)
+    {
+        if (!string.IsNullOrEmpty(imageName))
+        {
+            bool isImageDeleted = _usersService.DeleteProfileImage(imageName);
+            return Json(new { success = isImageDeleted });
+        }
+        return Json(new { success = false });
     }
 
     #endregion

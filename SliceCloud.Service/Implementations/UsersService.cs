@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
@@ -8,17 +9,28 @@ using SliceCloud.Service.Utils;
 
 namespace SliceCloud.Service.Implementations;
 
-public class UsersService(IUsersRepository usersRepository, IRolesRepository rolesRepository, IUsersLoginService usersLoginService) : IUsersService
+public class UsersService(IUsersRepository usersRepository, IRolesRepository rolesRepository, IUsersLoginService usersLoginService, IImageService imageService, IWebHostEnvironment env) : IUsersService
 {
     private readonly IUsersRepository _usersRepository = usersRepository;
     private readonly IRolesRepository _rolesRepository = rolesRepository;
     private readonly IUsersLoginService _usersLoginService = usersLoginService;
 
+    private readonly IImageService _imageService = imageService;
+
+    private readonly IWebHostEnvironment _env = env;
+
     #region GetAllUsers
 
     public async Task<PaginatedList<User>> GetAllUsersAsync(int pageNumber, int pageSize, string query, string sortOrder, string sortColumn, string search)
     {
-        PaginatedList<User>? paginatedUsers = await _usersRepository.GetAllUsersAsync(pageNumber, pageSize, query, sortOrder, sortColumn, search);
+        PaginatedList<User> paginatedUsers = await _usersRepository.GetAllUsersAsync(pageNumber, pageSize, query, sortOrder, sortColumn, search);
+
+        foreach (var user in paginatedUsers)
+        {
+            user.ProfileImage = string.IsNullOrEmpty(user.ProfileImage)
+                ? "images/uploads/Default_pfp.svg"
+                : "images/uploads/" + user.ProfileImage;
+        }
 
         return paginatedUsers;
     }
@@ -80,7 +92,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
             createUserViewModel.Role = role!.RoleName.ToString();
         }
 
-        // string itemImgPath = await _imageService.ImgPath(itemImage);
+        string? itemImgPath = await _imageService.ImgPath(itemImage);
 
         User user = new()
         {
@@ -97,7 +109,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
             CountryId = createUserViewModel.CountryId,
             StateId = createUserViewModel.StateId,
             CityId = createUserViewModel.CityId,
-            ProfileImage = null
+            ProfileImage = itemImgPath
         };
 
         bool isUserCreated = await _usersRepository.CreateUserAsync(user);
@@ -130,6 +142,10 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
         if (user != null)
         {
+
+            user.ProfileImage = string.IsNullOrEmpty(user.ProfileImage)
+               ? ""
+               : "images/uploads/" + user.ProfileImage;
             UpdateUserViewModel updateUserViewModel = new()
             {
                 FirstName = user.FirstName,
@@ -162,16 +178,16 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
     public async Task<bool> UpdateExitingUserAsync(UpdateUserViewModel updateUserViewModel, int id, IFormFile itemImage)
     {
-        var user = await _usersRepository.GetUserByIdAsync(id);
+        User? user = await _usersRepository.GetUserByIdAsync(id);
 
-        // if (itemImage != null)
-        // {
-        //     user!.ProfileImage = await _imageService.ImgPath(itemImage);
-        // }
-        // else
-        // {
-        //     user!.Profileimg = updateUserViewModel.ProfileImage;
-        // }
+        if (itemImage != null)
+        {
+            user!.ProfileImage = await _imageService.ImgPath(itemImage);
+        }
+        else
+        {
+            user!.ProfileImage = updateUserViewModel.ProfileImage;
+        }
 
 
         if (user != null)
@@ -233,6 +249,35 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
             .Where(r => !excludedRoleIds.Contains(r.RoleId))
             .ToList();
     }
+
+
+
+    #region DeleteProfileImage
+
+    public bool DeleteProfileImage(string imagePath)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+            return false;
+
+        // Remove leading slash if exists
+        imagePath = imagePath.TrimStart('/');
+
+        string fullPath = Path.Combine(
+            _env.WebRootPath,
+            imagePath
+        );
+
+        if (File.Exists(fullPath))
+        {
+            File.Delete(fullPath);
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion
+
 
     #endregion
 }

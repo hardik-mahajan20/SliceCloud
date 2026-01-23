@@ -58,7 +58,7 @@ public class UpdateUserViewModel
 
     public int RoleId { get; set; }
 
-    public string ProfileImage { get; set; } = string.Empty;
+    public string? ProfileImage { get; set; } = string.Empty;
 
     public List<Role> Roles { get; set; } = [];
 

@@ -77,17 +77,11 @@
                     </div>
             </div>
             <div class="row">
-            @{
-                    bool hasImage = false;
-                    string? imagePath = "";
-                    if (Model!.ProfileImage != null)
-                    {
-                        hasImage = !string.IsNullOrEmpty(Model.ProfileImage);
-                        imagePath = hasImage ? Url.Content("~/images/uploads/" + Model.ProfileImage) : "";
-                    }
+           @{
+                bool hasImage = !string.IsNullOrEmpty(Model?.ProfileImage);
+                string imagePath = hasImage ? Url.Content("~/" + Model!.ProfileImage) : "";
+            }
 
-
-                }
                  <div class="col-12 col-md-6 input-group d-flex justify-content-center align-items-center file-upload p-4"
                         style="border: 1.8px dashed #dee2e6; border-radius: 6px; position: relative;">
 
@@ -97,6 +91,9 @@
                             class="@(hasImage ? "d-flex" : "d-none") align-items-center gap-2">
                             <img id="imagePreview" class="rounded-circle mb-2"
                                 style="width: 100px; height: 100px; object-fit: cover;" src="@imagePath" />
+                               <input type="hidden" id="profileImagePath" name="ProfileImage" value="@Model?.ProfileImage" />
+
+
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-primary" onclick="editImage()">Edit</button>
                                 <button type="button" class="btn btn-sm btn-outline-primary"
@@ -104,21 +101,21 @@
                             </div>
                         </div>
                         <button type="button" class="btn d-flex align-items-center gap-2 @(hasImage ? "d-none" : "")"
-                            id="uploadButton" onclick="$('#inputGroupFile01').click();">
+                            id="uploadButton" onclick="$('#imageInput').click();">
                             <i class="bi bi-cloud-upload-fill"></i> Drag and Drop Or Browse files
                             <div>Browse files</div>
                         </button>
 
                         
-                        <input type="file" class="form-control" name="itemImage" id="inputGroupFile01"
+                        <input type="file" class="form-control" name="itemImage" id="imageInput"
                             style="display: none;" accept="image/*" onchange="handleImageUpload(this)">
                  </div>
             </div>
             <div class="row mt-3">
                 <div class="col-12 col-md-4">
                     <div class="form-floating mb-3">
-                        <select class="form-select" id="floatingSelect-country-id" placeholder="Select Country Please"
-                        asp-for="CountryId">
+                        <select class="form-select"  placeholder="Select Country Please"
+                        asp-for="CountryId" id="Country">
                         <option selected>Select Country*</option>
                         @if(Model?.Countries != null){
                         @foreach (Country country in Model.Countries)
@@ -133,8 +130,8 @@
                 </div>
                 <div class="col-12 col-md-4">
                     <div class="form-floating mb-3">
-                        <select class="form-select" id="floatingSelect-state-id" placeholder="Select State Please"
-                        asp-for="StateId">
+                        <select class="form-select"  placeholder="Select State Please"
+                        asp-for="StateId" id="State">   
                         <option selected>Select State*</option>
                         @if(Model?.States != null){
                         @foreach (State state in Model.States)
@@ -149,8 +146,8 @@
                 </div>
                 <div class="col-12 col-md-4">
                     <div class="form-floating mb-3">
-                        <select class="form-select" id="floatingSelect-city-id" placeholder="Select City Please"
-                        asp-for="CityId">
+                        <select class="form-select" placeholder="Select City Please"
+                        asp-for="CityId" id="City">
                         <option selected>Select City*</option>
                         @if(Model?.Cities != null){
                         @foreach (City city in Model.Cities)
