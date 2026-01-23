@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -55,4 +56,11 @@ public interface IUsersService
     /// <param name="id">The ID of the user to delete.</param>
     /// <returns>A task that returns true if the deletion was successful, otherwise false.</returns>
     Task<bool> DeleteExistingUserAsync(int id);
+
+    /// <summary>
+    /// Gives allows list of roles for the particular user.
+    /// </summary>
+    /// <param name="claimsPrincipal">THe claimsPrincipal of the user.</param>
+    /// <returns>A task that returns list of role a user allow to add.</returns>
+    Task<List<Role>> GetAllowedRolesAsync(ClaimsPrincipal claimsPrincipal);
 }

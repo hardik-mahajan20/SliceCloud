@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
@@ -205,6 +206,32 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
     public async Task<bool> DeleteExistingUserAsync(int id)
     {
         return await _usersRepository.DeleteExistingUserAsync(id);
+    }
+
+    #endregion
+
+    #region GetAllowedRoles
+
+    public async Task<List<Role>> GetAllowedRolesAsync(ClaimsPrincipal user)
+    {
+        string? userRole = user.FindFirst(ClaimTypes.Role)?.Value;
+        HashSet<int> excludedRoleIds = [];
+
+        if (userRole == "Manager")
+        {
+            excludedRoleIds.Add(1);
+        }
+        else if (userRole == "Chef")
+        {
+            excludedRoleIds.Add(1);
+            excludedRoleIds.Add(2);
+        }
+
+        List<Role>? allRoles = await _rolesRepository.GetAllRolesAsync();
+
+        return allRoles
+            .Where(r => !excludedRoleIds.Contains(r.RoleId))
+            .ToList();
     }
 
     #endregion
