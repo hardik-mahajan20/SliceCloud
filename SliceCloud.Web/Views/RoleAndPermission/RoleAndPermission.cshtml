@@ -1,7 +1,43 @@
+@using SliceCloud.Repository.ViewModels
+@model List<SliceCloud.Repository.ViewModels.RoleViewModel>
 @{
-    ViewData[index: "Title"] = "RoleAndPermission";
+    ViewData[index: "Title"] = "Roles";
 }
-
-<div class="d-flex align-items-center justify-content-center">
-    <h1 class="custom-body-text-color">RoleAndPermission</h1>
+@section Styles {
+    <link rel="stylesheet" href="~/css/role-and-permission.css" />
+}
+<div class="d-flex flex-column w-100 p-4">
+    <div class="d-flex justify-content-between w-100 mb-3 d-sm-row d-column flex-wrap flex-sm-nowrap">
+        <h1 class="custom-body-text-color">Role</h1>
+    </div>
+    <div class="d-flex flex-column row">
+        <section class="role-main col-12 col-sm-10">
+            <div class="table-responsive p-3 bg-white ">
+                <table class="table">
+                    <tr class="table-header">
+                        <th scope="col">
+                            <span class="heading">Role</span>
+                        </th>
+                        <th scope="col" class="text-end">
+                            <span class="heading">Action</span>
+                        </th>
+                    </tr>
+                    <tbody>
+                        @foreach (RoleViewModel roleViewModel in Model)
+                        {
+                            <tr>
+                                <td>@roleViewModel.RoleName</td>
+                                <td class="text-end">
+                                    <a asp-controller="RoleAndPermission" asp-action="Permission"
+                                        asp-route-id="@roleViewModel.RoleId" class="text-black">
+                                        <i class="bi bi-pen"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
 </div>

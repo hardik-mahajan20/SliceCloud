@@ -25,4 +25,36 @@ public class PermissionRepository(SliceCloudContext sliceCloudContext) : IPermis
     }
 
     #endregion
+
+    #region GetAllPermissionsById
+    public async Task<List<Permission>> GetAllPermissionsByRoleIdAsync(int roleId)
+    {
+        return await _sliceCloudContext.Permissions
+                .Include(p => p.Module)
+                .Where(p => p.RoleId == roleId)
+                .ToListAsync();
+    }
+
+    #endregion
+
+    #region GetPermissionsByRole
+
+    public async Task<List<Permission>> GetPermissionsByRoleAsync(int roleId, List<int> permissionIds)
+    {
+        return await _sliceCloudContext.Permissions
+            .Where(p => p.RoleId == roleId && permissionIds.Contains(p.PermissionId))
+            .ToListAsync();
+    }
+
+    #endregion
+
+    #region SaveChanges
+
+    public async Task SaveChangesAsync()
+    {
+        await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
+
 }
