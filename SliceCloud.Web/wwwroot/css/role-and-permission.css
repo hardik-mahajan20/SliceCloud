@@ -1,0 +1,34 @@
+.table-header {
+  font-weight: bold;
+  font-size: large;
+  color: #585b5e;
+}
+
+.table td,
+.table th {
+  text-align: start;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table td:nth-child(1),
+.table th:nth-child(1) {
+  width: 50%;
+}
+
+.table td:nth-child(2),
+.table th:nth-child(2) {
+  width: 50%;
+}
+
+.truncate-text {
+  text-align: start;
+  display: inline-block;
+  max-width: 190px !important;
+  min-width: 190px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
