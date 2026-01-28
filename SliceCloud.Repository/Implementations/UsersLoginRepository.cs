@@ -1,22 +1,18 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 
 namespace SliceCloud.Repository.Implementations;
 
-public class UsersLoginRepository(SliceCloudContext context) : IUsersLoginRepository
+public class UsersLoginRepository(SliceCloudContext sliceCloudContext) : IUsersLoginRepository
 {
-    private readonly SliceCloudContext _context = context;
+    private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    public async Task<UsersLogin?> GetUserLoginByEmailAsync(string userEmail)
-    {
-        return await _context.UsersLogins.FirstOrDefaultAsync(u => u.Email!.ToLower() == userEmail.ToLower());
-    }
+    #region GetUserLogin
 
     public async Task<UsersLogin?> GetUserLoginAsync(string userEmail, string userHashedPassword)
     {
-        UsersLogin? usersLogin = await _context.UsersLogins.Include(u => u.User).FirstOrDefaultAsync(
+        UsersLogin? usersLogin = await _sliceCloudContext.UsersLogins.Include(u => u.User).FirstOrDefaultAsync(
             u => u.Email == userEmail
             && u.PasswordHash == userHashedPassword
             && u.IsFirstLogin == false
@@ -26,57 +22,95 @@ public class UsersLoginRepository(SliceCloudContext context) : IUsersLoginReposi
         return usersLogin;
     }
 
+    #endregion
+
+    #region GetUserLoginByEmail
+
+    public async Task<UsersLogin?> GetUserLoginByEmailAsync(string userEmail)
+    {
+        return await _sliceCloudContext.UsersLogins.FirstOrDefaultAsync(u => u.Email!.ToLower() == userEmail.ToLower());
+    }
+
+    #endregion
+
+    #region SavePasswordResetToken
+
     public async Task SavePasswordResetTokenAsync(int userId, string passwordResetToken, DateTime expiration, bool isUsed)
     {
-        UsersLogin? user = await _context.UsersLogins.FindAsync(userId);
-        if (user != null)
+        UsersLogin? usersLogin = await _sliceCloudContext.UsersLogins.FindAsync(userId);
+        if (usersLogin != null)
         {
-            user.ResetToken = passwordResetToken;
-            user.ResetTokenExpiration = expiration;
-            user.IsResetTokenUsed = isUsed;
-            await _context.SaveChangesAsync();
+            usersLogin.ResetToken = passwordResetToken;
+            usersLogin.ResetTokenExpiration = expiration;
+            usersLogin.IsResetTokenUsed = isUsed;
+            await _sliceCloudContext.SaveChangesAsync();
         }
     }
+
+    #endregion
+
+    #region GetUserByResetToken
 
     public async Task<UsersLogin?> GetUserByResetTokenAsync(string resetToken)
     {
-        return await _context.UsersLogins.FirstOrDefaultAsync(u => u.ResetToken == resetToken);
+        return await _sliceCloudContext.UsersLogins.FirstOrDefaultAsync(u => u.ResetToken == resetToken);
     }
+
+    #endregion
+
+    #region SetUserPassword
 
     public async Task<bool> SetUserPasswordAsync(int userLoginId, string newPassword)
     {
-        UsersLogin? user = await _context.UsersLogins.FindAsync(userLoginId);
-        if (user == null)
+        UsersLogin? usersLogin = await _sliceCloudContext.UsersLogins.FindAsync(userLoginId);
+        if (usersLogin == null)
         {
             return false;
         }
-        User? userTable = await _context.Users.FindAsync(user.UserId);
+
+        User? userTable = await _sliceCloudContext.Users.FindAsync(usersLogin.UserId);
         if (userTable == null)
         {
             return false;
         }
-        user.PasswordHash = newPassword;
+
+        usersLogin.PasswordHash = newPassword;
         userTable.PasswordHash = newPassword;
 
-        _context.UsersLogins.Update(user);
-        _context.Users.Update(userTable);
-        await _context.SaveChangesAsync();
+        _sliceCloudContext.UsersLogins.Update(usersLogin);
+        _sliceCloudContext.Users.Update(userTable);
+        await _sliceCloudContext.SaveChangesAsync();
 
         return true;
     }
 
+    #endregion
+
+    #region InvalidateResetToken
+
     public async Task<bool> InvalidateResetTokenAsync(int userLoginId)
     {
-        UsersLogin? usersLogin = await _context.UsersLogins
+        UsersLogin? usersLogin = await _sliceCloudContext.UsersLogins
        .FirstOrDefaultAsync(u => u.UserLoginId == userLoginId);
 
         if (usersLogin == null)
             return false;
 
         usersLogin.IsResetTokenUsed = true;
-        await _context.SaveChangesAsync();
+        await _sliceCloudContext.SaveChangesAsync();
 
         return true;
     }
 
+    #endregion
+
+    #region CreateUserLogin
+
+    public async Task CreateUserLoginAsync(UsersLogin usersLogin)
+    {
+        await _sliceCloudContext.UsersLogins.AddAsync(usersLogin);
+        await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
 }

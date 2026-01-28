@@ -5,7 +5,7 @@ namespace SliceCloud.Repository.Interfaces;
 public interface IUsersLoginRepository
 {
     /// <summary>
-    /// Retrieves a user login details by their email & hashed password asynchronously.
+    /// Retrieves user's login details by their email & hashed password asynchronously.
     /// </summary>
     /// <param name="userEmail">The email of the user to retrieve.</param>
     /// <param name="userHashedPassword">The password of the user to retrieve.</param>
@@ -13,10 +13,10 @@ public interface IUsersLoginRepository
     Task<UsersLogin?> GetUserLoginAsync(string userEmail, string userHashedPassword);
 
     /// <summary>
-    /// Retrieves a user by their email asynchronously.
+    /// Retrieves a user's login details by their email asynchronously.
     /// </summary>
     /// <param name="userEmail">The email of the user to retrieve.</param>
-    /// <returns>A task that returns the user if found, otherwise null.</returns>
+    /// <returns>A task that returns the users's login details if found, otherwise null.</returns>
     Task<UsersLogin?> GetUserLoginByEmailAsync(string userEmail);
 
     /// <summary>
@@ -35,16 +35,16 @@ public interface IUsersLoginRepository
     );
 
     /// <summary>
-    /// Retrieves a user login details by their resetToken asynchronously.
+    /// Retrieves a user's login details by their resetToken asynchronously.
     /// </summary>
     /// <param name="resetToken">The email of the user to retrieve.</param>
-    /// <returns>A task that returns the user login details if found, otherwise null.</returns>
+    /// <returns>A task that returns the user's login details if found, otherwise null.</returns>
     Task<UsersLogin?> GetUserByResetTokenAsync(string resetToken);
 
     /// <summary>
     /// Sets a new password for a user.
     /// </summary>
-    /// <param name="userLoginId">The ID of the user login to update.</param>
+    /// <param name="userLoginId">The ID of the user's.</param>
     /// <param name="newPassword">The new password to set.</param>
     /// <returns>A task that returns true if the password was updated successfully, otherwise false.</returns>
     Task<bool> SetUserPasswordAsync(int userLoginId, string newPassword);
@@ -55,4 +55,11 @@ public interface IUsersLoginRepository
     /// <param name="usersLogin">The user whose reset token should be invalidated.</param>
     /// <returns>A task that returns true if the token is invalidated successfully, otherwise false.</returns>
     Task<bool> InvalidateResetTokenAsync(int userLoginId);
+
+    /// <summary>
+    /// Creates a new user login asynchronously.
+    /// </summary>
+    /// <param name="login">The user login details to create.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task CreateUserLoginAsync(UsersLogin usersLogin);
 }

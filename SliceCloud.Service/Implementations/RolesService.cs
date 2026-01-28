@@ -10,9 +10,18 @@ public class RolesService(IRolesRepository rolesRepository) : IRolesService
 
     #region GetRoleById
 
-    public async Task<Role?> GetRoleByIdAsync(int id)
+    public async Task<Role?> GetRoleByIdAsync(int roleId)
     {
-        return await _rolesRepository.GetRoleByIdAsync(id);
+        return await _rolesRepository.GetRoleByIdAsync(roleId);
+    }
+
+    #endregion
+
+    #region GetAllRoles
+
+    public async Task<List<Role>> GetAllRolesAsync()
+    {
+        return await _rolesRepository.GetAllRolesAsync();
     }
 
     #endregion

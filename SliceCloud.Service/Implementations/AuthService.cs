@@ -28,9 +28,9 @@ public class AuthService(IUsersLoginRepository usersLoginRepository) : IAuthServ
     public async Task<UsersLogin?> GetUserLoginByEmailAsync(string userEmail)
     {
         UsersLogin? usersLogin = await _usersLoginRepository.GetUserLoginByEmailAsync(userEmail);
-        if (usersLogin is not null)
-            return usersLogin;
-        return null;
+        if (usersLogin is null)
+            return null;
+        return usersLogin;
     }
 
     #endregion
@@ -39,8 +39,7 @@ public class AuthService(IUsersLoginRepository usersLoginRepository) : IAuthServ
 
     public async Task<string> GeneratePasswordResetTokenAsync(string userEmail)
     {
-        UsersLogin? usersLogin = await _usersLoginRepository.GetUserLoginByEmailAsync(userEmail);
-        if (usersLogin == null) return string.Empty;
+        UsersLogin? usersLogin = await _usersLoginRepository.GetUserLoginByEmailAsync(userEmail) ?? throw new InvalidOperationException("User not found with the provided email.");
 
         string token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 

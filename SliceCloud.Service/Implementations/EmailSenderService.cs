@@ -16,27 +16,28 @@ public class EmailSenderService(IConfiguration configuration, IWebHostEnvironmen
 
     public async Task SendEmailAsync(string toEmail, string subject, string htmlBody, string imagePath)
     {
-        var smtpHost = _configuration["EmailSettings:SmtpHost"];
-        var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]!);
-        var smtpUser = _configuration["EmailSettings:SmtpUser"];
-        var smtpPass = _configuration["EmailSettings:SmtpPass"];
-        var fromEmail = _configuration["EmailSettings:FromEmail"];
+        string? smtpHost = _configuration["EmailSettings:SmtpHost"];
+        int smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]!);
+        string? smtpUser = _configuration["EmailSettings:SmtpUser"];
+        string? smtpPass = _configuration["EmailSettings:SmtpPass"];
+        string? fromEmail = _configuration["EmailSettings:FromEmail"];
 
-        using (var client = new SmtpClient(smtpHost, smtpPort))
+        using (SmtpClient? client = new SmtpClient(smtpHost, smtpPort))
         {
             client.Credentials = new NetworkCredential(smtpUser, smtpPass);
             client.EnableSsl = true;
 
-            var mailMessage = new MailMessage
+            MailMessage mailMessage = new()
             {
                 From = new MailAddress(fromEmail ?? string.Empty, "SliceCloud Support"),
                 Subject = subject,
                 IsBodyHtml = true
-            };
+            }
+            ;
 
             mailMessage.To.Add(toEmail);
 
-            var alternateView = AlternateView.CreateAlternateViewFromString(htmlBody, null, MediaTypeNames.Text.Html);
+            AlternateView? alternateView = AlternateView.CreateAlternateViewFromString(htmlBody, null, MediaTypeNames.Text.Html);
 
             if (File.Exists(imagePath))
             {
@@ -62,7 +63,7 @@ public class EmailSenderService(IConfiguration configuration, IWebHostEnvironmen
 
     public async Task SendResetPasswordEmailAsync(string toEmail, string? resetLink)
     {
-        var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "logo.png");
+        string? imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "logo.png");
 
         string subject = "Reset Your Password - SliceCloud";
 
