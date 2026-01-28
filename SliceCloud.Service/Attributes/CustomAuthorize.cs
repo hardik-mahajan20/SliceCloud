@@ -8,10 +8,10 @@ namespace SliceCloud.Service.Attributes
 {
 
     [AttributeUsage(AttributeTargets.All)]
-    public class CustomAuthorizeAttribute(string requiredPermission, params string[] roles) : Attribute, IAsyncAuthorizationFilter
+    public class CustomAuthorizeAttribute(string? requiredPermission = null, params string[] roles) : Attribute, IAsyncAuthorizationFilter
     {
         private readonly string[] _roles = roles;
-        private readonly string _requiredPermission = requiredPermission;
+        private readonly string _requiredPermission = requiredPermission ?? string.Empty;
 
         /// <summary>
         /// Handles the authorization logic asynchronously.

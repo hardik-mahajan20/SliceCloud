@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Models;
 
 namespace SliceCloud.Repository.ViewModels;

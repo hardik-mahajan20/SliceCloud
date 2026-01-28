@@ -1,7 +1,165 @@
+@using SliceCloud.Repository.Models
+@model SliceCloud.Repository.ViewModels.MyProfileViewModel
 @{
-    ViewData[index: "Title"] = "MyProfile";
+    ViewData[index: "Title"] = "My Profile";
 }
 
-<div class="d-flex align-items-center justify-content-center">
-    <h1 class="custom-body-text-color">MyProfile</h1>
+<div class="d-flex flex-column w-100 p-4">
+    <div class="d-flex justify-content-between w-100 mb-3 d-sm-row d-column flex-wrap flex-sm-nowrap ">
+        <h1 class="custom-body-text-color">My Profile</h1>
+        <div>
+            <a class="btn btn-outline-primary"
+                asp-controller="@(ViewData["From"] as string == "OrderApp" ? "OrderAppTableView" : "Dashboard")"
+                asp-action="@(ViewData["From"] as string == "OrderApp" ? "Index" : "Dashboard")"
+                asp-route-from="@ViewData["From"]">
+                Back
+            </a>
+        </div>
+    </div>
+    <div class="position-relative">
+        <div class=" form-wrapper bg-white">
+            <div class="position-relative">
+                <div class="position-absolute w-100 z-0 shadow-lg" style="height: 65px;">
+                    <img src="~/images/static/profile_div_bg.jpg" class="w-100 h-100 image-contain" alt="Background Image">
+                </div>
+                <div class=" d-flex flex-column flex-md-row justify-content-between w-100 align-items-center z-2 p-5">
+                    <div class="left d-flex flex-column flex-md-row align-items-center gap-3">
+                        <div class="position-relative">
+                            <div class="overflow-hidden border border-black border-opacity-50 rounded-circle shadow-lg"
+                                style="height: 150px; width: 150px;">
+                                <img id="displayImage"
+                                    src="@(string.IsNullOrEmpty(Model.ProfileImage) ? Url.Content(contentPath: "~/images/static/default_pfp.png") : Url.Content(Model.ProfileImage.StartsWith(value: "/") ? Model.ProfileImage : "~/images/uploads/" + Model.ProfileImage))"
+                                    class="w-100 h-100 image-cover" alt="Profile Image">
+                            </div>
+                            <input type="file" id="imageInput" accept="image/*" hidden>
+                            <div class="dropdown position-absolute z-3" style="bottom: -10px; left: 100px;">
+                                <div class="btn border rounded-circle bg-white">
+                                    <button class="border-0 bg-white" type="button" id="imageDropdown"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-camera"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu" aria-labelledby="imageDropdown">
+                                        <li><a class="dropdown-item" href="#" id="uploadImageOption">Upload Image</a>
+                                        </li>
+                                        <li><a class="dropdown-item text-danger" href="#" id="deleteImageOption">Delete
+                                                Image</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex  justify-content-between ms-2">
+                            <div class="d-flex flex-column justify-content-start">
+                                <div class="mb-0 h3">@Model.FirstName @Model.LastName</div>
+                                <div class="mb-0">@Model.Role</div>
+                                <div class="d-block d-md-none">@Model.Email</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right z-2 d-none d-md-block">
+                        @Model.Email
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="p-3 shadow-sm rounded form-wrapper border-0">
+                    <form asp-controller="MyProfile" asp-action="MyProfile" class="p-1" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="from" value="@ViewData[index: "From"]" />
+                        <input type="hidden" asp-for="UserId" />
+                        <div class="row">
+                            <div class="col-12 col-md-6 ">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" asp-for="FirstName"
+                                        placeholder="First Name" id="FirstName">
+                                    <label for="FirstName">First Name</label>
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 ">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" placeholder="Last Name"
+                                        asp-for="LastName" id="LastName">
+                                    <label for="LastName">Last Name</label>
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-md-6 ">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" placeholder="User Name"
+                                        asp-for="UserName" id="Username" autocomplete="on">
+                                    <label for="Username">User Name</label>
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 ">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" placeholder="Phone Number"
+                                        asp-for="PhoneNumber" id="Phone" autocomplete="on">
+                                    <label for="Phone">Phone</label>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 col-md-4">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="CountryId" asp-for="CountryId"
+                                        asp-items="@(new SelectList(Model.Countries, "CountryId", "CountryName"))">
+                                        <option value="0">Select Country</option>
+                                    </select>
+                                    <label for="CountryId">Country</label>
+                                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="StateId" asp-for="StateId"
+                                        asp-items="@(new SelectList(Model.States, "StateId", "StateName"))">>
+                                        <option value="0">Select State</option>
+                                    </select>
+                                    <label for="StateId">State</label>
+                                    <span asp-validation-for="StateId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="CityId" asp-for="CityId"
+                                        asp-items="@(new SelectList(Model.Cities, "CityId", "CityName"))">>
+                                        <option value="0">Select City</option>
+                                    </select>
+                                    <span asp-validation-for="CityId" class="text-danger"></span>
+                                    <label for="CityId">City</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="Address" placeholder="Address"
+                                        asp-for="Address" autocomplete="on">
+                                    <label for="Address">Address</label>
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 ">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="Zipcode" placeholder="ZipCode"
+                                        asp-for="ZipCode">
+                                    <label for="Zipcode">Zipcode</label>
+                                    <span asp-validation-for="ZipCode" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="button" class="btn btn-outline-primary" id="cancelButton">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

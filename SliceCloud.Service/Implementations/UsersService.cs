@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
+using SliceCloud.Repository.Enums;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
 
@@ -123,7 +124,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
                 UserName = user.UserName,
                 HashPassword = user.PasswordHash,
                 RoleId = user.RoleId,
-                Status = (Status)1,
+                Status = (UserStatus)1,
             };
 
             await _usersLoginService.CreateUserLoginAsync(login);
