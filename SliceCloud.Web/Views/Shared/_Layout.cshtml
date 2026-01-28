@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 
     @RenderSection(name: "Styles", required: false)
 
@@ -42,9 +44,10 @@
             <div class="custom-body-page-color flex-grow-1">
                 <div class="custom-navbar-bg-color d-flex justify-content-between align-items-center p-3 w-100">
                     <div>
-                        <img src="~/images/icons/list.svg" alt="This is list icon" class="d-block d-xxl-none"
-                            data-bs-toggle="offcanvas" href="#sidebar-off-canvas" role="button"
-                            aria-controls="sidebar-off-canvas">
+                        <div class="d-block d-xxl-none" data-bs-toggle="offcanvas" href="#sidebar-off-canvas"
+                            role="button" aria-controls="sidebar-off-canvas">
+                            <i class="bi bi-list fs-1"></i>
+                        </div>
                     </div>
                     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar-off-canvas"
                         aria-labelledby="side-bar-offcanvas">
@@ -67,7 +70,7 @@
     <script src="~/js/site.js"></script>
 
 
-    @if (TempData.Peek(key: "Toast") != null)
+    @if (TempData[key: "Toast"] != null)
     {
         <script>
             const toast = JSON.parse('@Html.Raw(TempData.Peek(key: "Toast"))');

@@ -1,0 +1,108 @@
+@using System.Security.Claims
+@using SliceCloud.Repository.Models
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ClaimsPrincipal? user1 = HttpContextAccessor.HttpContext?.User;
+    string? userRole = user1?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+<div class="table-responsive shadow-sm p-3 bg-white rounded shadow">
+    <div class="table-wrapper border-0">
+        <table class="table">
+            <tr class="table-header">
+                <th scope="col">
+                    <a href="javascript:void(0);" class="sortable-column" data-column="FirstName">
+                        Name <i class="bi bi-arrow-up"></i><i class="bi bi-arrow-down"></i>
+                    </a>
+                </th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+                <th scope="col">
+                    <a href="javascript:void(0);" class="sortable-column" data-column="RoleId">
+                        Role <i class="bi bi-arrow-up"></i><i class="bi bi-arrow-down"></i>
+                    </a>
+                </th>
+                <th scope="col">Status</th>
+                <th>Action</th>
+            </tr>
+            <tbody id="tableBody">
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center border-bottom-0">
+                            <div class="d-flex flex-column">
+                                <i class="bi bi-emoji-frown fs-4"></i>
+                                <div>No records found</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (User user in Model)
+                    {
+                        <tr>
+                            <td class="p-2 ">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="@Url.Content("~/" + user.ProfileImage)" alt="Profile Image" width="30px" height="30px"
+                                        alt="Profile Image" width="30px" height="30px" class="rounded-circle object-fit-fill">
+                                    <span>@user.FirstName</span>
+                                </div>
+                            </td>
+                            <td class="p-2">@user.Email</td>
+                            <td class="p-2">@user.PhoneNumber</td>
+                            <td class="p-2 ">@(user.RoleId)</td>
+                            <td class="p-2">
+                                <span
+                                    class="rounded-pill px-2 @(user.Status == 1 ? "custom-status-bg-color" : "custom-status-inactive-bg-color")">
+                                    @(user.Status)
+                                </span>
+                            </td>
+                            <td class="p-2">
+                                <div class="d-flex gap-4 justify-content-center">
+                                    <a asp-controller="Users" asp-action="UpdateUser" asp-route-id="@user.UserId"
+                                        class="text-black text-reset">
+                                        <i class="bi bi-pen fs-5"></i>
+                                    </a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" class="text-decoration-none text-black"
+                                        data-id="@user.UserId" data-url="/Users/DeleteUser">
+                                        <i class="bi bi-trash fs-5"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.Count != 0)
+    {
+        <div class="pagination-container  d-flex flex-wrap flex-md-nowrap">
+            <span id="showingInfo">Showing @Model.FromRec - @Model.ToRec of @Model.TotalItems</span>
+            @{
+                int[] pageSizes = { 5, 10, 20 };
+            }
+
+            <select id="pageSizeDropdown" class="form-select">
+                @foreach (int size in pageSizes)
+                {
+                    <option value="@size" selected="@(Model.PageSize == size ? "selected" : null)">@size</option>
+                }
+            </select>
+
+            <input type="hidden" id="totalPages" value="@Model.TotalPages" />
+            <input type="hidden" id="totalRecords" value="@Model.TotalItems" />
+            <input type="hidden" id="currentPage" value="@Model.PageIndex" />
+            <input type="hidden" id="pageSize" value="@Model.PageSize" />
+
+            <button id="prevPageBtn">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button id="nextPageBtn">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+
+        </div>
+    }
+</div>

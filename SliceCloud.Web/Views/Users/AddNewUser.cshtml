@@ -1,0 +1,195 @@
+@using SliceCloud.Repository.Models
+@model SliceCloud.Repository.ViewModels.CreateUserViewModel
+
+
+<div class="d-flex flex-column w-100 p-4">
+    <div class="d-flex justify-content-between w-100 mb-3">
+        <h1 class="custom-body-text-color">Add New User</h1>
+        <div>
+            <a asp-controller="Users" asp-action="Users" class="btn btn-outline-primary">
+                Back
+            </a>
+        </div>
+    </div>
+    <div class="p-3 shadow-sm bg-white rounded form-wrapper shadow">
+        <form method="post" asp-controller="Users" asp-action="AddNewUser" class="p-1" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" asp-for="FirstName" placeholder="First Name Please">
+                        <label for="FirstName">First Name*</label>
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" asp-for="LastName" placeholder="Last Name Please">
+                        <label for="LastName">Last Name*</label>
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" asp-for="UserName" placeholder="User Name Please"
+                            autocomplete="on">
+                        <label for="UserName">User Name*</label>
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="floatingSelect-role-id" placeholder="Select Role Please"
+                        asp-for="RoleId">
+                        <option selected>Select Role*</option>
+                        @if(Model?.Roles != null){
+                        @foreach (Role role in Model.Roles)
+                        {   
+                                <option value="@role.RoleId">@role.RoleName</option>
+                        }
+                        }
+                    </select>
+                    <label for="RoleId">Role*</label>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" asp-for="Email" placeholder="name@example.com">
+                        <label for="Email">Email*</label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" asp-for="Password" placeholder="name@example.com">
+                        <label for="Password">Password*</label>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            @{
+                    bool hasImage = false;
+                    string? imagePath = "";
+                    if (!string.IsNullOrEmpty(Model?.ProfileImage))
+                    {
+                        hasImage = !string.IsNullOrEmpty(Model.ProfileImage);
+                        imagePath = hasImage ? Url.Content("~/images/uploads/" + Model.ProfileImage) : "";
+                    }
+
+
+                }
+                 <div class="col-12 col-md-6 input-group d-flex justify-content-center align-items-center file-upload p-4"
+                        style="border: 1.8px dashed #dee2e6; border-radius: 6px; position: relative;">
+
+                        <input type="hidden" id="RemoveImage" name="RemoveImage" value="false" />
+                        
+                        <div id="imagePreviewContainer"
+                            class="@(hasImage ? "d-flex" : "d-none") align-items-center gap-2">
+                            <img id="imagePreview" class="rounded-circle mb-2"
+                                style="width: 100px; height: 100px; object-fit: cover;" src="@imagePath" />
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="editImage()">New</button>
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                    onclick="removeImage()">Delete</button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn d-flex align-items-center gap-2 @(hasImage ? "d-none" : "")"
+                            id="uploadButton" onclick="$('#imageInput').click();">
+                            <i class="bi bi-cloud-upload-fill"></i> Drag and Drop Or Browse files
+                            <div>Browse files</div>
+                        </button>
+
+                        
+                        <input type="file" class="form-control" name="itemImage" id="imageInput"
+                            style="display: none;" accept="image/*" onchange="handleImageUpload(this)">
+                 </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select"  placeholder="Select Country Please"
+                        asp-for="CountryId" id="Country">
+                        <option selected>Select Country*</option>
+                        @if(Model?.Countries != null){
+                        @foreach (Country country in Model.Countries)
+                        {   
+                                <option value="@country.CountryId">@country.CountryName</option>
+                        }
+                        }
+                    </select>
+                    <label for="CountryId">Country*</label>
+                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select"  placeholder="Select State Please"
+                        asp-for="StateId" id="State">
+                        <option selected>Select State*</option>
+                        @if(Model?.States != null){
+                        @foreach (State state in Model.States)
+                        {   
+                                <option value="@state.StateId">@state.StateName</option>
+                        }
+                        }
+                    </select>
+                    <label for="StateId">State*</label>
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select"  placeholder="Select City Please"
+                        asp-for="CityId" id="City">
+                        <option selected>Select City*</option>
+                        @if(Model?.Cities != null){
+                        @foreach (City city in Model.Cities)
+                        {   
+                                <option value="@city.CityId">@city.CityName</option>
+                        }
+                        }
+                    </select>
+                    <label for="CityId">City*</label>
+                    <span asp-validation-for="CityId" class="text-danger"></span>
+                    </div>
+                </div>
+                
+            </div>
+             <div class="row">
+                <div class="col-12 col-md-4">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" asp-for="ZipCode" placeholder="name@example.com">
+                        <label for="ZipCode">ZipCode*</label>
+                        <span asp-validation-for="ZipCode" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" asp-for="Address" placeholder="name@example.com">
+                        <label for="Address">Address*</label>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" asp-for="Phone" placeholder="name@example.com">
+                        <label for="Phone">Phone*</label>
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-row align-items-center justify-content-start gap-1 mt-1">
+                <button type="submit" class="btn btn-primary text-white">Create User</button>
+                <a asp-controller="Users" asp-action="Users" class="btn btn-outline-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/add-new-user.js"></script>
+}
