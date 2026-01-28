@@ -1,0 +1,93 @@
+@model SliceCloud.Repository.ViewModels.RoleAndPermissionsViewModel
+@{
+    ViewData[index: "Title"] = "Permissions";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/permissions.css" />
+}
+<div class="d-flex flex-column w-100 p-4 permissions-table-wrapper">
+    <div class="d-flex justify-content-between w-100 mb-3 d-sm-row d-column flex-wrap flex-sm-nowrap ">
+        <h1 class="custom-body-text-color">Permissions</h1>
+        <div class="d-flex align-items-center gap-2 d-sm-row d-column flex-wrap flex-sm-nowrap">
+            <a asp-controller="RoleAndPermission" asp-action="RoleAndPermission" class="btn btn-outline-primary">
+                Back
+            </a>
+        </div>
+    </div>
+    <div class="bg-white d-flex flex-column p-4">
+        <div class="form-floating col-6 col-sm-4 custom-focus mb-2">
+            <input type="text" class="form-control" name="roleTitle" id="roleTitle" placeholder="Role Name"
+                value="@Model.RoleName" readonly>
+            <label for="roleTitle">Role</label>
+        </div>
+        <form asp-controller="RoleAndPermission" asp-action="UpdatePermission" method="post">
+            <input type="hidden" asp-for="RoleId">
+            <div class="  permissions-wrapper ">
+                <table class="table p-2 table-responsive">
+                    <tr class="table-header">
+                        <th>
+                            <input class="form-check-input master-checkbox" type="checkbox" id="permissions-checkbox">
+                            Permissions
+                        </th>
+                        <th>Can View</th>
+                        <th>Can Add/Edit</th>
+                        <th>Can Delete</th>
+                    </tr>
+                    <tbody class="table-group-divider">
+                        @for (int i = 0; i < Model.Permissions?.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="hidden" asp-for="@Model.Permissions[i].PermissionId">
+                                        <input class="form-check-input module-checkbox" type="checkbox" value=""
+                                            id="@Model.Permissions[i].PermissionId">
+                                        <label class="form-check-label" for="@Model.Permissions[i].PermissionId">
+                                            @Model.Permissions[i].ModuleName
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input can-view switch-box" type="checkbox" role="switch"
+                                            asp-for="@Model.Permissions[i].CanView" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input can-add-edit switch-box" type="checkbox"
+                                            role="switch" asp-for="@Model.Permissions[i].CanAddEdit" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input can-delete switch-box" type="checkbox" role="switch"
+                                            asp-for="@Model.Permissions[i].CanDelete" />
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if ((ViewBag.UserRole == "Admin" && @Model.RoleName == "Admin")
+                        || (ViewBag.UserRole == "Admin" && @Model.RoleName == "Manager")
+                        || (ViewBag.UserRole == "Admin" && @Model.RoleName == "Chef")
+                        || (ViewBag.UserRole == "Manager" && @Model.RoleName == "Manager")
+                        || (ViewBag.UserRole == "Manager" && @Model.RoleName == "Chef")
+                        )
+            {
+                <div class="d-flex justify-content-end gap-2 mt-3 ">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a asp-controller="RoleAndPermission" asp-action="RoleAndPermission"
+                        class="btn btn-outline-primary">Cancel</a>
+                </div>
+            }
+        </form>
+    </div>
+    <input type="hidden" id="currentUserRole" value="@Model.UserRole" />
+    <input type="hidden" id="targetRole" value="@Model.RoleName" />
+</div>
+@section Scripts {
+    <script src="~/js/permissions.js"></script>
+}
