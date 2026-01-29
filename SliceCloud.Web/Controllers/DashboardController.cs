@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using SliceCloud.Repository.Constants;
+using SliceCloud.Service.Attributes;
+using SliceCloud.Service.Utils;
 
 namespace SliceCloud.Web.Controllers;
 
@@ -10,9 +13,18 @@ public class DashboardController() : Controller
 
     #region Dashboard GET
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     public IActionResult Dashboard()
     {
-        return View();
+        try
+        {
+            return View();
+        }
+        catch (Exception)
+        {
+            TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
+            return View();
+        }
     }
 
     #endregion

@@ -29,7 +29,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         foreach (var user in paginatedUsers)
         {
             user.ProfileImage = string.IsNullOrEmpty(user.ProfileImage)
-                ? "images/uploads/Default_pfp.svg"
+                ? "images/uploads/default_pfp.svg"
                 : "images/uploads/" + user.ProfileImage;
         }
 

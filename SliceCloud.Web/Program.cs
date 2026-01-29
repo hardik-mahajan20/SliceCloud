@@ -21,6 +21,8 @@ builder.Services.AddControllers()
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// To use the context 
+builder.Services.AddHttpContextAccessor();
 DependencyInjection.RegisterServices(builder.Services, connectionString!);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

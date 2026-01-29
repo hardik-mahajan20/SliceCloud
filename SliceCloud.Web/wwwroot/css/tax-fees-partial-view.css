@@ -1,0 +1,63 @@
+.table-header {
+    font-weight: 600;
+    font-size: large;
+    color: #585b5e;
+}
+
+.table td,
+.table th {
+    text-align: start;
+    vertical-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table td:nth-child(6),
+.table th:nth-child(6) {
+    text-align: center;
+    vertical-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table td:nth-child(1),
+.table th:nth-child(1) {
+    width: 20%;
+}
+
+.table td:nth-child(2),
+.table th:nth-child(2) {
+    width: 20%;
+}
+
+.table td:nth-child(3),
+.table th:nth-child(3) {
+    width: 20%;
+}
+
+.table td:nth-child(4),
+.table th:nth-child(4) {
+    width: 20%;
+}
+
+.table td:nth-child(5),
+.table th:nth-child(5) {
+    width: 10%;
+}
+
+.table td:nth-child(6),
+.table th:nth-child(6) {
+    width: 10%;
+}
+
+.truncate-text {
+    text-align: start;
+    display: inline-block;
+    max-width: 190px !important;
+    min-width: 190px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
