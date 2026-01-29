@@ -116,3 +116,17 @@ body {
   min-height: 100%;
   overflow-y: auto;
 }
+
+.sortable-column {
+  text-decoration: none !important;
+  color: black !important;
+  font-weight: bold;
+}
+
+.sortable-column:hover {
+  color: black !important;
+}
+
+#search {
+  background-color: white !important;
+}

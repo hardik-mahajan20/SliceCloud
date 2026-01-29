@@ -1,0 +1,85 @@
+@using SliceCloud.Repository.ViewModels
+@model SliceCloud.Repository.ViewModels.PaginatedList<SliceCloud.Repository.ViewModels.CustomerViewModel>
+
+<div class="bg-white">
+    <div class="customer-wrapper">
+        <table class="table">
+            <tr class="table-header">
+                <th scope="col">
+                    <a href="javascript:void(0);" class="sortable-column" data-column="CustomerName">
+                        Name
+                        <i class="bi bi-arrow-up  sort-arrow" data-order="asc"></i>
+                        <i class="bi bi-arrow-down  sort-arrow" data-order="desc"></i>
+                    </a>
+                </th>
+                <th scope="col">
+                    Email
+                </th>
+                <th scope="col">
+                    Phone Number
+                </th>
+                <th scope="col">
+                    <a href="javascript:void(0);" class="sortable-column" data-column="CreateDate">
+                        Date
+                        <i class="bi bi-arrow-up  sort-arrow" data-order="asc"></i>
+                        <i class="bi bi-arrow-down  sort-arrow" data-order="desc"></i>
+                    </a>
+                </th>
+                <th scope="col">
+                    <a href="javascript:void(0);" class="sortable-column" data-column="TotalOrder">
+                        Total Order
+                        <i class="bi bi-arrow-up  sort-arrow" data-order="asc"></i>
+                        <i class="bi bi-arrow-down  sort-arrow" data-order="desc"></i>
+                    </a>
+                </th>
+            </tr>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center border-bottom-0"> 
+                            <div class="d-flex flex-column">
+                                <i class="bi bi-emoji-frown fs-4"></i><div>No records found</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (CustomerViewModel customer in Model)
+                    {
+                        <tr class="customer-row" data-id="@customer.CustomerId" style="cursor: pointer;">
+                            <td>@customer.CustomerName</td>
+                            <td>@customer.Email</td>
+                            <td>@customer.PhoneNumber</td>
+                            <td>@customer.CreatedDate.ToString("yyyy-MM-dd")</td>
+                            <td>@customer.TotalOrder</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+@if (Model.Count != 0)
+{
+        <div class="pagination-container d-flex flex-wrap flex-md-nowrap">
+            <span>Showing @ViewBag.FromRec - @ViewBag.ToRec of @ViewBag.TotalItems</span>
+            @{
+                int[] pageSizes = { 5, 10, 20 };
+            }
+            <select id="pageSizeDropdown" class="form-select">
+                @foreach (int size in pageSizes)
+                {
+                    <option value="@size" selected="@(ViewBag.PageSize == size ? "selected" : null)">@size</option>
+                }
+        </select>
+        <input type="hidden" id="totalPages" value="@ViewBag.TotalPages" />
+        <button id="prevPageBtn">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <button id="nextPageBtn">
+           <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+    }
+</div>
