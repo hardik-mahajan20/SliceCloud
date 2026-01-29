@@ -1,3 +1,4 @@
+@using SliceCloud.Repository.Constants
 @model SliceCloud.Repository.ViewModels.RoleAndPermissionsViewModel
 @{
     ViewData[index: "Title"] = "Permissions";
@@ -70,11 +71,11 @@
                     </tbody>
                 </table>
             </div>
-            @if ((ViewBag.UserRole == "Admin" && @Model.RoleName == "Admin")
-                        || (ViewBag.UserRole == "Admin" && @Model.RoleName == "Manager")
-                        || (ViewBag.UserRole == "Admin" && @Model.RoleName == "Chef")
-                        || (ViewBag.UserRole == "Manager" && @Model.RoleName == "Manager")
-                        || (ViewBag.UserRole == "Manager" && @Model.RoleName == "Chef")
+            @if ((ViewBag.UserRole == RolesConstants.ADMIN && @Model.RoleName == RolesConstants.ADMIN)
+                        || (ViewBag.UserRole == RolesConstants.ADMIN && @Model.RoleName == RolesConstants.MANAGER)
+                        || (ViewBag.UserRole == RolesConstants.ADMIN && @Model.RoleName == RolesConstants.CHEF)
+                        || (ViewBag.UserRole == RolesConstants.MANAGER && @Model.RoleName == RolesConstants.MANAGER)
+                        || (ViewBag.UserRole == RolesConstants.MANAGER && @Model.RoleName == RolesConstants.CHEF)
                         )
             {
                 <div class="d-flex justify-content-end gap-2 mt-3 ">

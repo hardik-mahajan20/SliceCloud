@@ -6,6 +6,11 @@ public static class PasswordUtils
 {
     #region HashPassword
 
+    /// <summary>
+    /// Converts the password to the hashed password.
+    /// </summary>
+    /// <param name="password">The password which needs to be converted</param>
+    /// <returns>The hashed password.</returns>
     public static string HashPassword(string password)
     {
         return Convert.ToBase64String(

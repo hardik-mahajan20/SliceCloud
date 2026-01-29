@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
+using SliceCloud.Repository.Constants;
 
 namespace SliceCloud.Repository.Implementations;
 
@@ -18,15 +19,16 @@ public class PermissionRepository(SliceCloudContext sliceCloudContext) : IPermis
                .Where(p => p.Role.RoleName == roleName && p.ModuleId == moduleId)
                .AnyAsync(
                    p =>
-                       (permissionName == "CanView" && p.CanView == true)
-                       || (permissionName == "CanAddEdit" && p.CanAddEdit == true)
-                       || (permissionName == "CanDelete" && p.CanDelete == true)
+                       (permissionName == PermissionConstants.CAN_VIEW && p.CanView == true)
+                       || (permissionName == PermissionConstants.CAN_ADD_EDIT && p.CanAddEdit == true)
+                       || (permissionName == PermissionConstants.CAN_DELETE && p.CanDelete == true)
                );
     }
 
     #endregion
 
     #region GetAllPermissionsById
+
     public async Task<List<Permission>> GetAllPermissionsByRoleIdAsync(int roleId)
     {
         return await _sliceCloudContext.Permissions

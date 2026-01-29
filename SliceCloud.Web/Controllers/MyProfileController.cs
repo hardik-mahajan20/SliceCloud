@@ -6,6 +6,9 @@ using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Web.Controllers;
 
+/// <summary>
+/// This controller is referenced for the my-profile module related end points.
+/// </summary>
 public class MyProfileController(ICountryService countryService, IStateService stateService, ICityService cityService, IMyProfileService profileService, IAuthService authenticateUserService) : Controller
 {
 
