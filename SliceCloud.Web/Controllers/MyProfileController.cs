@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Interfaces;
+using SliceCloud.Service.Utils;
 
 namespace SliceCloud.Web.Controllers;
 
@@ -24,7 +25,7 @@ public class MyProfileController(ICountryService countryService, IStateService s
     [HttpGet]
     public async Task<IActionResult> MyProfile()
     {
-        UserCredentialViewModel userCredentialViewModel = GetUserLoginDetails();
+        UserCredentialViewModel userCredentialViewModel = _authenticateUserService.DecodeJwtToken(Request.Cookies["AuthToken"] ?? "");
         if (string.IsNullOrEmpty(userCredentialViewModel.Email))
         {
             return RedirectToAction("Login", "Auth");
@@ -45,20 +46,67 @@ public class MyProfileController(ICountryService countryService, IStateService s
 
     #endregion
 
-    #region Helper Methods
+    #region MyProfile - POST
 
-    private UserCredentialViewModel GetUserLoginDetails()
+    [CustomAuthorize]
+    [HttpPost]
+    public async Task<IActionResult> MyProfile(MyProfileViewModel myProfileViewModel)
     {
-        var token = Request.Cookies["AuthToken"];
-        UserCredentialViewModel userCredentialViewModel = _authenticateUserService.DecodeJwtToken(token ?? "");
-        return userCredentialViewModel;
-    }
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                foreach (var state in ModelState)
+                {
+                    foreach (var error in state.Value.Errors)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Invalid Field: {state.Key}, Error: {error.ErrorMessage}");
+                    }
+                }
 
-    private async Task PopulateDropdowns(int countryId, int stateId)
-    {
-        ViewBag.Countries = await _countryService.GetAllCountriesAsync();
-        ViewBag.States = await _stateService.GetStatesByCountryIdAsync(countryId);
-        ViewBag.Cities = await _cityService.GetCitiesByStateIdAsync(stateId);
+
+                return View(myProfileViewModel);
+            }
+
+
+            UserCredentialViewModel userCredentialViewModel = _authenticateUserService.DecodeJwtToken(Request.Cookies["AuthToken"] ?? "");
+            if (string.IsNullOrEmpty(userCredentialViewModel.Email))
+            {
+                return RedirectToAction("Dashboard", "Dashboard");
+            }
+
+            MyProfileViewModel? user = await _profileService.GetProfileByIdAsync(userCredentialViewModel.Id);
+
+            bool isDuplicateUsername = await _profileService.IsUsernameTakenAsync(myProfileViewModel.UserName, myProfileViewModel.Id);
+            if (isDuplicateUsername)
+            {
+                ModelState.AddModelError("Username", "Username already exists. Please choose a different one.");
+
+                myProfileViewModel.Countries = await _countryService.GetAllCountriesAsync();
+                myProfileViewModel.States = await _stateService.GetStatesByCountryIdAsync(myProfileViewModel.CountryId);
+                myProfileViewModel.Cities = await _cityService.GetCitiesByStateIdAsync(myProfileViewModel.StateId);
+
+                return View(myProfileViewModel);
+            }
+
+            UserCredentialViewModel? loggedInUser = _authenticateUserService.DecodeJwtToken(Request.Cookies["AuthToken"] ?? ""); ;
+
+            MyProfileViewModel? updatedProfile = await _profileService.UpdateProfileAsync(loggedInUser.Id, myProfileViewModel);
+
+            if (updatedProfile is not null)
+            {
+                TempData.SetToast("success", "Profile Updated Successfully!");
+                return RedirectToAction(nameof(MyProfile));
+            }
+
+            TempData.SetToast("error", "Profile update failed!");
+            return RedirectToAction(nameof(MyProfile));
+        }
+        catch (Exception)
+        {
+            TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
+            return RedirectToAction(nameof(MyProfile));
+        }
     }
 
     #endregion

@@ -6,7 +6,7 @@ namespace SliceCloud.Repository.ViewModels;
 
 public class MyProfileViewModel
 {
-    public int? Id { get; set; }
+    public int Id { get; set; }
 
     [Required(ErrorMessage = "First Name is required.")]
     [StringLength(20, ErrorMessage = "First Name cannot exceed 20 characters.")]
@@ -29,8 +29,6 @@ public class MyProfileViewModel
     public required string Address { get; set; }
 
     public string? ProfileImage { get; set; }
-
-    public int? UserId { get; set; }
 
     [Required(ErrorMessage = "Please select a valid country.")]
     [Range(1, int.MaxValue, ErrorMessage = "Please select a country.")]

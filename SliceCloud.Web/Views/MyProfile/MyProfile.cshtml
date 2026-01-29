@@ -66,7 +66,7 @@
                     <form asp-controller="MyProfile" asp-action="MyProfile" class="p-1" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="from" value="@ViewData[index: "From"]" />
-                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="Id" />
                         <div class="row">
                             <div class="col-12 col-md-6 ">
                                 <div class="form-floating mb-3">

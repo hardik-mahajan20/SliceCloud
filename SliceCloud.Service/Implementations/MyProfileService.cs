@@ -37,4 +37,36 @@ public class MyProfileService(IUsersRepository usersRepository) : IMyProfileServ
     }
 
     #endregion
+
+    #region IsUsernameTaken
+
+    public async Task<bool> IsUsernameTakenAsync(string username, int currentUserId)
+    {
+        bool existingUser = await _usersRepository.IsUsernameExistsAsync(username, currentUserId);
+        return existingUser;
+    }
+
+    #endregion
+
+    #region UpdateProfile
+
+    public async Task<MyProfileViewModel?> UpdateProfileAsync(int userId, MyProfileViewModel updateProfileViewModel)
+    {
+        User? user = await _usersRepository.GetUserByIdAsync(userId);
+        if (user == null) return null;
+
+        user.FirstName = updateProfileViewModel.FirstName;
+        user.LastName = updateProfileViewModel.LastName;
+        user.UserName = updateProfileViewModel.UserName;
+        user.PhoneNumber = updateProfileViewModel.PhoneNumber;
+        user.CountryId = updateProfileViewModel.CountryId;
+        user.StateId = updateProfileViewModel.StateId;
+        user.CityId = updateProfileViewModel.CityId;
+        user.Address = updateProfileViewModel.Address;
+        user.ZipCode = updateProfileViewModel.ZipCode;
+        await _usersRepository.UpdateUserAsync(user);
+        return await GetProfileByIdAsync(userId);
+    }
+
+    #endregion
 }
