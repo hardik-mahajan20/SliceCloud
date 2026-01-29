@@ -45,12 +45,17 @@ public class JwtService : IJwtService
         Role? role = await _rolesService.GetRoleByIdAsync(userDetail.RoleId)
         ?? throw new Exception("User role not found while generating JWT token.");
 
+        int? userId = userDetail.UserId;
+        if (userId is null || userId == 0)
+        {
+            throw new Exception("User id not found while generating JWT token.");
+        }
         List<Claim>? claims = new List<Claim>
         {
             new Claim(ClaimTypes.Email, email),
             new Claim(ClaimTypes.Role, role.RoleName),
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()!),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-
         };
 
         if (rememberMe)
@@ -106,7 +111,7 @@ public class JwtService : IJwtService
             return null;
         }
     }
-    
+
     #endregion
 
 }

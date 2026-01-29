@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
@@ -7,6 +8,9 @@ using SliceCloud.Service.Utils;
 
 namespace SliceCloud.Web.Controllers;
 
+/// <summary>
+/// This controller is referenced for the role and permissions module related end points.
+/// </summary>
 public class RoleAndPermissionController(IRolesService rolesService, IPermissionService permissionService) : Controller
 {
     private readonly IRolesService _rolesService = rolesService;
@@ -39,7 +43,7 @@ public class RoleAndPermissionController(IRolesService rolesService, IPermission
 
     #region Permission GET
 
-    [CustomAuthorize("CanView", "Admin", "Manager", "Chef")]
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public async Task<IActionResult> Permission(int id)
     {
@@ -78,7 +82,7 @@ public class RoleAndPermissionController(IRolesService rolesService, IPermission
 
     #region UpdatePermission
 
-    [CustomAuthorize("CanView", "Admin", "Manager", "Chef")]
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
     public IActionResult UpdatePermission(RoleAndPermissionsViewModel roleAndPermissionsViewModel)
     {
@@ -102,6 +106,6 @@ public class RoleAndPermissionController(IRolesService rolesService, IPermission
             return View();
         }
     }
-    
+
     #endregion
 }

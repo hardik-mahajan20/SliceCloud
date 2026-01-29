@@ -50,6 +50,13 @@ public interface IUsersRepository
     Task<User?> GetUserByIdAsync(int userId);
 
     /// <summary>
+    /// Retrieves a user by their email asynchronously.
+    /// </summary>
+    /// <param name="userEmail">The email of the user to retrieve.</param>
+    /// <returns>A task that returns the user if found, otherwise null.</returns>
+    Task<User?> GetUserByEmailAsync(string userEmail);
+
+    /// <summary>
     /// Updates a user's information asynchronously.
     /// </summary>
     /// <param name="user">The user to update.</param>

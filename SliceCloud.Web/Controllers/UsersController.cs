@@ -4,9 +4,13 @@ using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
+using SliceCloud.Repository.Constants;
 
 namespace SliceCloud.Web.Controllers;
 
+/// <summary>
+/// This controller is referenced for the users module related end points.
+/// </summary>
 public class UsersController(IUsersService usersService, ICountryService countryService, IStateService stateService, ICityService cityService, IEmailSenderService emailSenderService, IRolesService rolesService, IAuthService authService) : Controller
 {
     private readonly IUsersService _usersService = usersService;
@@ -41,7 +45,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region AddNewUser
 
-    [CustomAuthorize("CanAddEdit", "Admin", "Manager", "Chef")]
+    [CustomAuthorize(PermissionConstants.CAN_ADD_EDIT, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public async Task<IActionResult> AddNewUser()
     {
@@ -103,7 +107,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region AddNewUser
 
-    [CustomAuthorize("CanAddEdit", "Admin", "Manager", "Chef")]
+    [CustomAuthorize(PermissionConstants.CAN_ADD_EDIT, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
     public async Task<IActionResult> AddNewUser(CreateUserViewModel createUserViewModel, IFormFile? itemImage)
     {
@@ -175,7 +179,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region UpdateUser
 
-    [CustomAuthorize("CanAddEdit", "Admin", "Manager", "Chef")]
+    [CustomAuthorize(PermissionConstants.CAN_ADD_EDIT, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public async Task<IActionResult> UpdateUser(int id)
     {
@@ -217,7 +221,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region UpdateUser
 
-    [CustomAuthorize("CanAddEdit", "Admin", "Manager", "Chef")]
+    [CustomAuthorize(PermissionConstants.CAN_ADD_EDIT, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
     public async Task<IActionResult> UpdateUser(UpdateUserViewModel updateUserViewModel, int id, IFormFile? itemImage)
     {
@@ -289,7 +293,7 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #region DeleteUser
 
-    [CustomAuthorize("CanDelete", "Admin", "Manager", "Chef")]
+    [CustomAuthorize(PermissionConstants.CAN_DELETE, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
     public async Task<IActionResult> DeleteUser(int id)
     {

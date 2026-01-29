@@ -119,6 +119,15 @@ public class UsersRepository(SliceCloudContext sliceCloudContext) : IUsersReposi
 
     #endregion
 
+    #region GetUserByEmailAsync
+
+    public async Task<User?> GetUserByEmailAsync(string userEmail)
+    {
+        return await _sliceCloudContext.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+    }
+
+    #endregion
+
     #region  
 
     public async Task<bool> UpdateUserAsync(User user)

@@ -1,3 +1,5 @@
+using SliceCloud.Repository.Enums;
+
 namespace SliceCloud.Repository.ViewModels;
 
 public class UsersLoginViewModel
@@ -12,10 +14,5 @@ public class UsersLoginViewModel
 
     public string UserName { get; set; } = string.Empty;
 
-    public Status Status { get; set; }
-}
-public enum Status
-{
-    Active = 1,
-    InActive = 2
+    public UserStatus Status { get; set; }
 }
