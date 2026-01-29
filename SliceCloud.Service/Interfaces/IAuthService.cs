@@ -1,4 +1,5 @@
 using SliceCloud.Repository.Models;
+using SliceCloud.Repository.ViewModels;
 
 namespace SliceCloud.Service.Interfaces;
 
@@ -40,4 +41,11 @@ public interface IAuthService
     /// <param name="newPassword">The new password to set.</param>
     /// <returns>A task that returns true if the password was updated successfully, otherwise false.</returns>
     Task<bool> UpdateUserPasswordAsync(string token, string newPassword);
+
+    /// <summary>
+    /// Decodes a JWT token and retrieves the login view model.
+    /// </summary>
+    /// <param name="token">The JWT token to decode.</param>
+    /// <returns>The decoded credential view model.</returns>
+    UserCredentialViewModel DecodeJwtToken(string token);
 }

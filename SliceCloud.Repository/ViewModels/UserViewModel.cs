@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using SliceCloud.Repository.Enums;
 
 namespace SliceCloud.Repository.ViewModels;
 
@@ -42,16 +43,5 @@ public class UserViewModel
     [StringLength(15, ErrorMessage = "Phone number cannot exceed 15 digits.")]
     public string PhoneNumber { get; set; } = string.Empty;
 
-    public Roles Roles { get; set; }
-}
-public enum UserStatus
-{
-    Active = 1,
-    InActive = 0,
-}
-public enum Roles
-{
-    Admin = 1,
-    Manager = 2,
-    Chef = 3
+    public UserRoles Roles { get; set; }
 }

@@ -7,6 +7,9 @@ using SliceCloud.Service.Utils;
 
 namespace SliceCloud.Web.Controllers;
 
+/// <summary>
+/// This controller is referenced for the authentication related end points.
+/// </summary>
 public class AuthController(IAuthService authService, IJwtService jwtService, IEmailSenderService emailSenderService) : Controller
 {
     private readonly IAuthService _authService = authService;
@@ -242,7 +245,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
                 return View(model);
             }
 
-             TempData.SetToast("success", "Your password has been successfully reset. Please log in with your new password.");
+            TempData.SetToast("success", "Your password has been successfully reset. Please log in with your new password.");
             return RedirectToAction("Login", "Auth");
         }
         catch (Exception)

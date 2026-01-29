@@ -1,13 +1,20 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
+using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
 
 namespace SliceCloud.Service.Implementations;
 
-public class AuthService(IUsersLoginRepository usersLoginRepository) : IAuthService
+public class AuthService(IUsersLoginRepository usersLoginRepository, IConfiguration configuration) : IAuthService
 {
     private readonly IUsersLoginRepository _usersLoginRepository = usersLoginRepository;
+    private readonly IConfiguration _configuration = configuration;
 
     #region AuthenticateUser
 
@@ -96,6 +103,46 @@ public class AuthService(IUsersLoginRepository usersLoginRepository) : IAuthServ
 
         return true;
     }
+
+    public UserCredentialViewModel DecodeJwtToken(string token)
+    {
+        JwtSecurityTokenHandler? handler = new();
+        byte[]? key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
+
+        TokenValidationParameters validations = new()
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = false
+        };
+
+        try
+        {
+            ClaimsPrincipal principal = handler.ValidateToken(token, validations, out _);
+
+            string? userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string? emailClaim = principal.FindFirst(ClaimTypes.Email)?.Value;
+
+            _ = int.TryParse(userIdClaim, out int userId);
+
+            return new UserCredentialViewModel
+            {
+                Id = userId,
+                Email = emailClaim ?? string.Empty
+            };
+        }
+        catch
+        {
+            return new UserCredentialViewModel
+            {
+                Id = 0,
+                Email = string.Empty
+            };
+        }
+    }
+
 
     #endregion
 }
