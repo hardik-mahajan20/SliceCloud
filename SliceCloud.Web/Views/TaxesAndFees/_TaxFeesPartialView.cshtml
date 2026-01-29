@@ -1,0 +1,115 @@
+@using SliceCloud.Repository.ViewModels
+@model List<SliceCloud.Repository.ViewModels.TaxesFeesViewModel>
+
+<div class="table-responsive shadow-sm p-3 bg-white rounded shadow">
+    <div class="table-wrapper border-0">
+        <table class="table">
+                <tr class="table-header">
+                    <th class="align-middle">
+                        Name
+                    </th>
+                    <th class="align-middle">Type</th>
+                    <th class="align-middle">IsEnabled</th>
+                    <th class="align-middle">Default</th>
+                    <th class="align-middle">IsInclusive</th>
+                    <th class="align-middle">Tax Value </th>
+                    <th  class="align-middle">Action</th>
+                </tr>
+            <tbody>
+                 @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="text-center border-bottom-0">
+                             <div class="d-flex flex-column">
+                                <i class="bi bi-emoji-frown fs-4"></i>
+                                <div>No records found</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else{
+                @foreach (TaxesFeesViewModel tax in Model)
+                {
+                    <tr>
+                        <td>@tax.TaxName</td>
+                        <td>@tax.TaxType</td>
+                        <td>
+                            <div class="form-check form-switch is-enabled-toggle ">
+                                <input class="form-check-input form-check-input-quick toggle-switch" type="checkbox"   role="switch" name="IsEnabled_@tax.TaxId"
+                                    id="IsEnabled_@tax.TaxId" value="true" data-id="@tax.TaxId" data-type="IsEnabled"
+                                    @(tax.IsEnabled ? "checked" : "")   style="width: 60px; height: 30px;  opacity: 1;" >
+                            </div>
+                        </td>
+                       
+                        <td>
+                            <div class="form-check form-switch is-default-toggle">
+                                <input class="form-check-input form-check-input-quick" type="checkbox"  role="switch" name="IsDefault_@tax.TaxId"
+                                    id="IsDefault_@tax.TaxId" value="true" data-id="@tax.TaxId" data-type="IsDefault"
+                                    @(tax.IsDefault ? "checked" : "") style="width: 60px; height: 30px;  opacity: 1;" >
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <div class="form-check form-switch is-inclusive-toggle">
+                                <input class="form-check-input form-check-input-quick" type="checkbox"  role="switch" name="IsInclusive_@tax.TaxId"
+                                    id="IsInclusive_@tax.TaxId" value="true" data-id="@tax.TaxId" data-type="IsInclusive"
+                                    @(tax.IsInclusive ? "checked" : "") style="width: 60px; height: 30px;  opacity: 1;" >
+                            </div>
+                        </td>
+
+                        <td>
+                            @if (tax.TaxType == "Percentage")
+                            {
+                                @(value: $"{tax.TaxValue}.00%")
+                            }
+                            else if (tax.TaxType == "Flat Amount")
+                            {
+                                @(value: $"₹{tax.TaxValue}.00")
+                            }
+                            else
+                            {
+                                @tax.TaxValue
+                            }
+                        </td>
+                        <td class="text-start">
+                             
+                            <div class="d-flex justify-content-center align-items-center">
+                                <button class="text-black text-reset edit-tax btn cursor-pointer" data-id="@tax.TaxId">
+                                  <i class="bi bi-pen fs-5"></i>
+                                </button>
+                                <button class="text-black text-reset delete-tax btn cursor-pointer" data-id="@tax.TaxId">
+                                   <i class="bi bi-trash fs-5"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                }
+            </tbody>
+
+        </table>
+    </div>
+@if (Model.Count != 0){
+    <div class="pagination-container d-flex flex-wrap flex-md-nowrap ">
+        <span>Showing @ViewBag.FromRec - @ViewBag.ToRec of @ViewBag.TotalItems</span>
+        @{
+            int[] pageSizes = { 5, 10, 20 };
+        }
+
+        <select id="pageSizeDropdown" class="form-select">
+            @foreach (var size in pageSizes)
+            {
+                <option value="@size" selected="@(ViewBag.PageSize == size ? "selected" : null)">@size</option>
+            }
+        </select>
+
+        <input type="hidden" id="totalPages" value="@ViewBag.TotalPages" />
+        <button id="prevPageBtn">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <button id="nextPageBtn">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+    }
+</div>

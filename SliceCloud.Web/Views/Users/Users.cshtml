@@ -25,13 +25,8 @@
         @await Html.PartialAsync(partialViewName: "_UserTablePartialView", Model)
     </div>
 </div>
-@await Html.PartialAsync(
-partialViewName: "_ConfirmDeleteModal",
-viewData: new ViewDataDictionary(ViewData)
-{
-    [index: "DeleteMessage"] = "Are you sure you want to delete this user?"
-}
-)
+@await Html.PartialAsync(partialViewName: "_ConfirmDeleteModal",viewData: new ViewDataDictionary(ViewData){ [index:
+"DeleteMessage"] = "Are you sure you want to delete this user?"})
 
 @section Scripts {
     <script src="~/js/users-table.js"></script>
