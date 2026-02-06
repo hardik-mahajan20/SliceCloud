@@ -1,3 +1,6 @@
+using ClosedXML.Excel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -56,6 +59,217 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
                 TotalAmount = o.TotalAmount
             }).ToList()
         };
+    }
+
+    #endregion
+
+    #region  GetFilteredOrders
+
+    public async Task<IEnumerable<Customer>> GetFilteredOrders(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
+    {
+        IQueryable<Customer>? query = _customerRepository.GetAllCustomersQueryable();
+
+        DateTime? startUtc = startDate?.ToUniversalTime();
+        DateTime? endUtc = endDate?.ToUniversalTime();
+
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            query = query.Where(o =>
+                EF.Functions.ILike(o.CustomerName, $"%{searchText}%") ||
+                EF.Functions.ILike(o.Email!, $"%{searchText}%") ||
+                EF.Functions.ILike(o.CustomerId.ToString(), $"%{searchText}%"));
+        }
+
+        if (startUtc.HasValue)
+        {
+            query = query.Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value >= startUtc.Value);
+        }
+
+        if (endUtc.HasValue)
+        {
+            DateTime endOfDay = endUtc.Value.Date.AddDays(1).AddTicks(-1); // End of day as max ticks on that date
+            query = query.Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value <= endOfDay);
+        }
+
+        switch (sortColumn)
+        {
+            case "CustomerName":
+                query = sortOrder == "asc" ? query.OrderBy(o => o.CustomerName) : query.OrderByDescending(o => o.CustomerName);
+                break;
+            case "OrderDate":
+                query = sortOrder == "asc" ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
+                break;
+            case "TotalAmount":
+                query = sortOrder == "asc" ? query.OrderBy(o => o.TotalOrder) : query.OrderByDescending(o => o.TotalOrder);
+                break;
+            default:
+                query = sortOrder == "asc" ? query.OrderBy(o => o.CustomerId) : query.OrderByDescending(o => o.CustomerId);
+                break;
+        }
+
+        Task<List<Customer>>? customers = query.ToListAsync();
+
+        return await customers;
+    }
+
+    #endregion
+
+    #region ExportCustomersToExcel
+
+    public async Task<FileResult> ExportCustomersToExcel(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath)
+    {
+        IEnumerable<Customer>? customers = await GetFilteredOrders(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
+
+        using var workbook = new XLWorkbook();
+        IXLWorksheet? worksheet = workbook.Worksheets.Add("Customers");
+
+        string imagePath = Path.Combine(webRootPath, "images/logo.png");
+
+        if (System.IO.File.Exists(imagePath))
+        {
+            IXLRange? mergedRange = worksheet.Range("O2:P6").Merge();
+            mergedRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            mergedRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+            double mergedWidth = worksheet.Columns("O:P").Sum(c => c.Width) * 7;
+            double mergedHeight = worksheet.Rows(2, 6).Sum(r => r.Height);
+
+            ClosedXML.Excel.Drawings.IXLPicture? picture = worksheet.AddPicture(imagePath)
+                .MoveTo(worksheet.Cell("O2"))
+                .WithSize((int)mergedWidth, (int)mergedHeight);
+        }
+
+        IXLRange? statusRange = worksheet.Range("A2:B3");
+        statusRange.Merge().Value = "Account:";
+        statusRange.Style.Font.Bold = true;
+        statusRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#0066A7");
+        statusRange.Style.Font.FontColor = XLColor.White;
+        statusRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        statusRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        statusRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        string statusTextOrder = orderStatus switch
+        {
+            0 => "Account Manager",
+            1 => "Chef",
+            _ => "Admin"
+        };
+
+        IXLRange allStatusRange = worksheet.Range("C2:F3");
+        allStatusRange.Merge().Value = statusTextOrder;
+        allStatusRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        allStatusRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        allStatusRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        IXLRange searchLabelRange = worksheet.Range("H2:I3");
+        searchLabelRange.Merge().Value = "Search Text:";
+        searchLabelRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#0066A7");
+        searchLabelRange.Style.Font.FontColor = XLColor.White;
+        searchLabelRange.Style.Font.Bold = true;
+        searchLabelRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        searchLabelRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        searchLabelRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        IXLRange searchValueRange = worksheet.Range("J2:M3");
+        searchValueRange.Merge().Value = string.IsNullOrEmpty(searchText) ? "" : searchText;
+        searchValueRange.Style.Fill.BackgroundColor = XLColor.White;
+        searchValueRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        searchValueRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        searchValueRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        IXLRange dateLabelRange = worksheet.Range("A5:B6");
+        dateLabelRange.Merge().Value = "Date:";
+        dateLabelRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#0066A7");
+        dateLabelRange.Style.Font.FontColor = XLColor.White;
+        dateLabelRange.Style.Font.Bold = true;
+        dateLabelRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        dateLabelRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        dateLabelRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        IXLRange dateValueRange = worksheet.Range("C5:F6");
+        string dateValueText;
+        if (startDate.HasValue && endDate.HasValue)
+            dateValueText = $"{startDate.Value:dd-MM-yyyy} to {endDate.Value:dd-MM-yyyy}";
+        else if (startDate.HasValue)
+            dateValueText = startDate.Value.ToString("dd-MM-yyyy");
+        else if (endDate.HasValue)
+            dateValueText = endDate.Value.ToString("dd-MM-yyyy");
+        else
+            dateValueText = "All Time";
+        dateValueRange.Merge().Value = dateValueText;
+        dateValueRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        dateValueRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        dateValueRange.Style.Fill.BackgroundColor = XLColor.White;
+        dateValueRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        IXLRange recordsLabelRange = worksheet.Range("H5:I6");
+        recordsLabelRange.Merge().Value = "No. Of Records:";
+        recordsLabelRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#0066A7");
+        recordsLabelRange.Style.Font.FontColor = XLColor.White;
+        recordsLabelRange.Style.Font.Bold = true;
+        recordsLabelRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        recordsLabelRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        recordsLabelRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        IXLRange recordsValueRange = worksheet.Range("J5:M6");
+        recordsValueRange.Merge().Value = customers.Count();
+        recordsValueRange.Style.Fill.BackgroundColor = XLColor.White;
+        recordsValueRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        recordsValueRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        recordsValueRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        IXLRange summaryRange = worksheet.Range("A2:M6");
+        summaryRange.Style.Font.Bold = true;
+        summaryRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        summaryRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        summaryRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        worksheet.Range("A9:A9").Merge().Value = "Customer ID";
+        worksheet.Range("B9:D9").Merge().Value = "Customer Name";
+        worksheet.Range("E9:H9").Merge().Value = "Email";
+        worksheet.Range("I9:K9").Merge().Value = "Date";
+        worksheet.Range("L9:N9").Merge().Value = "Mobile Number";
+        worksheet.Range("O9:P9").Merge().Value = "Total Order";
+
+        IXLRange headerRange = worksheet.Range("A9:P9");
+        headerRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#0066A7");
+        headerRange.Style.Font.FontColor = XLColor.White;
+        headerRange.Style.Font.Bold = true;
+        headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        headerRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+        int row = 10;
+        foreach (Customer customer in customers)
+        {
+            worksheet.Cell(row, 1).Value = customer.CustomerId;
+            worksheet.Range(row, 2, row, 4).Merge().Value = customer.CustomerName;
+            worksheet.Range(row, 5, row, 8).Merge().Value = customer.Email;
+            worksheet.Range(row, 9, row, 11).Merge().Value = customer.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss") ?? "";
+            worksheet.Range(row, 12, row, 14).Merge().Value = customer.PhoneNo;
+            worksheet.Range(row, 15, row, 16).Merge().Value = customer.TotalOrder;
+            row++;
+        }
+
+        IXLRange dataRange = worksheet.Range("A9:P" + (row - 1));
+        dataRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+        dataRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+        dataRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+        worksheet.Columns().AdjustToContents();
+        worksheet.Column(1).Width = 15;
+
+        worksheet.Cells().Style.IncludeQuotePrefix = true;
+
+        using (MemoryStream stream = new MemoryStream())
+        {
+            workbook.SaveAs(stream);
+            byte[]? fileBytes = stream.ToArray();
+            return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = $"Orders_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.xlsx"
+            };
+
+        }
     }
     #endregion
 }

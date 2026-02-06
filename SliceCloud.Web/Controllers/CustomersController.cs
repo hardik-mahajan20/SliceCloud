@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SliceCloud.Repository.Constants;
+using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Interfaces;
@@ -141,6 +142,44 @@ public class CustomersController(ICustomerService customerService, IWebHostEnvir
         {
             TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
             return Json(new { success = false });
+        }
+    }
+
+    #endregion
+
+    #region ExportCustomers
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    public async Task<IActionResult> ExportCustomers(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
+    {
+
+        try
+        {
+            IEnumerable<Customer> customers = await _customerService.GetFilteredOrders(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
+
+            if (customers == null || !customers.Any())
+            {
+                Response.ContentType = "application/json";
+                Response.StatusCode = 200;
+                return Json(new { success = false, message = "No records found to download" });
+            }
+
+            FileResult fileResult = await _customerService.ExportCustomersToExcel(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder, _webHostEnvironment.WebRootPath);
+
+            if (fileResult == null)
+            {
+                Response.ContentType = "application/json";
+                Response.StatusCode = 200;
+                return Json(new { success = false, message = "File generation failed." });
+            }
+
+            return fileResult;
+        }
+        catch (Exception ex)
+        {
+            Response.ContentType = "application/json";
+            Response.StatusCode = 200;
+            return Json(new { success = false, message = "An error occurred while processing your request: " + ex.Message });
         }
     }
 

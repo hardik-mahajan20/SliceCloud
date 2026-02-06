@@ -53,4 +53,10 @@ public interface ICustomerRepository
     /// <param name="customer">The customer object with updated information.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task<bool> UpdateCustomerAsync(Customer customer);
+
+    /// <summary>
+    /// Retrieves a all customer list as queryable.
+    /// </summary>
+    /// <returns>All the customers list as queryable.</returns>
+    IQueryable<Customer> GetAllCustomersQueryable();
 }

@@ -117,4 +117,13 @@ public class CustomerRepository(SliceCloudContext sliceCloudContext) : ICustomer
     }
 
     #endregion
+
+    #region GetAllCustomersQueryable
+
+    public IQueryable<Customer> GetAllCustomersQueryable()
+    {
+        return _sliceCloudContext.Customers.AsQueryable();
+    }
+
+    #endregion
 }
