@@ -2,6 +2,154 @@
     ViewData[index: "Title"] = "Customers";
 }
 
-<div class="d-flex align-items-center justify-content-center">
-    <h1 class="custom-body-text-color">Customers</h1>
+@section Styles {
+    <link rel="stylesheet" href="~/css/customers.css" />
+    <link rel="stylesheet" href="~/css/customers-table-partial.css" />
+}
+<div class="container-fluid p-4">
+    <div class="d-flex flex-column flex-xl-row align-item-center justify-content-between mb-3">
+        <h1 class="custom-body-text-color d-flex align-items-start mb-2">Customers</h1>
+        <div class="col-12 col-xl-9">
+            <div class="d-flex flex-column flex-sm-row align-item-center justify-content-end gap-1 ">
+                <div class="d-flex align-items-center border rounded px-2 bg-white custom-input-size mb-1">
+                    <input class="form-control border-0 shadow-none p-0" type="text" placeholder="Search" id="search"
+                        style="width: 100%; font-size: 14px; height: 100%;">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div class="form-floating custom-input-size mb-1">
+                    <select id="timeFilter" class="form-select  ">
+                        <option value="all">All Time</option>
+                        <option value="currentDate">Today</option>
+                        <option value="7">Last 7 Days</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="month">Current Month</option>
+                        <option value="custom">Custom Date</option>
+                        <option value="year">This Year</option>
+                    </select>
+                    <label for="timeFilter">Time</label>
+                </div>
+                <div class="d-flex  justify-content-end gap-2 mb-5 d-none">
+                    <div class="d-flex flex-column flex-md-row gap-3">
+                        <div class="form-floating custom-input-size col-12 col-md-6">
+                            <input type="date" id="startDate" class="form-control" placeholder="Start Date">
+                            <label for="startDate">Start Date</label>
+                        </div>
+                        <div class="form-floating custom-input-size col-12 col-md-6">
+                            <input type="date" id="endDate" class="form-control" placeholder="End Date">
+                            <label for="endDate">End Date</label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100px;">Search</button>
+                    <a class="btn btn-outline-primary d-flex align-items-center justify-content-center p-0"
+                        style="width: 100px;" id="clear">Clear</a>
+                </div>
+                <div class="mb-1">
+                    <button
+                        class="btn btn-primary text-white d-flex align-items-center justify-content-center custom-input-size "
+                        style="width: 100px;" id="exportBtn">
+                        <div class="d-flex align-items-center justify-content-center p-1 gap-1 "><i
+                                class="bi bi-file-earmark-arrow-up"></i>
+                            Export
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="customerTableContainer">
+
+    </div>
 </div>
+
+<div class="modal fade customer-history-modal" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg " id="customDateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customDateModalLabel">Select Date Range</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex flex-column flex-md-row  gap-1">
+                    <div class="form-floating custom-input-size">
+                        <input type="date" id="customStartDate" class="form-control" placeholder="Start Date">
+                        <label for="customStartDate">Start Date</label>
+                    </div>
+                    <div class="form-floating custom-input-size">
+                        <input type="date" id="customEndDate" class="form-control" placeholder="End Date">
+                        <label for="customEndDate">End Date</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="applyCustomDate" class="btn btn-primary text-white">Submit</button>
+                <button type="button" class="btn btn-outline-primary " data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="customerHistoryModal" tabindex="-1" aria-labelledby="customerHistoryModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerHistoryModalLabel">Customer History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid p-0">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="info-field">
+                                <span class="info-label">Name</span>
+                                <div class="info-value" id="customerName"></div>
+                            </div>
+                            <div class="info-field">
+                                <span class="info-label">Mobile Number</span>
+                                <div class="info-value" id="customerPhone"></div>
+                            </div>
+                            <div class="info-field">
+                                <span class="info-label">Max Order</span>
+                                <div class="info-value" id="customerMaxOrder"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-field">
+                                <span class="info-label">Average Bill</span>
+                                <div class="info-value" id="customerAvgBill"></div>
+                            </div>
+                            <div class="info-field">
+                                <span class="info-label">Coming Since</span>
+                                <div class="info-value" id="customerComingSince"></div>
+                            </div>
+                            <div class="info-field">
+                                <span class="info-label">Visits</span>
+                                <div class="info-value" id="customerVisits"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="customer-history-table">
+                        <table class="order-table">
+                            <thead>
+                                <tr>
+                                    <th>Order Date</th>
+                                    <th>Order Type</th>
+                                    <th>Payment</th>
+                                    <th>Items</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/customers.js"></script>
+}
