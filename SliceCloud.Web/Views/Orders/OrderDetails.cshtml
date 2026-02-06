@@ -1,0 +1,148 @@
+@using SliceCloud.Repository.Enums
+@using SliceCloud.Repository.ViewModels
+@model SliceCloud.Repository.ViewModels.OrderInvoiceViewModel
+@{
+    ViewData["Title"] = "Order Details";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/order-details.css" />
+}
+<div class="d-flex flex-column w-100 p-4">
+    <div class="d-flex justify-content-between w-100 mb-3">
+        <h1 class="custom-body-text-color">Order-Details</h1>
+        <div class="d-flex align-items-center gap-2"></div>
+        <div>
+            <a asp-controller="Orders" asp-action="Orders" class="btn btn-outline-primary " id="back">
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="p-3 shadow-sm bg-white rounded order-detail-wrapper shadow">
+        <div class="card p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4 class="fw-bold">Order Summary
+                    @{
+                        var orderStatus = Enum.Parse<OrderStatus>(Model.OrderStatus ?? "");
+                        string badgeClass = orderStatus switch
+                        {
+                            OrderStatus.Pending => "bg-warning text-dark",
+                            OrderStatus.InProgress => "bg-primary text-white",
+                            OrderStatus.Served => "bg-success text-white",
+                            OrderStatus.Completed => "bg-secondary text-white",
+                            OrderStatus.Cancelled => "bg-danger text-white",
+                            OrderStatus.OnHold => "bg-dark text-white",
+                            OrderStatus.Failed => "bg-danger text-white",
+                            _ => "bg-info text-white"
+                        };
+                    }
+                    <span class="badge @badgeClass">@orderStatus</span>
+                </h4>
+                <button
+                    class="btn custom-navbar-bg-color text-white d-flex align-items-center justify-content-center custom-input-size"
+                    style="width: 100px;" id="downloadInvoice" data-orderid="@Model.OrderId">
+                    <div class="d-flex align-items-center justify-content-center p-1 gap-1">
+                        <i class="bi bi-cloud-upload"></i>
+                    </div>
+                </button>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <p><strong>Invoice No. :</strong> @Model.InvoiceNumber</p>
+                    <div class="d-flex flex-column flex-sm-row gap-3">
+                        <div><strong>Paid on :</strong> @Model.PaidOn?.ToString("dd-MM-yyyy HH:mm")</div>
+                        <div><strong>Placed on :</strong> @Model.OrderDate.ToString("dd-MM-yyyy HH:mm")</div>
+                        <div><strong>Modified on :</strong> @Model.ModifiedOn?.ToString("dd-MM-yyyy HH:mm")</div>
+                        <div><strong>Order Duration :</strong> @Model.OrderDuration</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 col-md-6 mb-4 mb-md-0">
+                <div class="card p-3 shadow-sm gap-1">
+                    <h5 class="fw-bold"><i class="bi bi-person-lines-fill"></i> Customer Details</h5>
+                    <div>Name: @Model.CustomerName</div>
+                    <div>Phone: @Model.CustomerPhone</div>
+                    <div>No of Person: @Model.NoOfPersons</div>
+                    <div>Email: @Model.CustomerEmail</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="card p-3 shadow-sm h-100 gap-1">
+                    <h5 class="fw-bold"><i class="bi bi-ticket-perforated"></i> Table
+                        Details</h5>
+                    <div>Sections: @(Model.Sections != null && Model.Sections.Any() ? string.Join(", ", Model.Sections)
+                                                : "N/A")</div>
+                    <div>Tables: @(Model.Tables != null && Model.Tables.Any() ? string.Join(", ", Model.Tables) : "N/A")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4 p-3 shadow-sm">
+            <h5 class="fw-bold">Order Items</h5>
+            <div class="order-summary-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sr.No</th>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Items.Count; i++)
+                        {
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td>
+                                    @Model.Items[i].ItemName
+                                    @if (Model.Items[i].Modifiers.Any())
+                                    {
+                                        <ul class="p-0 m-0">
+                                            @foreach (var modifier in Model.Items[i].Modifiers)
+                                            {
+                                                <li class="text-muted">@modifier.ModifierName</li>
+                                            }
+                                        </ul>
+                                    }
+                                </td>
+                                <td>@Model.Items[i].Quantity</td>
+                                <td class="text-end">₹@Model.Items[i].UnitPrice.ToString("0.00")</td>
+                                <td class="text-end">₹@Model.Items[i].Total.ToString("0.00")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3"></td>
+                            <td class="text-end">Subtotal:</td>
+                            <td class="text-end">₹@Model.SubTotal.ToString("0.00")</td>
+                        </tr>
+                        @foreach (var tax in Model.TaxBreakdown)
+                        {
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="text-end">@tax.TaxName:</td>
+                                <td class="text-end">₹@tax.TaxValue.ToString("0.00")</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td colspan="3"></td>
+                            <td class="text-end fs-5 ">Total:</td>
+                            <td class="text-end fs-5 ">₹@Model.TotalAmountDue.ToString("0.00")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/order-details.js"></script>
+}
