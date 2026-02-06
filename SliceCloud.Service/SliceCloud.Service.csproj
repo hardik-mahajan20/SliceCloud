@@ -3,6 +3,7 @@
     <ProjectReference Include="..\SliceCloud.Repository\SliceCloud.Repository.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
   </ItemGroup>
   <PropertyGroup>
