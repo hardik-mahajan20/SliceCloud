@@ -112,13 +112,13 @@ public class OrdersController(IOrderService orderService, IWebHostEnvironment ho
 
     public Task<IActionResult> ExportOrders(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
     {
-        List<Repository.Models.Order>? orders = _orderService.GetFilteredCustomersAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
+        List<Order>? orders = _orderService.GetFilteredCustomersAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
         using (XLWorkbook? workbook = new XLWorkbook())
         {
             IXLWorksheet? worksheet = workbook.Worksheets.Add("Orders");
 
             string? webRootPath = _hostingEnvironment.WebRootPath;
-            string? imagePath = Path.Combine(webRootPath, "images/logos/logo.png");
+            string? imagePath = Path.Combine(webRootPath, "images/logo.png");
 
             if (System.IO.File.Exists(imagePath))
             {
