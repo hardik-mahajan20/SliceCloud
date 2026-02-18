@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
