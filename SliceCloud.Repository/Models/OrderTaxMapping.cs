@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SliceCloud.Repository.Models;
+﻿namespace SliceCloud.Repository.Models;
 
 public partial class OrderTaxMapping
 {
