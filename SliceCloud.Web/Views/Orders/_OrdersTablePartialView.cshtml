@@ -1,0 +1,124 @@
+@model SliceCloud.Repository.ViewModels.PaginatedList<SliceCloud.Repository.ViewModels.OrderViewModel>
+
+<div class="table-responsive bg-white ">
+    <div class=" orders-wrapper  ">
+        <table class="table">
+            <tr class="table-header">
+                <th scope="col">
+                    <a href="javascript:void(0);" class="sortable-column" data-column="OrderId">
+                        OrderId <i class="bi bi-arrow-up"></i><i class="bi bi-arrow-down"></i>
+                    </a>
+                </th>
+                <th scope="col">
+                    <a href="javascript:void(0);" class="sortable-column" data-column="OrderDate">
+                        Date <i class="bi bi-arrow-up"></i><i class="bi bi-arrow-down"></i>
+                    </a>
+                </th>
+                <th>
+                    <a href="javascript:void(0);" class="sortable-column" data-column="CustomerName">
+                        Customer Name <i class="bi bi-arrow-up"></i><i class="bi bi-arrow-down"></i>
+                    </a>
+                </th>
+                <th>Status</th>
+                <th>Payment Mode</th>
+                <th>Rating</th>
+                <th scope="col">
+                    <a href="javascript:void(0);" class="sortable-column" data-column="TotalAmount">
+                        Total Amount <i class="bi bi-arrow-up"></i><i class="bi bi-arrow-down"></i>
+                    </a>
+                </th>
+                <th>Actions</th>
+            </tr>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="text-center border-bottom-0">
+                            <div class="d-flex flex-column">
+                                <i class="bi bi-emoji-frown fs-4"></i>
+                                <div>No records found</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (SliceCloud.Repository.ViewModels.OrderViewModel order in Model)
+                    {
+                        <tr>
+                            <td>@order.OrderId</td>
+                            <td>@order.OrderDate.ToString(format: "yyyy-MM-dd")</td>
+                            <td>@order.CustomerName</td>
+                            <td>
+                                @order.Status
+                            </td>
+                            <td>@order.PaymentMode</td>
+                            <td>
+                                <div class="rating-stars">
+                                    @{
+                                        double ratingValue = (double?)(order.Rating) ?? 0.0;
+                                        int roundedRating = (int)Math.Round(ratingValue);
+                                    }
+
+                                    @for (var i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= roundedRating)
+                                        {
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star text-muted"></i>
+                                        }
+                                    }
+                                    <span>(@ratingValue.ToString("0.0"))</span>
+                                </div>
+                            </td>
+                            <td>@order.TotalAmount.ToString(format: "C")</td>
+                            <td class="action-icons">
+                                <div class="">
+                                    <a id="downloadInvoice" data-orderid="@order.OrderId" class="btn p-0 "
+                                        style=" color: inherit;">
+                                        <i class="bi bi-filetype-pdf"></i>
+                                    </a>
+                                    <a class="btn view-order view-details p-0 " asp-controller="Orders"
+                                        asp-action="OrderDetails" asp-route-orderId="@order.OrderId" style="color: inherit;">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.Count != 0)
+    {
+        <div class="pagination-container d-flex flex-wrap flex-md-nowrap">
+            <span>Showing @Model.FromRec - @Model.ToRec of @Model.TotalItems</span>
+            @{
+                int[] pageSizes = { 5, 10, 20 };
+            }
+
+            <select id="pageSizeDropdown" class="form-select">
+                @foreach (var size in pageSizes)
+                {
+                    <option value="@size" selected="@(Model.PageSize == size ? "selected" : null)">@size</option>
+                }
+            </select>
+
+            <input type="hidden" id="totalPages" value="@Model.TotalPages" />
+            <input type="hidden" id="totalRecords" value="@Model.TotalItems" />
+            <input type="hidden" id="currentPage" value="@Model.PageIndex" />
+            <input type="hidden" id="pageSize" value="@Model.PageSize" />
+
+            <button id="prevPageBtn">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button id="nextPageBtn">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    }
+</div>

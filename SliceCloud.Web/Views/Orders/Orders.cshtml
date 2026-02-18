@@ -1,7 +1,84 @@
 @{
     ViewData[index: "Title"] = "Orders";
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/orders.css" />
+    <link rel="stylesheet" href="~/css/orders-table.css" />
+}
+<div class="container-fluid p-4">
+    <div
+        class="d-flex flex-column flex-xl-row align-item-center justify-content-between gap-3 gap-sm-2 gap-xl-5 mb-2 mb-sm-1">
+        <h1 class="custom-body-text-color d-flex align-items-start mb-2">Orders</h1>
+        <div class="col-12 col-xl-9 ">
+            <div class="d-flex flex-column flex-sm-row align-item-center justify-content-end gap-1 flex-wrap  ">
+                <div class="d-flex align-items-center border rounded px-2 bg-white custom-input-size mb-1">
+                    <input class="form-control border-0 shadow-none p-0 " type="text" placeholder="Search" id="search"
+                        style="font-size: 14px; height: 100%;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-search"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                    </svg>
+                </div>
+                <div class="form-floating custom-input-size mb-1">
+                    <select id="statusFilter" class="form-select ">
+                        <option value="" selected>All Status</option>
+                        <option value="0">Pending</option>
+                        <option value="1">InProgress</option>
+                        <option value="2">Served</option>
+                        <option value="3">Completed</option>
+                        <option value="4">Cancelled</option>
+                        <option value="5">On Hold</option>
+                        <option value="6">Failed</option>
+                    </select>
+                    <label for="statusFilter">Status</label>
+                </div>
+                <div class="form-floating custom-input-size mb-1">
+                    <select id="timeFilter" class="form-select h-100">
+                        <option value="all">All Time</option>
+                        <option value="7">Last 7 Days</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="month">Current Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                    <label for="timeFilter">Time</label>
+                </div>
+                <div class="mb-1">
+                    <button
+                        class="btn custom-navbar-bg-color text-white w-100 custom-input-size d-flex align-items-center justify-content-center col"
+                        id="exportBtn">
+                       <i class="bi bi-cloud-upload"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="d-flex align-items-center justify-content-center">
-    <h1 class="custom-body-text-color">Orders</h1>
+    <div class="d-flex flex-column flex-sm-row align-item-center justify-content-end gap-2  mb-3 mb-sm-2">
+        <div class="form-floating custom-input-size">
+            <input type="date" id="startDate" class="form-control h-100" placeholder="Start Date">
+            <label for="startDate">Start Date</label>
+        </div>
+        <div class="form-floating custom-input-size">
+            <input type="date" id="endDate" class="form-control h-100" placeholder="End Date">
+            <label for="endDate">End Date</label>
+        </div>
+        <div class="">
+            <button class="btn btn-primary w-100 custom-input-size">Search</button>
+        </div>
+        <div class="">
+            <a class="btn btn-outline-primary w-100 custom-input-size d-flex align-items-center justify-content-center"
+                id="clear">Clear</a>
+        </div>
+    </div>
+    <div id="ordersContainer"></div>
+    <div id="orderModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content"></div>
+        </div>
+    </div>
 </div>
+@section Scripts {
+    <script src="~/js/orders.js"></script>
+}
