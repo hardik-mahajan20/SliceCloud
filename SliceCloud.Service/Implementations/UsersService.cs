@@ -7,6 +7,7 @@ using SliceCloud.Repository.ViewModels;
 using SliceCloud.Repository.Enums;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace SliceCloud.Service.Implementations;
 
@@ -244,7 +245,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
             excludedRoleIds.Add(2);
         }
 
-        List<Role>? allRoles = await _rolesRepository.GetAllRolesAsync();
+        List<Role>? allRoles = await _rolesRepository.GetAllRolesAsQueryable().ToListAsync();
 
         return allRoles
             .Where(r => !excludedRoleIds.Contains(r.RoleId))

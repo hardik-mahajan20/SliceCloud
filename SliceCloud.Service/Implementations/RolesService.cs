@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Service.Interfaces;
@@ -21,7 +22,7 @@ public class RolesService(IRolesRepository rolesRepository) : IRolesService
 
     public async Task<List<Role>> GetAllRolesAsync()
     {
-        return await _rolesRepository.GetAllRolesAsync();
+        return await _rolesRepository.GetAllRolesAsQueryable().ToListAsync();
     }
 
     #endregion
