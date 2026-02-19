@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 
@@ -8,11 +7,11 @@ public class StateRepository(SliceCloudContext sliceCloudContext) : IStateReposi
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetStatesByCountryId
+    #region GetAllStatesAsQueryable
 
-    public async Task<List<Models.State>> GetStatesByCountryIdAsync(int countryId)
+    public IQueryable<State> GetAllStatesAsQueryable()
     {
-        return await _sliceCloudContext.States.Where(s => s.CountryId == countryId).ToListAsync();
+        return _sliceCloudContext.States.AsQueryable();
     }
 
     #endregion

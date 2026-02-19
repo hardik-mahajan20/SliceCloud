@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Service.Interfaces;
@@ -12,7 +13,9 @@ public class StateService(IStateRepository stateRepository) : IStateService
 
     public async Task<List<State>> GetStatesByCountryIdAsync(int countryId)
     {
-        return await _stateRepository.GetStatesByCountryIdAsync(countryId);
+        IQueryable<State>? queary = _stateRepository.GetAllStatesAsQueryable();
+        List<State>? states = await queary.Where(s => s.CountryId == countryId).ToListAsync();
+        return states;
     }
 
     #endregion
