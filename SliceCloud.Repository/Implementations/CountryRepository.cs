@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 
@@ -10,9 +9,9 @@ public class CountryRepository(SliceCloudContext sliceCloudContext) : ICountryRe
 
     #region GetAllCountries
 
-    public async Task<List<Country>> GetAllCountriesAsync()
+    public IQueryable<Country> GetAllCountruiesAsQuearyable()
     {
-        return await _sliceCloudContext.Countries.ToListAsync();
+        return _sliceCloudContext.Countries.AsQueryable();
     }
 
     #endregion
