@@ -17,8 +17,54 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     public async Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, DateTime? startDate, DateTime? endDate, int page, int pageSize, string sortColumn, string sortDirection)
     {
-        PaginatedList<Customer>? customers = await _customerRepository.GetPaginatedCustomersAsync(
-            search, status, startDate, endDate, page, pageSize, sortColumn, sortDirection);
+        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQuearyable();
+
+        DateTime? startUtc = startDate?.ToUniversalTime();
+        DateTime? endUtc = endDate?.ToUniversalTime();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            string trimmedSearch = search.Trim().ToLower();
+            query = query.Where(
+                o =>
+                    (o.CustomerName != null && o.CustomerName.ToLower().Contains(trimmedSearch))
+                    || (o.Email != null && o.Email.ToLower().Contains(trimmedSearch))
+                    || (o.PhoneNo != null && o.PhoneNo.ToLower().Contains(trimmedSearch))
+            );
+        }
+
+        if (startUtc.HasValue)
+        {
+            query = query.Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value >= startUtc.Value);
+        }
+
+        if (endUtc.HasValue)
+        {
+            // End of day as max ticks on that date
+            DateTime endOfDay = endUtc.Value.Date.AddDays(1).AddTicks(-1);
+            query = query.Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value <= endOfDay);
+        }
+
+        query = sortColumn switch
+        {
+            "CreateDate"
+              => sortDirection == "asc"
+                  ? query.OrderBy(o => o.CreatedAt)
+                  : query.OrderByDescending(o => o.CreatedAt),
+            "TotalOrder"
+              => sortDirection == "asc"
+                  ? query.OrderBy(o => o.TotalOrder).ThenBy(o => o.CustomerId)
+                  : query
+                    .OrderByDescending(o => o.TotalOrder)
+                    .ThenByDescending(o => o.CustomerId),
+            "CustomerName"
+              => sortDirection == "asc"
+                  ? query.OrderBy(o => o.CustomerName)
+                  : query.OrderByDescending(o => o.CustomerName),
+            _ => query.OrderByDescending(o => o.CreatedAt)
+        };
+
+        PaginatedList<Customer>? customers = await PaginatedList<Customer>.CreateAsync(query, page, pageSize);
 
         List<CustomerViewModel>? customerViewModel = customers.Select(c => new CustomerViewModel
         {
@@ -67,7 +113,7 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     public async Task<IEnumerable<Customer>> GetFilteredOrders(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
     {
-        IQueryable<Customer>? query = _customerRepository.GetAllCustomersQueryable();
+        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQuearyable();
 
         DateTime? startUtc = startDate?.ToUniversalTime();
         DateTime? endUtc = endDate?.ToUniversalTime();
