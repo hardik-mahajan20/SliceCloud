@@ -9,68 +9,6 @@ public class OrderRepository(SliceCloudContext sliceCloudContext) : IOrderReposi
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    public async Task<PaginatedList<Order>> GetOrdersAsync(string search, string status, DateTime? startDate, DateTime? endDate, int page, int pageSize, string sortColumn, string sortDirection)
-    {
-        IQueryable<Order> query = _sliceCloudContext.Orders.Include(o => o.Customer).AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            string? trimmedSearch = search.Trim().ToLower();
-            query = query.Where(
-                o =>
-                    (
-                        o.Customer != null
-                        && o.Customer.CustomerName.ToLower().Contains(trimmedSearch)
-                    )
-                    || o.OrderId.ToString().Contains(trimmedSearch)
-                    || (
-                        o.PaymentMode != null && o.PaymentMode.ToLower().Contains(trimmedSearch)
-                    )
-            );
-        }
-
-        if (!string.IsNullOrEmpty(status) && int.TryParse(status, out int statusValue))
-        {
-            query = query.Where(o => o.Status == statusValue);
-        }
-
-        if (startDate.HasValue)
-        {
-            query = query.Where(
-                o => o.OrderDate.HasValue && o.OrderDate.Value.Date >= startDate.Value.Date
-            );
-        }
-        if (endDate.HasValue)
-        {
-            DateTime endOfDay = endDate.Value.Date.AddDays(1).AddSeconds(-1);
-            query = query.Where(o => o.OrderDate.HasValue && o.OrderDate.Value <= endOfDay);
-        }
-
-        query = sortColumn switch
-        {
-            "CustomerName"
-              => sortDirection == "asc"
-                  ? query.OrderBy(o => o.Customer.CustomerName ?? string.Empty)
-                  : query.OrderByDescending(o => o.Customer.CustomerName ?? string.Empty),
-            "OrderDate"
-              => sortDirection == "asc"
-                  ? query.OrderBy(o => o.OrderDate).ThenBy(o => o.OrderId)
-                  : query.OrderByDescending(o => o.OrderDate).ThenByDescending(o => o.OrderId),
-            "TotalAmount"
-              => sortDirection == "asc"
-                  ? query.OrderBy(o => o.TotalAmount).ThenBy(o => o.OrderId)
-                  : query
-                    .OrderByDescending(o => o.TotalAmount)
-                    .ThenByDescending(o => o.OrderId),
-            _
-              => sortDirection == "asc"
-                  ? query.OrderBy(o => o.OrderId)
-                  : query.OrderByDescending(o => o.OrderId),
-        };
-
-        return await PaginatedList<Order>.CreateAsync(query, page, pageSize);
-    }
-
     #region GetAllOrderAsQueryable
 
     public IQueryable<Order> GetAllOrderAsQueryable()
@@ -93,17 +31,6 @@ public class OrderRepository(SliceCloudContext sliceCloudContext) : IOrderReposi
                 .ThenInclude(t => t.Section)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
-        if (order == null)
-        {
-            throw new ArgumentNullException(nameof(order), "Order object is null.");
-        }
-        else
-        {
-            if (order.OrderTables.Any())
-            {
-                OrderTable? orderTable = order.OrderTables.FirstOrDefault();
-            }
-        }
         return order;
     }
 
@@ -111,6 +38,7 @@ public class OrderRepository(SliceCloudContext sliceCloudContext) : IOrderReposi
     #endregion
 
     #region GetOrderItemsAsync
+
     public async Task<List<OrderItemViewModel>> GetOrderItemsAsync(int orderId)
     {
         var orderItems = await _sliceCloudContext.OrderedItems
