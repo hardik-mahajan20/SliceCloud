@@ -5,9 +5,8 @@ namespace SliceCloud.Repository.Interfaces;
 public interface ICityRepository
 {
     /// <summary>
-    /// Retrieves all cities by its state id asynchronously.
+    /// Retrieves all cities as quearyable.
     /// </summary>
-    /// <param name="id">The ID of the state to retrieve cities for.</param>
-    /// <returns>A task that returns the list of cities.</returns>
-    Task<List<City>> GetCitiesByStateIdAsync(int stateId);
+    /// <returns>All cities as quearyable.</returns>
+    IQueryable<City> GetAllCitiesAsQuearyable();
 }
