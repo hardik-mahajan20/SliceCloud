@@ -1,5 +1,4 @@
 using SliceCloud.Repository.Models;
-using SliceCloud.Repository.ViewModels;
 
 namespace SliceCloud.Repository.Interfaces;
 
@@ -19,9 +18,8 @@ public interface IOrderRepository
     Task<Order?> GetOrderWithDetailsAsync(int orderId);
 
     /// <summary>
-    /// Retrieves a list of order items for a specific order asynchronously.
+    /// Retrieves a list of order items for a specific order as queryable.
     /// </summary>
-    /// <param name="orderId">The ID of the order to retrieve items for.</param>
-    /// <returns>A task that returns a list of order items.</returns>
-    Task<List<OrderItemViewModel>> GetOrderItemsAsync(int orderId);
+    /// <returns>A list of order items as queryable.</returns>
+    IQueryable<OrderedItem> GetOrderItemsDetailsAsQueryable(int orderId);
 }

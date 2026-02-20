@@ -182,7 +182,34 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         Invoice? invoice = order.Invoices.FirstOrDefault();
         OrderTable? orderTable = order.OrderTables.FirstOrDefault();
 
-        List<OrderItemViewModel>? orderDetails = await _orderRepository.GetOrderItemsAsync(orderId);
+        List<OrderedItem>? orderedItems = await _orderRepository.GetOrderItemsDetailsAsQueryable(orderId).ToListAsync();
+
+        List<OrderItemViewModel>? orderDetails = orderedItems.Select(oi =>
+        {
+            var itemModifiers = oi.OrderedItemModifiers.Select(oim =>
+                new ModifierViewModel
+                {
+                    ModifiedItemId = oi.ItemId,
+                    ModifierName = oim.ItemModifier.ModifierName,
+                    Rate = oim.ItemModifier.Rate,
+                    Quantity = oim.Quantity
+                }).ToList();
+
+            decimal modifiersTotal = itemModifiers.Sum(m =>
+                ((decimal?)m.Rate ?? 0) * (m.Quantity ?? 0));
+
+            return new OrderItemViewModel
+            {
+                ItemId = oi.ItemId,
+                ItemName = oi.Item.ItemName,
+                Quantity = oi.Quantity,
+                UnitPrice = oi.Item.Rate,
+                Total = oi.Quantity * oi.Item.Rate,
+                ModifierTotal = modifiersTotal,
+                Modifiers = itemModifiers
+            };
+        }).ToList();
+
         decimal subTotal =
             orderDetails.Sum(i => i.Total) + orderDetails.Sum(i => i.ModifierTotal);
 
