@@ -33,11 +33,9 @@ public class OrderRepository(SliceCloudContext sliceCloudContext) : IOrderReposi
         return order;
     }
 
-
     #endregion
 
     #region GetOrderItemsAsync
-
 
     public IQueryable<OrderedItem> GetOrderItemsDetailsAsQueryable(int orderId)
     {

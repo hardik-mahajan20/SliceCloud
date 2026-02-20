@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SliceCloud.Repository.Interfaces;
@@ -40,8 +41,11 @@ public class JwtService : IJwtService
         JwtSecurityTokenHandler tokenHandler = new();
         byte[] key = Encoding.UTF8.GetBytes(_key);
 
-        UsersLogin userDetail = await _userLoginRepository.GetUserLoginByEmailAsync(email)
-               ?? throw new Exception("User not found while generating JWT token.");
+
+        UsersLogin? userDetail = await _userLoginRepository.GetUsersLoginAsQueryable()
+                                .FirstOrDefaultAsync(u => u.Email!.Equals(email, StringComparison.CurrentCultureIgnoreCase))
+                                 ?? throw new Exception("User not found while generating JWT token.");
+
         Role? role = await _rolesService.GetRoleByIdAsync(userDetail.RoleId)
         ?? throw new Exception("User role not found while generating JWT token.");
 

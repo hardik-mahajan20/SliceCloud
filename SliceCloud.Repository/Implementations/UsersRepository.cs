@@ -88,18 +88,7 @@ public class UsersRepository(SliceCloudContext sliceCloudContext) : IUsersReposi
 
     public async Task<bool> UpdateUserAsync(User user)
     {
-
         _sliceCloudContext.Users.Update(user);
-
-        UsersLogin? userLogin = await _sliceCloudContext.UsersLogins.FirstOrDefaultAsync(
-            u => u.Email == user.Email
-        );
-
-        if (userLogin is not null)
-        {
-            userLogin.RoleId = user.RoleId;
-            _sliceCloudContext.UsersLogins.Update(userLogin);
-        }
         return await _sliceCloudContext.SaveChangesAsync() > 0;
     }
 
