@@ -25,7 +25,38 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
     public async Task<PaginatedList<User>> GetAllUsersAsync(int pageNumber, int pageSize, string query, string sortOrder, string sortColumn, string search)
     {
-        PaginatedList<User> paginatedUsers = await _usersRepository.GetAllUsersAsync(pageNumber, pageSize, query, sortOrder, sortColumn, search);
+        IQueryable<User>? usersQuery = _usersRepository.GetAllUsersAsQuearyable().Where(u => u.IsDeleted == false);
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            usersQuery = usersQuery.Where(u =>
+                (u.FirstName != null && u.FirstName.Contains(search, StringComparison.CurrentCultureIgnoreCase)) ||
+                (u.Email != null && u.Email.Contains(search, StringComparison.CurrentCultureIgnoreCase)) ||
+                (u.PhoneNumber != null && u.PhoneNumber.Contains(search, StringComparison.CurrentCultureIgnoreCase))
+            );
+        }
+
+        usersQuery = sortColumn switch
+        {
+            "CreateDate"
+              => sortOrder == "asc"
+                  ? usersQuery.OrderBy(o => o.CreatedAt)
+                  : usersQuery.OrderByDescending(o => o.CreatedAt),
+            "Email"
+              => sortOrder == "asc"
+                  ? usersQuery.OrderBy(o => o.Email).ThenBy(o => o.UserId)
+                  : usersQuery
+                    .OrderByDescending(o => o.Email)
+                    .ThenByDescending(o => o.UserId),
+            "Phone"
+              => sortOrder == "asc"
+                  ? usersQuery.OrderBy(o => o.PhoneNumber)
+                  : usersQuery.OrderByDescending(o => o.PhoneNumber),
+            _ => usersQuery.OrderByDescending(o => o.CreatedAt)
+        };
+
+
+        PaginatedList<User> paginatedUsers = await PaginatedList<User>.CreateAsync(usersQuery, pageNumber, pageSize);
 
         foreach (var user in paginatedUsers)
         {

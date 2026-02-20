@@ -27,9 +27,9 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
             string trimmedSearch = search.Trim().ToLower();
             query = query.Where(
                 o =>
-                    (o.CustomerName != null && o.CustomerName.ToLower().Contains(trimmedSearch))
-                    || (o.Email != null && o.Email.ToLower().Contains(trimmedSearch))
-                    || (o.PhoneNo != null && o.PhoneNo.ToLower().Contains(trimmedSearch))
+                    (o.CustomerName != null && o.CustomerName.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
+                    || (o.Email != null && o.Email.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
+                    || (o.PhoneNo != null && o.PhoneNo.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
             );
         }
 
@@ -92,7 +92,7 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
         {
             Name = customer.CustomerName,
             PhoneNumber = customer.PhoneNo,
-            MaxOrder = customer.Orders.Any() ? customer.Orders.Max(o => o.TotalAmount) : 0,
+            MaxOrder = customer.Orders.Count != 0 ? customer.Orders.Max(o => o.TotalAmount) : 0,
             AvgBill = customer.Orders.Any() ? Math.Round(customer.Orders.Average(o => o.TotalAmount), 2) : 0,
             ComingSince = customer.CreatedAt ?? DateTime.Now,
             Visits = customer.Orders.Count,
@@ -116,14 +116,18 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
         IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQuearyable();
 
         DateTime? startUtc = startDate?.ToUniversalTime();
+
         DateTime? endUtc = endDate?.ToUniversalTime();
 
-        if (!string.IsNullOrEmpty(searchText))
+
+        if (!string.IsNullOrWhiteSpace(searchText))
         {
-            query = query.Where(o =>
-                EF.Functions.ILike(o.CustomerName, $"%{searchText}%") ||
-                EF.Functions.ILike(o.Email!, $"%{searchText}%") ||
-                EF.Functions.ILike(o.CustomerId.ToString(), $"%{searchText}%"));
+            string trimmedSearch = searchText.Trim().ToLower();
+            query = query.Where(
+                o =>
+                    (o.CustomerName != null && o.CustomerName.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
+                    || (o.Email != null && o.Email.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
+            );
         }
 
         if (startUtc.HasValue)

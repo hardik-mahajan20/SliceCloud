@@ -1,15 +1,14 @@
 using SliceCloud.Repository.Models;
-using SliceCloud.Repository.ViewModels;
 
 namespace SliceCloud.Repository.Interfaces;
 
 public interface IUsersRepository
 {
     /// <summary>
-    /// Retrieves all paginated users.
+    /// Retrieves all users as queryable.
     /// </summary>
-    /// <returns>An paginated result of all users.</returns>
-    Task<PaginatedList<User>> GetAllUsersAsync(int pageNumber, int pageSize, string query, string sortOrder, string sortColumn, string search);
+    /// <returns>All users as queryable.</returns>
+    IQueryable<User> GetAllUsersAsQuearyable();
 
     /// <summary>
     /// Checks if an email exists in the database.

@@ -47,8 +47,8 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
             string trimmedSearch = search.Trim().ToLower();
             query = query.Where(
                 t =>
-                    t.TaxName.ToLower().Contains(trimmedSearch)
-                    || t.TaxType.ToLower().Contains(trimmedSearch)
+                    t.TaxName.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase)
+                    || t.TaxType.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase)
             );
         }
 
