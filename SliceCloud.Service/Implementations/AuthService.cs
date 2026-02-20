@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -29,7 +30,7 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
             && u.PasswordHash == hashedPassword
             && u.IsFirstLogin == false
             && u.User!.IsDeleted == false
-            && u.User.Status == 1
+            && u.User.Status == (int)UserStatus.Active
             );
 
         if (usersLogin == null) return null;
@@ -45,8 +46,10 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
     {
         UsersLogin? usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable()
                         .FirstOrDefaultAsync(u => u.Email!.ToLower() == userEmail.ToLower());
+
         if (usersLogin is null)
             return null;
+
         return usersLogin;
     }
 
@@ -77,6 +80,7 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
     public async Task<bool> ValidatePasswordResetTokenAsync(string token)
     {
         UsersLogin? usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable().FirstOrDefaultAsync(u => u.ResetToken == token);
+
         if (usersLogin == null || usersLogin.ResetTokenExpiration.GetValueOrDefault() < DateTime.UtcNow || usersLogin.IsResetTokenUsed == true)
         {
             return false;

@@ -1,6 +1,7 @@
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -47,18 +48,18 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
         query = sortColumn switch
         {
-            "CreateDate"
-              => sortDirection == "asc"
+            CustomerConstants.CREATEDATE
+              => sortDirection == GenralConstants.ASCENDING
                   ? query.OrderBy(o => o.CreatedAt)
                   : query.OrderByDescending(o => o.CreatedAt),
-            "TotalOrder"
-              => sortDirection == "asc"
-                  ? query.OrderBy(o => o.TotalOrder).ThenBy(o => o.CustomerId)
-                  : query
-                    .OrderByDescending(o => o.TotalOrder)
-                    .ThenByDescending(o => o.CustomerId),
-            "CustomerName"
-              => sortDirection == "asc"
+            CustomerConstants.TOTAL_ORDER
+               => sortDirection == GenralConstants.ASCENDING
+                   ? query.OrderBy(o => o.TotalOrder).ThenBy(o => o.CustomerId)
+                   : query
+                     .OrderByDescending(o => o.TotalOrder)
+                     .ThenByDescending(o => o.CustomerId),
+            CustomerConstants.CUSTOMER_NAME
+              => sortDirection == GenralConstants.ASCENDING
                   ? query.OrderBy(o => o.CustomerName)
                   : query.OrderByDescending(o => o.CustomerName),
             _ => query.OrderByDescending(o => o.CreatedAt)
@@ -99,8 +100,8 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
             Orders = customer.Orders.Select(o => new OrderViewModel
             {
                 OrderDate = o.OrderDate ?? DateTime.Now,
-                OrderType = o.OrderType ?? "NA",
-                PaymentMode = o.PaymentMode ?? "NA",
+                OrderType = o.OrderType ?? GenralConstants.NA,
+                PaymentMode = o.PaymentMode ?? GenralConstants.NA,
                 ItemsCount = o.OrderedItems.Count,
                 TotalAmount = o.TotalAmount
             }).ToList()
@@ -143,17 +144,17 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
         switch (sortColumn)
         {
-            case "CustomerName":
-                query = sortOrder == "asc" ? query.OrderBy(o => o.CustomerName) : query.OrderByDescending(o => o.CustomerName);
+            case CustomerConstants.CUSTOMER_NAME:
+                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CustomerName) : query.OrderByDescending(o => o.CustomerName);
                 break;
-            case "OrderDate":
-                query = sortOrder == "asc" ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
+            case CustomerConstants.ORDER_DATE:
+                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
                 break;
-            case "TotalAmount":
-                query = sortOrder == "asc" ? query.OrderBy(o => o.TotalOrder) : query.OrderByDescending(o => o.TotalOrder);
+            case CustomerConstants.TOTAL_AMOUNT:
+                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.TotalOrder) : query.OrderByDescending(o => o.TotalOrder);
                 break;
             default:
-                query = sortOrder == "asc" ? query.OrderBy(o => o.CustomerId) : query.OrderByDescending(o => o.CustomerId);
+                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CustomerId) : query.OrderByDescending(o => o.CustomerId);
                 break;
         }
 
@@ -171,7 +172,7 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
         IEnumerable<Customer>? customers = await GetFilteredOrders(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
 
         using var workbook = new XLWorkbook();
-        IXLWorksheet? worksheet = workbook.Worksheets.Add("Customers");
+        IXLWorksheet? worksheet = workbook.Worksheets.Add(CustomerConstants.CUSTOMERS);
 
         string imagePath = Path.Combine(webRootPath, "images/logo.png");
 

@@ -4,9 +4,9 @@ namespace SliceCloud.Repository.Constants;
 /// Contains string constants for general purpose.
 /// Used to avoid magic strings and ensure consistency across the project.
 /// </summary>
-public static class GenralConstants
+public static class ErrorConstants
 {
-    public const string ACCESS_DENIED = "Access Denied.";
+    public const string USER_ID_CLAIM_MISSING = "User ID claim is missing.";
     public const string ERROR = "Error";
     public const string UNAUTHORIZED = "You are Unauthorized.";
     public const string X_REQUESTED_WITH = "X-Requested-With";
@@ -21,6 +21,5 @@ public static class GenralConstants
     public const string AUTH_TOKEN = "AuthToken";
     public const string USER_DATA = "UserData";
     public const string TOAST = "Toast";
-    public const string NA = "NA";
-    public const string ASCENDING = "asc";
+    public const string JWT = "Jwt";
 }
