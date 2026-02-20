@@ -186,8 +186,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         decimal subTotal =
             orderDetails.Sum(i => i.Total) + orderDetails.Sum(i => i.ModifierTotal);
 
-        // Get tax mappings from repository
-        List<OrderTaxMapping>? taxMappings = await _orderTaxRepository.GetTaxMappingsByOrderIdAsync(orderId);
+        List<OrderTaxMapping>? taxMappings = await _orderTaxRepository.GetAllOrderWithTaxesAsQueryable().Where(tm => tm.OrderId == orderId).ToListAsync();
 
         List<TaxBreakdownViewModel>? taxBreakdown = taxMappings
             .Select(
