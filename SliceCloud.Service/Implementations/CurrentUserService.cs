@@ -1,7 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using SliceCloud.Repository.Interfaces;
-namespace SliceCloud.Repository.Implementations;
+using SliceCloud.Service.Interfaces;
+
+namespace SliceCloud.Service.Implementations;
 
 public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
 {
