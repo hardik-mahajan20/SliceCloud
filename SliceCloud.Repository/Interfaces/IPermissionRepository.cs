@@ -5,28 +5,22 @@ namespace SliceCloud.Repository.Interfaces;
 public interface IPermissionRepository
 {
     /// <summary>
-    /// Checks if a role has a specific permission for a given module.
+    /// Retrieves all permissions with roles and modules as queryable.
     /// </summary>
-    /// <param name="roleName">The name of the role.</param>
-    /// <param name="permissionName">The name of the permission.</param>
-    /// <param name="moduleId">The ID of the module.</param>
-    /// <returns>A task that returns true if the role has the permission, otherwise false.</returns>
-    Task<bool> RoleHasPermissionAsync(string roleName, string permissionName, int moduleId);
+    /// <returns>All permissions with roles and modules as queryable.</returns>
+    IQueryable<Permission> GetAllPermissionWithRolesAndModulesAsQueryable();
 
     /// <summary>
-    /// Retrieves all permissions associated with a specific role ID asynchronously.
+    /// Retrieves all permissions with modules as queryable.
     /// </summary>
-    /// <param name="roleId">The ID of the role to retrieve permissions for.</param>
-    /// <returns>A task that returns a list of permissions.</returns>
-    Task<List<Permission>> GetAllPermissionsByRoleIdAsync(int roleId);
+    /// <returns>All permissions with modules as queryable.</returns>
+    IQueryable<Permission> GetAllPermissionWithModulesAsQueryable();
 
     /// <summary>
-    /// Retrieves all permissions associated with a specific role ID and permissionIds asynchronously.
+    /// Retrieves all permissions as queryable.
     /// </summary>
-    /// <param name="roleId">The ID of the role to retrieve permissions for.</param>
-    /// <param name="permissionIds">The permissionIds of the role to retrieve permissions for.</param>
-    /// <returns>A task that returns a list of permissions.</returns>
-    Task<List<Permission>> GetPermissionsByRoleAsync(int roleId, List<int> permissionIds);
+    /// <returns>All permissions as queryable.</returns>
+    IQueryable<Permission> GetAllPermissionAsQueryable();
 
     /// <summary>
     /// Saves changes of open context asynchronously.

@@ -13,7 +13,7 @@ public class OrderRepository(SliceCloudContext sliceCloudContext) : IOrderReposi
 
     public IQueryable<Order> GetAllOrderAsQueryable()
     {
-        return _sliceCloudContext.Orders.Include(o => o.Customer).AsNoTracking();
+        return _sliceCloudContext.Orders.Include(o => o.Customer).AsQueryable();
     }
 
     #endregion
