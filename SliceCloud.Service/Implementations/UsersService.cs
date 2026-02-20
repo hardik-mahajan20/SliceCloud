@@ -76,16 +76,24 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
     {
         Dictionary<string, string> errors = [];
 
-        if (createUserViewModel.Email != null)
-            if (await _usersRepository.IsEmailExistsAsync(createUserViewModel.Email, null))
-                errors.Add(nameof(createUserViewModel.Email), "Email already exists.");
+        bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == createUserViewModel.Email);
+        if (isEmailExists)
+        {
+            errors.Add(nameof(createUserViewModel.Email), "Email already exists.");
+        }
 
-        if (await _usersRepository.IsUsernameExistsAsync(createUserViewModel.UserName, null))
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == createUserViewModel.UserName);
+        if (isUsernameExists)
+        {
             errors.Add(nameof(createUserViewModel.UserName), "UserName already exists.");
+        }
 
-        if (createUserViewModel.Phone != null)
-            if (await _usersRepository.IsPhoneExistsAsync(createUserViewModel.Phone, null))
-                errors.Add(nameof(createUserViewModel.Phone), "Phone number already exists.");
+        bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == createUserViewModel.Phone);
+
+        if (isPhoneExists)
+        {
+            errors.Add(nameof(createUserViewModel.Phone), "Phone number already exists.");
+        }
 
         return errors;
     }
@@ -98,16 +106,23 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
     {
         Dictionary<string, string> errors = [];
 
-        if (updateUserViewModel.Email != null)
-            if (await _usersRepository.IsEmailExistsAsync(updateUserViewModel.Email, updateUserViewModel.Id))
-                errors.Add(nameof(updateUserViewModel.Email), "Email already exists.");
+        bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == updateUserViewModel.Email && u.UserId == updateUserViewModel.Id);
+        if (isEmailExists)
+        {
+            errors.Add(nameof(updateUserViewModel.Email), "Email already exists.");
+        }
 
-        if (await _usersRepository.IsUsernameExistsAsync(updateUserViewModel.UserName, updateUserViewModel.Id))
-            errors.Add(nameof(updateUserViewModel.UserName), "UserName already exists.");
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == updateUserViewModel.UserName && u.UserId == updateUserViewModel.Id);
+        if (isUsernameExists)
+        {
+            errors.Add(nameof(updateUserViewModel.Email), "Email already exists.");
+        }
 
-        if (updateUserViewModel.PhoneNumber != null)
-            if (await _usersRepository.IsPhoneExistsAsync(updateUserViewModel.PhoneNumber, updateUserViewModel.Id))
-                errors.Add(nameof(updateUserViewModel.PhoneNumber), "Phone number already exists.");
+        bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == updateUserViewModel.PhoneNumber && u.UserId == updateUserViewModel.Id);
+        if (isPhoneExists)
+        {
+            errors.Add(nameof(updateUserViewModel.Email), "Email already exists.");
+        }
 
         return errors;
     }
@@ -254,7 +269,13 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
     public async Task<bool> DeleteExistingUserAsync(int id)
     {
-        return await _usersRepository.DeleteExistingUserAsync(id);
+        User? user = await _usersRepository.GetUserByIdAsync(id);
+        if (user is not null)
+        {
+            user.IsDeleted = true;
+            return await _usersRepository.UpdateUserAsync(user);
+        }
+        return false;
     }
 
     #endregion

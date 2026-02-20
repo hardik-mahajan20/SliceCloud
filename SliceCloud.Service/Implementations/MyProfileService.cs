@@ -44,8 +44,8 @@ public class MyProfileService(IUsersRepository usersRepository, IUsersLoginRepos
 
     public async Task<bool> IsUsernameTakenAsync(string username, int currentUserId)
     {
-        bool existingUser = await _usersRepository.IsUsernameExistsAsync(username, currentUserId);
-        return existingUser;
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == username && u.UserId == currentUserId);
+        return isUsernameExists;
     }
 
     #endregion
