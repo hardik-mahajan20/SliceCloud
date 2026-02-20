@@ -27,9 +27,9 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
             string trimmedSearch = search.Trim().ToLower();
             query = query.Where(
                 o =>
-                    (o.CustomerName != null && o.CustomerName.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
-                    || (o.Email != null && o.Email.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
-                    || (o.PhoneNo != null && o.PhoneNo.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
+                    (o.CustomerName != null && o.CustomerName.ToLower() == trimmedSearch)
+                    || (o.Email != null && o.Email.ToLower() == trimmedSearch)
+                    || (o.PhoneNo != null && o.PhoneNo.ToLower() == trimmedSearch)
             );
         }
 
@@ -125,8 +125,8 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
             string trimmedSearch = searchText.Trim().ToLower();
             query = query.Where(
                 o =>
-                    (o.CustomerName != null && o.CustomerName.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
-                    || (o.Email != null && o.Email.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase))
+                    (o.CustomerName != null && o.CustomerName.ToLower() == trimmedSearch)
+                    || (o.Email != null && o.Email.ToLower() == trimmedSearch)
             );
         }
 

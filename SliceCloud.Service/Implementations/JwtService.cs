@@ -43,7 +43,7 @@ public class JwtService : IJwtService
 
 
         UsersLogin? userDetail = await _userLoginRepository.GetUsersLoginAsQueryable()
-                                .FirstOrDefaultAsync(u => u.Email!.Equals(email, StringComparison.CurrentCultureIgnoreCase))
+                                .FirstOrDefaultAsync(u => u.Email!.ToLower() == email.ToLower())
                                  ?? throw new Exception("User not found while generating JWT token.");
 
         Role? role = await _rolesService.GetRoleByIdAsync(userDetail.RoleId)

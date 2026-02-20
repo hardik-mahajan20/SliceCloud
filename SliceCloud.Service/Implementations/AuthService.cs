@@ -44,7 +44,7 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
     public async Task<UsersLogin?> GetUserLoginByEmailAsync(string userEmail)
     {
         UsersLogin? usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable()
-                        .FirstOrDefaultAsync(u => u.Email!.Equals(userEmail, StringComparison.CurrentCultureIgnoreCase));
+                        .FirstOrDefaultAsync(u => u.Email!.ToLower() == userEmail.ToLower());
         if (usersLogin is null)
             return null;
         return usersLogin;
@@ -57,7 +57,7 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
     public async Task<string> GeneratePasswordResetTokenAsync(string userEmail)
     {
         UsersLogin? usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable()
-                               .FirstOrDefaultAsync(u => u.Email!.Equals(userEmail, StringComparison.CurrentCultureIgnoreCase)) ?? throw new InvalidOperationException("User not found with the provided email.");
+                               .FirstOrDefaultAsync(u => u.Email!.Equals(userEmail.Equals(userEmail, StringComparison.CurrentCultureIgnoreCase))) ?? throw new InvalidOperationException("User not found with the provided email.");
 
         string token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 

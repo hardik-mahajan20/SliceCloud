@@ -34,11 +34,12 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
                 o =>
                     (
                         o.Customer != null
-                        && o.Customer.CustomerName.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase)
+                        && o.Customer.CustomerName.ToLower() == trimmedSearch
                     )
-                    || o.OrderId.ToString().Contains(trimmedSearch)
-                    || (
-                        o.PaymentMode != null && o.PaymentMode.Contains(trimmedSearch, StringComparison.CurrentCultureIgnoreCase)
+                    ||
+                    (
+                        o.PaymentMode != null
+                        && o.PaymentMode.ToLower() == trimmedSearch
                     )
             );
         }

@@ -29,10 +29,11 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
         if (!string.IsNullOrEmpty(search))
         {
+            string trimmedSearch = search.Trim().ToLower();
             usersQuery = usersQuery.Where(u =>
-                (u.FirstName != null && u.FirstName.Contains(search, StringComparison.CurrentCultureIgnoreCase)) ||
-                (u.Email != null && u.Email.Contains(search, StringComparison.CurrentCultureIgnoreCase)) ||
-                (u.PhoneNumber != null && u.PhoneNumber.Contains(search, StringComparison.CurrentCultureIgnoreCase))
+                (u.FirstName != null && u.FirstName.ToLower() == trimmedSearch) ||
+                (u.Email != null && u.Email.ToLower() == trimmedSearch) ||
+                (u.PhoneNumber != null && u.PhoneNumber.ToLower() == trimmedSearch)
             );
         }
 
