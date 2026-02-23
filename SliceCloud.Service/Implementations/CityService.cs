@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Service.Interfaces;
@@ -12,7 +13,13 @@ public class CityService(ICityRepository cityRepository) : ICityService
 
     public async Task<List<City>> GetCitiesByStateIdAsync(int stateId)
     {
-        return await _cityRepository.GetCitiesByStateIdAsync(stateId);
+        IQueryable<City>? cities = _cityRepository.GetAllCitiesAsQuearyable();
+
+        List<City>? filteredCities = await cities.Where(c => c.StateId == stateId)
+                                                    .AsNoTracking()
+                                                    .ToListAsync();
+
+        return filteredCities;
     }
 
     #endregion

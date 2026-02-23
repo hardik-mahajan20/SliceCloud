@@ -10,9 +10,9 @@ public class RolesRepository(SliceCloudContext sliceCloudContext) : IRolesReposi
 
     #region GetAllRoles
 
-    public async Task<List<Role>> GetAllRolesAsync()
+    public IQueryable<Role> GetAllRolesAsQueryable()
     {
-        return await _sliceCloudContext.Roles.ToListAsync();
+        return _sliceCloudContext.Roles.AsQueryable();
     }
 
     #endregion

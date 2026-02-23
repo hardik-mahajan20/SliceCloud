@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
-using SliceCloud.Repository.Constants;
 
 namespace SliceCloud.Repository.Implementations;
 
@@ -9,43 +8,29 @@ public class PermissionRepository(SliceCloudContext sliceCloudContext) : IPermis
 {
     SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region RoleHasPermission
+    #region GetAllPermissionWithRolesAndModulesAsQueryable
 
-    public async Task<bool> RoleHasPermissionAsync(string roleName, string permissionName, int moduleId)
+    public IQueryable<Permission> GetAllPermissionWithRolesAndModulesAsQueryable()
     {
-        return await _sliceCloudContext.Permissions
-               .Include(p => p.Role)
-               .Include(p => p.Module)
-               .Where(p => p.Role.RoleName == roleName && p.ModuleId == moduleId)
-               .AnyAsync(
-                   p =>
-                       (permissionName == PermissionConstants.CAN_VIEW && p.CanView == true)
-                       || (permissionName == PermissionConstants.CAN_ADD_EDIT && p.CanAddEdit == true)
-                       || (permissionName == PermissionConstants.CAN_DELETE && p.CanDelete == true)
-               );
+        return _sliceCloudContext.Permissions.Include(p => p.Role).Include(p => p.Module).AsQueryable();
     }
 
     #endregion
 
-    #region GetAllPermissionsById
+    #region GetAllPermissionWithModulesAsQueryable
 
-    public async Task<List<Permission>> GetAllPermissionsByRoleIdAsync(int roleId)
+    public IQueryable<Permission> GetAllPermissionWithModulesAsQueryable()
     {
-        return await _sliceCloudContext.Permissions
-                .Include(p => p.Module)
-                .Where(p => p.RoleId == roleId)
-                .ToListAsync();
+        return _sliceCloudContext.Permissions.Include(p => p.Module).AsQueryable();
     }
 
     #endregion
 
-    #region GetPermissionsByRole
+    #region GetAllPermissionAsQueryable
 
-    public async Task<List<Permission>> GetPermissionsByRoleAsync(int roleId, List<int> permissionIds)
+    public IQueryable<Permission> GetAllPermissionAsQueryable()
     {
-        return await _sliceCloudContext.Permissions
-            .Where(p => p.RoleId == roleId && permissionIds.Contains(p.PermissionId))
-            .ToListAsync();
+        return _sliceCloudContext.Permissions.AsQueryable();
     }
 
     #endregion

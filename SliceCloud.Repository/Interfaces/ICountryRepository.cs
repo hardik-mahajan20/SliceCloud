@@ -5,8 +5,8 @@ namespace SliceCloud.Repository.Interfaces;
 public interface ICountryRepository
 {
     /// <summary>
-    /// Retrieves all countries asynchronously.
+    /// Retrieves all countries as quearyable.
     /// </summary>
-    /// <returns>A task that returns the list of all countries.</returns>
-    Task<List<Country>> GetAllCountriesAsync();
+    /// <returns>All countries as quearyable.</returns>
+    IQueryable<Country> GetAllCountruiesAsQuearyable();
 }

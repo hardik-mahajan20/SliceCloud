@@ -8,109 +8,51 @@ public class UsersLoginRepository(SliceCloudContext sliceCloudContext) : IUsersL
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetUserLogin
+    #region GetUsersLoginAsQueryable
 
-    public async Task<UsersLogin?> GetUserLoginAsync(string userEmail, string userHashedPassword)
+    public IQueryable<UsersLogin> GetUsersLoginAsQueryable()
     {
-        UsersLogin? usersLogin = await _sliceCloudContext.UsersLogins.Include(u => u.User).FirstOrDefaultAsync(
-            u => u.Email == userEmail
-            && u.PasswordHash == userHashedPassword
-            && u.IsFirstLogin == false
-            && u.User!.IsDeleted == false
-            && u.User.Status == 1
-            );
-        return usersLogin;
+        return _sliceCloudContext.UsersLogins.AsQueryable();
     }
 
     #endregion
 
-    #region GetUserLoginByEmail
+    #region GetUsersLoginByIdAsync
 
-    public async Task<UsersLogin?> GetUserLoginByEmailAsync(string userEmail)
+    public async Task<UsersLogin?> GetUsersLoginByIdAsync(int userId)
     {
-        return await _sliceCloudContext.UsersLogins.FirstOrDefaultAsync(u => u.Email!.ToLower() == userEmail.ToLower());
-    }
-
-    #endregion
-
-    #region SavePasswordResetToken
-
-    public async Task SavePasswordResetTokenAsync(int userId, string passwordResetToken, DateTime expiration, bool isUsed)
-    {
-        UsersLogin? usersLogin = await _sliceCloudContext.UsersLogins.FindAsync(userId);
-        if (usersLogin != null)
-        {
-            usersLogin.ResetToken = passwordResetToken;
-            usersLogin.ResetTokenExpiration = expiration;
-            usersLogin.IsResetTokenUsed = isUsed;
-            await _sliceCloudContext.SaveChangesAsync();
-        }
-    }
-
-    #endregion
-
-    #region GetUserByResetToken
-
-    public async Task<UsersLogin?> GetUserByResetTokenAsync(string resetToken)
-    {
-        return await _sliceCloudContext.UsersLogins.FirstOrDefaultAsync(u => u.ResetToken == resetToken);
-    }
-
-    #endregion
-
-    #region SetUserPassword
-
-    public async Task<bool> SetUserPasswordAsync(int userLoginId, string newPassword)
-    {
-        UsersLogin? usersLogin = await _sliceCloudContext.UsersLogins.FindAsync(userLoginId);
-        if (usersLogin == null)
-        {
-            return false;
-        }
-
-        User? userTable = await _sliceCloudContext.Users.FindAsync(usersLogin.UserId);
-        if (userTable == null)
-        {
-            return false;
-        }
-
-        usersLogin.PasswordHash = newPassword;
-        userTable.PasswordHash = newPassword;
-
-        _sliceCloudContext.UsersLogins.Update(usersLogin);
-        _sliceCloudContext.Users.Update(userTable);
-        await _sliceCloudContext.SaveChangesAsync();
-
-        return true;
-    }
-
-    #endregion
-
-    #region InvalidateResetToken
-
-    public async Task<bool> InvalidateResetTokenAsync(int userLoginId)
-    {
-        UsersLogin? usersLogin = await _sliceCloudContext.UsersLogins
-       .FirstOrDefaultAsync(u => u.UserLoginId == userLoginId);
-
-        if (usersLogin == null)
-            return false;
-
-        usersLogin.IsResetTokenUsed = true;
-        await _sliceCloudContext.SaveChangesAsync();
-
-        return true;
+        return await _sliceCloudContext.UsersLogins.FindAsync(userId);
     }
 
     #endregion
 
     #region CreateUserLogin
 
-    public async Task CreateUserLoginAsync(UsersLogin usersLogin)
+    public async Task<bool> CreateUserLoginAsync(UsersLogin usersLogin)
     {
         await _sliceCloudContext.UsersLogins.AddAsync(usersLogin);
-        await _sliceCloudContext.SaveChangesAsync();
+        return await _sliceCloudContext.SaveChangesAsync() > 0;
     }
 
     #endregion
+
+    #region UpdateUsersLoginAsync
+
+    public async Task<bool> UpdateUsersLoginAsync(UsersLogin usersLogin)
+    {
+        _sliceCloudContext.UsersLogins.Update(usersLogin);
+        return await _sliceCloudContext.SaveChangesAsync() > 0;
+    }
+
+    #endregion
+
+    #region GetUsersLoginWithUserAsQueryable
+
+    public IQueryable<UsersLogin> GetUsersLoginWithUserAsQueryable()
+    {
+        return _sliceCloudContext.UsersLogins.Include(u => u.User).AsQueryable();
+    }
+
+    #endregion
+
 }

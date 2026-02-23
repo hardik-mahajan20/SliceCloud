@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Service.Implementations;
@@ -11,7 +12,7 @@ public class ImageService : IImageService
         {
             string fileGuid = Guid.NewGuid().ToString();
 
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "uploads");
+            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), GenralConstants.WWWROOT, GenralConstants.IMAGES, GenralConstants.UPLOADS);
 
             if (!Directory.Exists(uploadsFolder))
             {

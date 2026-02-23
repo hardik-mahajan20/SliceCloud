@@ -14,4 +14,9 @@ public static class SideBarOptionConstants
     public const string TAX_AND_FEES = "TaxesAndFees";
     public const string ORDERS = "Orders";
     public const string CUSTOMERS = "Customers";
+    public const string ORDER_APP = "OrderApp";
+    public const string ORDER_APP_KOT = "OrderAppKOT";
+    public const string ORDER_APP_MENU = "OrderAppMenu";
+    public const string ORDER_APP_WAITING_LIST = "OrderAppWaitingList";
+    public const string ORDER_APP_TABLE_VIEW = "OrderAppTableView";
 }

@@ -1,3 +1,4 @@
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -28,7 +29,7 @@ public class UsersLoginService(IUsersLoginRepository usersLoginRepository) : IUs
         catch (Exception ex)
         {
             string error = ex.InnerException?.Message ?? ex.Message;
-            throw new Exception("An error occurred while creating the user login. Details: " + error, ex);
+            throw new Exception(ErrorConstants.ERROR_OCCURRED_WHILE_CREATING_USER + error, ex);
         }
     }
 

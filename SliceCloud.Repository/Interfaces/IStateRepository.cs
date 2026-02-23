@@ -7,9 +7,8 @@ namespace SliceCloud.Repository.Interfaces;
 public interface IStateRepository
 {
     /// <summary>
-    /// Retrieves all states by its country id asynchronously.
+    /// Retrieves all states as queryable.
     /// </summary>
-    /// <param name="id">The ID of the country to retrieve states for.</param>
-    /// <returns>A task that returns the list of states.</returns>
-    Task<List<State>> GetStatesByCountryIdAsync(int countryId);
+    /// <returns>List of states as queryable.</returns>
+    IQueryable<State> GetAllStatesAsQueryable();
 }

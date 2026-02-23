@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
@@ -6,9 +7,10 @@ using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Service.Implementations;
 
-public class MyProfileService(IUsersRepository usersRepository) : IMyProfileService
+public class MyProfileService(IUsersRepository usersRepository, IUsersLoginRepository usersLoginRepository) : IMyProfileService
 {
     private readonly IUsersRepository _usersRepository = usersRepository;
+    private readonly IUsersLoginRepository _usersLoginRepository = usersLoginRepository;
 
     #region GetProfileById
 
@@ -42,8 +44,8 @@ public class MyProfileService(IUsersRepository usersRepository) : IMyProfileServ
 
     public async Task<bool> IsUsernameTakenAsync(string username, int currentUserId)
     {
-        bool existingUser = await _usersRepository.IsUsernameExistsAsync(username, currentUserId);
-        return existingUser;
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == username && u.UserId == currentUserId);
+        return isUsernameExists;
     }
 
     #endregion
@@ -65,6 +67,13 @@ public class MyProfileService(IUsersRepository usersRepository) : IMyProfileServ
         user.Address = updateProfileViewModel.Address;
         user.ZipCode = updateProfileViewModel.ZipCode;
         await _usersRepository.UpdateUserAsync(user);
+
+        UsersLogin usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable().FirstAsync(u => u.Email == user.Email!);
+        if (usersLogin is not null)
+        {
+            usersLogin.RoleId = user.RoleId;
+            await _usersLoginRepository.UpdateUsersLoginAsync(usersLogin);
+        }
         return await GetProfileByIdAsync(userId);
     }
 

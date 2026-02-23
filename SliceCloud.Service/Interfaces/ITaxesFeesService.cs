@@ -77,5 +77,5 @@ public interface ITaxesFeesService
     /// </summary>
     /// <param name="itemIds">The list ID of on which tax should be.</param>
     /// <returns>A task that returns item specific tax details.</returns>
-    List<ItemSpecificTaxViewModel> GetDefaultItemTaxesAsync(List<int> itemIds);
+    Task<List<ItemSpecificTaxViewModel>> GetDefaultItemTaxesAsync(List<int> itemIds);
 }

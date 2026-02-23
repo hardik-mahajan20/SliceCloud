@@ -8,14 +8,11 @@ public class OrderTaxRepository(SliceCloudContext sliceCloudContext) : IOrderTax
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetTaxMappingsByOrderId
+    #region GetAllOrderWithTaxesAsQueryable
 
-    public async Task<List<OrderTaxMapping>> GetTaxMappingsByOrderIdAsync(int orderId)
+    public IQueryable<OrderTaxMapping> GetAllOrderWithTaxesAsQueryable()
     {
-        return await _sliceCloudContext.OrderTaxMappings
-                .Where(tm => tm.OrderId == orderId)
-                .Include(tm => tm.Tax)
-                .ToListAsync();
+        return _sliceCloudContext.OrderTaxMappings.Include(tm => tm.Tax).AsQueryable();
     }
 
     #endregion

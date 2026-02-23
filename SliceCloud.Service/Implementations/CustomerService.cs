@@ -1,6 +1,7 @@
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -17,8 +18,54 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     public async Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, DateTime? startDate, DateTime? endDate, int page, int pageSize, string sortColumn, string sortDirection)
     {
-        PaginatedList<Customer>? customers = await _customerRepository.GetPaginatedCustomersAsync(
-            search, status, startDate, endDate, page, pageSize, sortColumn, sortDirection);
+        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQuearyable();
+
+        DateTime? startUtc = startDate?.ToUniversalTime();
+        DateTime? endUtc = endDate?.ToUniversalTime();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            string trimmedSearch = search.Trim().ToLower();
+            query = query.Where(
+                o =>
+                    (o.CustomerName != null && o.CustomerName.ToLower() == trimmedSearch)
+                    || (o.Email != null && o.Email.ToLower() == trimmedSearch)
+                    || (o.PhoneNo != null && o.PhoneNo.ToLower() == trimmedSearch)
+            );
+        }
+
+        if (startUtc.HasValue)
+        {
+            query = query.Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value >= startUtc.Value);
+        }
+
+        if (endUtc.HasValue)
+        {
+            // End of day as max ticks on that date
+            DateTime endOfDay = endUtc.Value.Date.AddDays(1).AddTicks(-1);
+            query = query.Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value <= endOfDay);
+        }
+
+        query = sortColumn switch
+        {
+            CustomerConstants.CREATEDATE
+              => sortDirection == GenralConstants.ASCENDING
+                  ? query.OrderBy(o => o.CreatedAt)
+                  : query.OrderByDescending(o => o.CreatedAt),
+            CustomerConstants.TOTAL_ORDER
+               => sortDirection == GenralConstants.ASCENDING
+                   ? query.OrderBy(o => o.TotalOrder).ThenBy(o => o.CustomerId)
+                   : query
+                     .OrderByDescending(o => o.TotalOrder)
+                     .ThenByDescending(o => o.CustomerId),
+            CustomerConstants.CUSTOMER_NAME
+              => sortDirection == GenralConstants.ASCENDING
+                  ? query.OrderBy(o => o.CustomerName)
+                  : query.OrderByDescending(o => o.CustomerName),
+            _ => query.OrderByDescending(o => o.CreatedAt)
+        };
+
+        PaginatedList<Customer>? customers = await PaginatedList<Customer>.CreateAsync(query, page, pageSize);
 
         List<CustomerViewModel>? customerViewModel = customers.Select(c => new CustomerViewModel
         {
@@ -46,15 +93,15 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
         {
             Name = customer.CustomerName,
             PhoneNumber = customer.PhoneNo,
-            MaxOrder = customer.Orders.Any() ? customer.Orders.Max(o => o.TotalAmount) : 0,
+            MaxOrder = customer.Orders.Count != 0 ? customer.Orders.Max(o => o.TotalAmount) : 0,
             AvgBill = customer.Orders.Any() ? Math.Round(customer.Orders.Average(o => o.TotalAmount), 2) : 0,
             ComingSince = customer.CreatedAt ?? DateTime.Now,
             Visits = customer.Orders.Count,
             Orders = customer.Orders.Select(o => new OrderViewModel
             {
                 OrderDate = o.OrderDate ?? DateTime.Now,
-                OrderType = o.OrderType ?? "NA",
-                PaymentMode = o.PaymentMode ?? "NA",
+                OrderType = o.OrderType ?? GenralConstants.NA,
+                PaymentMode = o.PaymentMode ?? GenralConstants.NA,
                 ItemsCount = o.OrderedItems.Count,
                 TotalAmount = o.TotalAmount
             }).ToList()
@@ -67,17 +114,21 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     public async Task<IEnumerable<Customer>> GetFilteredOrders(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
     {
-        IQueryable<Customer>? query = _customerRepository.GetAllCustomersQueryable();
+        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQuearyable();
 
         DateTime? startUtc = startDate?.ToUniversalTime();
+
         DateTime? endUtc = endDate?.ToUniversalTime();
 
-        if (!string.IsNullOrEmpty(searchText))
+
+        if (!string.IsNullOrWhiteSpace(searchText))
         {
-            query = query.Where(o =>
-                EF.Functions.ILike(o.CustomerName, $"%{searchText}%") ||
-                EF.Functions.ILike(o.Email!, $"%{searchText}%") ||
-                EF.Functions.ILike(o.CustomerId.ToString(), $"%{searchText}%"));
+            string trimmedSearch = searchText.Trim().ToLower();
+            query = query.Where(
+                o =>
+                    (o.CustomerName != null && o.CustomerName.ToLower() == trimmedSearch)
+                    || (o.Email != null && o.Email.ToLower() == trimmedSearch)
+            );
         }
 
         if (startUtc.HasValue)
@@ -93,17 +144,17 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
         switch (sortColumn)
         {
-            case "CustomerName":
-                query = sortOrder == "asc" ? query.OrderBy(o => o.CustomerName) : query.OrderByDescending(o => o.CustomerName);
+            case CustomerConstants.CUSTOMER_NAME:
+                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CustomerName) : query.OrderByDescending(o => o.CustomerName);
                 break;
-            case "OrderDate":
-                query = sortOrder == "asc" ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
+            case CustomerConstants.ORDER_DATE:
+                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
                 break;
-            case "TotalAmount":
-                query = sortOrder == "asc" ? query.OrderBy(o => o.TotalOrder) : query.OrderByDescending(o => o.TotalOrder);
+            case CustomerConstants.TOTAL_AMOUNT:
+                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.TotalOrder) : query.OrderByDescending(o => o.TotalOrder);
                 break;
             default:
-                query = sortOrder == "asc" ? query.OrderBy(o => o.CustomerId) : query.OrderByDescending(o => o.CustomerId);
+                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CustomerId) : query.OrderByDescending(o => o.CustomerId);
                 break;
         }
 
@@ -121,7 +172,7 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
         IEnumerable<Customer>? customers = await GetFilteredOrders(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
 
         using var workbook = new XLWorkbook();
-        IXLWorksheet? worksheet = workbook.Worksheets.Add("Customers");
+        IXLWorksheet? worksheet = workbook.Worksheets.Add(CustomerConstants.CUSTOMERS);
 
         string imagePath = Path.Combine(webRootPath, "images/logo.png");
 

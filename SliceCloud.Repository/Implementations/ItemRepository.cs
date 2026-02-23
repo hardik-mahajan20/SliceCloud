@@ -3,16 +3,17 @@ using SliceCloud.Repository.Models;
 
 namespace SliceCloud.Repository.Implementations;
 
-public class StateRepository(SliceCloudContext sliceCloudContext) : IStateRepository
+public class ItemRepository(SliceCloudContext sliceCloudContext) : IItemRepository
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllStatesAsQueryable
+    #region GetAllItemsAsQueryable
 
-    public IQueryable<State> GetAllStatesAsQueryable()
+    public IQueryable<Item> GetAllItemsAsQueryable()
     {
-        return _sliceCloudContext.States.AsQueryable();
+        return _sliceCloudContext.Items.AsQueryable();
     }
 
     #endregion
+
 }

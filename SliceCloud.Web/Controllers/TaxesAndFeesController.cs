@@ -251,14 +251,14 @@ public class TaxesAndFeesController(ITaxesFeesService taxesFeesService) : Contro
 
     #region GetItemSpecificTaxes
 
-    public IActionResult GetItemSpecificTaxes([FromBody] List<int> itemIds)
+    public async Task<IActionResult> GetItemSpecificTaxes([FromBody] List<int> itemIds)
     {
         try
         {
             if (itemIds == null || !itemIds.Any())
                 return BadRequest("Item ID list is empty.");
 
-            List<ItemSpecificTaxViewModel>? itemSpecificTaxViewModels = _taxesFeesService.GetDefaultItemTaxesAsync(itemIds);
+            List<ItemSpecificTaxViewModel>? itemSpecificTaxViewModels = await _taxesFeesService.GetDefaultItemTaxesAsync(itemIds);
             return Json(itemSpecificTaxViewModels);
         }
         catch (Exception ex)
