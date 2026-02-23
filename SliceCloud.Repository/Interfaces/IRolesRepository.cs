@@ -8,7 +8,7 @@ public interface IRolesRepository
     /// Retrieves all roles asynchronously.
     /// </summary>
     /// <returns>A task that returns the list of all roles.</returns>
-    Task<List<Role>> GetAllRolesAsync();
+    IQueryable<Role> GetAllRolesAsQueryable();
 
     /// <summary>
     /// Retrieves a role by its ID asynchronously.

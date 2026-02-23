@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
 using System.Security.Claims;
@@ -27,16 +28,16 @@ namespace SliceCloud.Service.Attributes
                 is not IPermissionService permissionService
             )
             {
-                context.Result = new RedirectToActionResult("Error", "Home", null);
+                context.Result = new RedirectToActionResult(GenralConstants.ERROR, GenralConstants.HOME, null);
                 return;
             }
 
             string? token = CookieUtils.GetJWTToken(context.HttpContext.Request);
 
-            ClaimsPrincipal? principal = jwtService?.ValidateToken(token ?? "");
+            ClaimsPrincipal? principal = jwtService?.ValidateToken(token ?? String.Empty);
             if (principal == null)
             {
-                context.Result = new RedirectToActionResult("Login", "Auth", null);
+                context.Result = new RedirectToActionResult(GenralConstants.LOGIN, GenralConstants.AUTH, null);
                 return;
             }
 
@@ -50,7 +51,7 @@ namespace SliceCloud.Service.Attributes
                 if (!_roles.Contains(userRole))
                 {
                     bool isAjax =
-                        context.HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+                        context.HttpContext.Request.Headers[GenralConstants.X_REQUESTED_WITH] == GenralConstants.XML_HTTP_REQUEST;
                     HandleAccessDenied(context, isAjax);
                     return;
                 }
@@ -58,18 +59,18 @@ namespace SliceCloud.Service.Attributes
 
             if (!string.IsNullOrEmpty(_requiredPermission))
             {
-                string? controllerName = context.RouteData.Values["controller"]?.ToString();
+                string? controllerName = context.RouteData.Values[GenralConstants.CONTROLLER]?.ToString();
                 int moduleId = GetModuleIdByControllerName(controllerName ?? string.Empty);
                 if (moduleId == 0)
                 {
-                    context.Result = new RedirectToActionResult("AccessDenied", "Error", null);
+                    context.Result = new RedirectToActionResult(GenralConstants.ACCESS_DENIED, GenralConstants.ERROR, null);
                     return;
                 }
                 // Bypass auth for QR-related controllers
                 if (
-                    controllerName == "QRRedirect"
-                    || controllerName == "QRCode"
-                    || controllerName == "QRMenu"
+                    controllerName == GenralConstants.QR_REDIRECT
+                    || controllerName == GenralConstants.QR_CODE
+                    || controllerName == GenralConstants.QR_MENU
                 )
                 {
                     return;
@@ -83,7 +84,7 @@ namespace SliceCloud.Service.Attributes
                 if (!hasPermission)
                 {
                     bool isAjax =
-                        context.HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+                        context.HttpContext.Request.Headers[GenralConstants.X_REQUESTED_WITH] == GenralConstants.XML_HTTP_REQUEST;
                     HandleAccessDenied(context, isAjax);
                     return;
                 }
@@ -100,11 +101,11 @@ namespace SliceCloud.Service.Attributes
             if (isAjax)
             {
                 context.HttpContext.Response.StatusCode = 401;
-                context.Result = new JsonResult(new { success = false, message = "Unauthorized." });
+                context.Result = new JsonResult(new { success = false, message = GenralConstants.UNAUTHORIZED });
             }
             else
             {
-                context.Result = new RedirectToActionResult("Login", "Auth", null);
+                context.Result = new RedirectToActionResult(GenralConstants.LOGIN, GenralConstants.AUTH, null);
             }
         }
 
@@ -119,12 +120,12 @@ namespace SliceCloud.Service.Attributes
             {
                 context.HttpContext.Response.StatusCode = 403;
                 context.Result = new JsonResult(
-                    new { success = false, message = "Access Denied." }
+                    new { success = false, message = GenralConstants.ACCESS_DENIED }
                 );
             }
             else
             {
-                context.Result = new RedirectToActionResult("AccessDenied", "Error", null);
+                context.Result = new RedirectToActionResult(GenralConstants.ACCESS_DENIED, GenralConstants.ERROR, null);
             }
         }
 
@@ -137,19 +138,19 @@ namespace SliceCloud.Service.Attributes
         {
             Dictionary<string, int> moduleMapping = new()
             {
-                { "Users", 1 },
-                { "RoleAndPermission", 2 },
-                { "Menu", 3 },
-                { "TableAndSection", 4 },
-                { "TaxesAndFees", 5 },
-                { "Orders", 6 },
-                { "Customers", 7 },
-                { "Dashboard", 8 },
-                { "OrderApp", 9 },
-                { "OrderAppKOT", 10 },
-                { "OrderAppMenu", 11 },
-                { "OrderAppWaitingList", 12 },
-                { "OrderAppTableView", 13 },
+                { SideBarOptionConstants.USERS, 1 },
+                { SideBarOptionConstants.ROLE_AND_PERMISSION, 2 },
+                { SideBarOptionConstants.MENU, 3 },
+                { SideBarOptionConstants.TABLE_AND_SECTION, 4 },
+                { SideBarOptionConstants.TAX_AND_FEES, 5 },
+                { SideBarOptionConstants.ORDERS, 6 },
+                { SideBarOptionConstants.CUSTOMERS, 7 },
+                { SideBarOptionConstants.DASHBOARD, 8 },
+                { SideBarOptionConstants.ORDER_APP, 9 },
+                { SideBarOptionConstants.ORDER_APP_KOT, 10 },
+                { SideBarOptionConstants.ORDER_APP_MENU, 11 },
+                { SideBarOptionConstants.ORDER_APP_WAITING_LIST, 12 },
+                { SideBarOptionConstants.ORDER_APP_TABLE_VIEW, 13 },
             };
 
             return moduleMapping.TryGetValue(controllerName, out int moduleId) ? moduleId : 0;

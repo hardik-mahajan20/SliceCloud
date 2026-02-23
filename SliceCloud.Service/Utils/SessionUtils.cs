@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Models;
 
 namespace SliceCloud.Service.Utils;
@@ -16,7 +17,7 @@ public static class SessionUtils
         if (user != null)
         {
             string userData = JsonSerializer.Serialize(user);
-            httpContext.Session.SetString("UserData", userData);
+            httpContext.Session.SetString(GenralConstants.USER_DATA, userData);
         }
     }
 
@@ -27,11 +28,11 @@ public static class SessionUtils
     /// <returns>A tuple containing the user's email and username, or null if not found.</returns>
     public static (string? Email, string? Username)? GetUser(HttpContext httpContext)
     {
-        string? userData = httpContext.Session.GetString("UserData");
+        string? userData = httpContext.Session.GetString(GenralConstants.USER_DATA);
 
         if (string.IsNullOrEmpty(userData))
         {
-            httpContext.Request.Cookies.TryGetValue("UserData", out userData);
+            httpContext.Request.Cookies.TryGetValue(GenralConstants.USER_DATA, out userData);
         }
 
         if (string.IsNullOrEmpty(userData))

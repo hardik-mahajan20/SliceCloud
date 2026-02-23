@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -5,17 +7,20 @@ using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Service.Implementations;
 
-public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrentUserService currentUserService) : ITaxesFeesService
+public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrentUserService currentUserService, IItemRepository itemRepository) : ITaxesFeesService
 {
     private readonly ITaxesFeesRepository _taxesFeesRepository = taxesFeesRepository;
 
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
+    private readonly IItemRepository _itemRepository = itemRepository;
+
     #region GetAllTaxes
 
     public async Task<List<TaxesFeesViewModel>> GetAllTaxesAsync()
     {
-        List<Taxis>? taxes = await _taxesFeesRepository.GetAllTaxesAsync();
+        // List<Taxis>? taxes = await _taxesFeesRepository.GetAllTaxesAsync();
+        List<Taxis>? taxes = await _taxesFeesRepository.GetAllTaxisAsQueryable().Where(t => !t.IsDeleted ?? false).ToListAsync();
 
         return taxes.Select(t => new TaxesFeesViewModel
         {
@@ -35,7 +40,35 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task<PaginatedList<TaxesFeesViewModel>> GetTaxesAndFeesAsync(string search, int page, int pageSize, string sortColumn, string sortDirection)
     {
-        PaginatedList<Taxis>? taxes = await _taxesFeesRepository.GetTaxesAndFeesAsync(search, page, pageSize, sortColumn, sortDirection);
+        IQueryable<Taxis>? query = _taxesFeesRepository.GetAllTaxisAsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            string trimmedSearch = search.Trim().ToLower();
+            query = query.Where(
+                t =>
+                    t.TaxName.ToLower() == trimmedSearch
+                    || t.TaxType.ToLower() == trimmedSearch
+            );
+        }
+
+        query = sortColumn switch
+        {
+            TaxConstants.TAX_NAME
+              => sortDirection == GenralConstants.ASCENDING
+                  ? query.OrderBy(t => t.TaxName)
+                  : query.OrderByDescending(t => t.TaxName),
+            TaxConstants.TAX_VALUE
+              => sortDirection == GenralConstants.ASCENDING
+                  ? query.OrderBy(t => t.TaxValue)
+                  : query.OrderByDescending(t => t.TaxValue),
+            _
+              => sortDirection == GenralConstants.ASCENDING
+                  ? query.OrderBy(t => t.TaxId)
+                  : query.OrderByDescending(t => t.TaxId),
+        };
+
+        PaginatedList<Taxis>? taxes = await PaginatedList<Taxis>.CreateAsync(query, page, pageSize);
 
         List<TaxesFeesViewModel>? taxesViewModel = taxes.Select(t => new TaxesFeesViewModel
         {
@@ -57,7 +90,16 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task<bool> IsDuplicateTaxNameAsync(string taxName, int? taxId = null)
     {
-        return await _taxesFeesRepository.IsTaxNameExistsAsync(taxName, taxId);
+        IQueryable<Taxis>? quary = _taxesFeesRepository.GetAllTaxisAsQueryable();
+
+        if (taxId is not null)
+        {
+            return await quary.AnyAsync(t => t.TaxName == taxName && t.TaxId != taxId);
+        }
+        else
+        {
+            return await quary.AnyAsync(t => t.TaxName == taxName);
+        }
     }
 
     #endregion
@@ -125,7 +167,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task<bool> DeleteTaxAsync(int taxId)
     {
-        Taxis? taxis = await _taxesFeesRepository.GetTaxByIdAsync(taxId) ?? throw new Exception("Tax not found");
+        Taxis? taxis = await _taxesFeesRepository.GetTaxByIdAsync(taxId) ?? throw new Exception(ErrorConstants.TAX_NOT_FOUND);
 
         taxis.IsDeleted = true;
         taxis.ModifiedBy = _currentUserService.UserId;
@@ -140,21 +182,21 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task ToggleTaxFieldAsync(int taxId, bool isChecked, string field)
     {
-        Taxis? taxis = await _taxesFeesRepository.GetTaxByIdAsync(taxId) ?? throw new Exception("Tax not found");
+        Taxis? taxis = await _taxesFeesRepository.GetTaxByIdAsync(taxId) ?? throw new Exception(ErrorConstants.TAX_NOT_FOUND);
 
         switch (field)
         {
-            case "IsEnabled":
+            case TaxConstants.TAX_IS_ENABLE:
                 taxis.IsEnabled = isChecked;
                 break;
-            case "IsDefault":
+            case TaxConstants.TAX_IS_DEFAULT:
                 taxis.IsDefault = isChecked;
                 break;
-            case "IsInclusive":
+            case TaxConstants.TAX_IS_INCLUSIVE:
                 taxis.IsInclusive = isChecked;
                 break;
             default:
-                throw new Exception("Invalid field type.");
+                throw new Exception(ErrorConstants.INVALID_FIELD_TYPE);
         }
         taxis.ModifiedBy = _currentUserService.UserId;
         taxis.ModifiedAt = DateTime.UtcNow;
@@ -167,9 +209,9 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task<List<TaxViewModel>> GetEnabledTaxesAsync()
     {
-        List<Taxis>? taxes = await _taxesFeesRepository.GetAllTaxesAsync();
+        List<Taxis>? quary = await _taxesFeesRepository.GetAllTaxisAsQueryable().Where(t => !t.IsDeleted ?? false).ToListAsync();
 
-        return taxes
+        return quary
             .Where(t => t.IsEnabled == true)
             .Select(t => new TaxViewModel
             {
@@ -185,12 +227,27 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     #region GetDefaultItemTaxes
 
-    public List<ItemSpecificTaxViewModel> GetDefaultItemTaxesAsync(List<int> itemIds)
+    public async Task<List<ItemSpecificTaxViewModel>> GetDefaultItemTaxesAsync(List<int> itemIds)
     {
         if (itemIds == null || !itemIds.Any())
             return new List<ItemSpecificTaxViewModel>();
 
-        return _taxesFeesRepository.GetDefaultTaxesForItemsAsync(itemIds);
+        IQueryable<Item>? query = _itemRepository.GetAllItemsAsQueryable();
+
+        List<ItemSpecificTaxViewModel>? itemSpecificTaxViewModels = await query.Where(i => itemIds.Contains(i.ItemId) && i.IsDefaultTax == true)
+                 .Select(
+                     i =>
+                         new ItemSpecificTaxViewModel
+                         {
+                             ItemId = i.ItemId,
+                             Percentage = i.TaxPercentage,
+                             TaxName = TaxConstants.OTHER
+                         }
+                 )
+                 .ToListAsync();
+
+
+        return itemSpecificTaxViewModels;
     }
 
     #endregion

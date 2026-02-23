@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using SliceCloud.Repository.Constants;
 
 namespace SliceCloud.Service.Utils;
 
@@ -21,7 +22,7 @@ public static class ToastExtensions
         string type,
         string message)
     {
-        tempData["Toast"] = JsonSerializer.Serialize(
+        tempData[GenralConstants.TOAST] = JsonSerializer.Serialize(
             new
             {
                 type,

@@ -1,4 +1,4 @@
-namespace SliceCloud.Repository.Interfaces;
+namespace SliceCloud.Service.Interfaces;
 
 public interface ICurrentUserService
 {

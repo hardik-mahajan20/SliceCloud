@@ -7,6 +7,8 @@ using SliceCloud.Repository.ViewModels;
 using SliceCloud.Repository.Enums;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
+using Microsoft.EntityFrameworkCore;
+using SliceCloud.Repository.Constants;
 
 namespace SliceCloud.Service.Implementations;
 
@@ -24,7 +26,39 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
     public async Task<PaginatedList<User>> GetAllUsersAsync(int pageNumber, int pageSize, string query, string sortOrder, string sortColumn, string search)
     {
-        PaginatedList<User> paginatedUsers = await _usersRepository.GetAllUsersAsync(pageNumber, pageSize, query, sortOrder, sortColumn, search);
+        IQueryable<User>? usersQuery = _usersRepository.GetAllUsersAsQuearyable().Where(u => u.IsDeleted == false);
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            string trimmedSearch = search.Trim().ToLower();
+            usersQuery = usersQuery.Where(u =>
+                (u.FirstName != null && u.FirstName.ToLower() == trimmedSearch) ||
+                (u.Email != null && u.Email.ToLower() == trimmedSearch) ||
+                (u.PhoneNumber != null && u.PhoneNumber.ToLower() == trimmedSearch)
+            );
+        }
+
+        usersQuery = sortColumn switch
+        {
+            UserConstants.CREATEDATE
+              => sortOrder == GenralConstants.ASCENDING
+                  ? usersQuery.OrderBy(o => o.CreatedAt)
+                  : usersQuery.OrderByDescending(o => o.CreatedAt),
+            UserConstants.EMAIL
+              => sortOrder == GenralConstants.ASCENDING
+                  ? usersQuery.OrderBy(o => o.Email).ThenBy(o => o.UserId)
+                  : usersQuery
+                    .OrderByDescending(o => o.Email)
+                    .ThenByDescending(o => o.UserId),
+            UserConstants.PHONE
+              => sortOrder == GenralConstants.ASCENDING
+                  ? usersQuery.OrderBy(o => o.PhoneNumber)
+                  : usersQuery.OrderByDescending(o => o.PhoneNumber),
+            _ => usersQuery.OrderByDescending(o => o.CreatedAt)
+        };
+
+
+        PaginatedList<User> paginatedUsers = await PaginatedList<User>.CreateAsync(usersQuery, pageNumber, pageSize);
 
         foreach (var user in paginatedUsers)
         {
@@ -44,16 +78,24 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
     {
         Dictionary<string, string> errors = [];
 
-        if (createUserViewModel.Email != null)
-            if (await _usersRepository.IsEmailExistsAsync(createUserViewModel.Email, null))
-                errors.Add(nameof(createUserViewModel.Email), "Email already exists.");
+        bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == createUserViewModel.Email);
+        if (isEmailExists)
+        {
+            errors.Add(nameof(createUserViewModel.Email), ErrorConstants.EMAIL_ALREADY_EXISTS);
+        }
 
-        if (await _usersRepository.IsUsernameExistsAsync(createUserViewModel.UserName, null))
-            errors.Add(nameof(createUserViewModel.UserName), "UserName already exists.");
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == createUserViewModel.UserName);
+        if (isUsernameExists)
+        {
+            errors.Add(nameof(createUserViewModel.UserName), ErrorConstants.USERNAME_ALREADY_EXISTS);
+        }
 
-        if (createUserViewModel.Phone != null)
-            if (await _usersRepository.IsPhoneExistsAsync(createUserViewModel.Phone, null))
-                errors.Add(nameof(createUserViewModel.Phone), "Phone number already exists.");
+        bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == createUserViewModel.Phone);
+
+        if (isPhoneExists)
+        {
+            errors.Add(nameof(createUserViewModel.Phone), ErrorConstants.PHONE_NUMBER_ALREADY_EXISTS);
+        }
 
         return errors;
     }
@@ -66,16 +108,23 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
     {
         Dictionary<string, string> errors = [];
 
-        if (updateUserViewModel.Email != null)
-            if (await _usersRepository.IsEmailExistsAsync(updateUserViewModel.Email, updateUserViewModel.Id))
-                errors.Add(nameof(updateUserViewModel.Email), "Email already exists.");
+        bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == updateUserViewModel.Email && u.UserId == updateUserViewModel.Id);
+        if (isEmailExists)
+        {
+            errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.EMAIL_ALREADY_EXISTS);
+        }
 
-        if (await _usersRepository.IsUsernameExistsAsync(updateUserViewModel.UserName, updateUserViewModel.Id))
-            errors.Add(nameof(updateUserViewModel.UserName), "UserName already exists.");
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == updateUserViewModel.UserName && u.UserId == updateUserViewModel.Id);
+        if (isUsernameExists)
+        {
+            errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.USERNAME_ALREADY_EXISTS);
+        }
 
-        if (updateUserViewModel.PhoneNumber != null)
-            if (await _usersRepository.IsPhoneExistsAsync(updateUserViewModel.PhoneNumber, updateUserViewModel.Id))
-                errors.Add(nameof(updateUserViewModel.PhoneNumber), "Phone number already exists.");
+        bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == updateUserViewModel.PhoneNumber && u.UserId == updateUserViewModel.Id);
+        if (isPhoneExists)
+        {
+            errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.PHONE_NUMBER_ALREADY_EXISTS);
+        }
 
         return errors;
     }
@@ -145,7 +194,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         {
 
             user.ProfileImage = string.IsNullOrEmpty(user.ProfileImage)
-               ? ""
+               ? string.Empty
                : "images/uploads/" + user.ProfileImage;
             UpdateUserViewModel updateUserViewModel = new()
             {
@@ -222,7 +271,13 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
     public async Task<bool> DeleteExistingUserAsync(int id)
     {
-        return await _usersRepository.DeleteExistingUserAsync(id);
+        User? user = await _usersRepository.GetUserByIdAsync(id);
+        if (user is not null)
+        {
+            user.IsDeleted = true;
+            return await _usersRepository.UpdateUserAsync(user);
+        }
+        return false;
     }
 
     #endregion
@@ -234,17 +289,17 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         string? userRole = user.FindFirst(ClaimTypes.Role)?.Value;
         HashSet<int> excludedRoleIds = [];
 
-        if (userRole == "Manager")
+        if (userRole == RolesConstants.MANAGER)
         {
             excludedRoleIds.Add(1);
         }
-        else if (userRole == "Chef")
+        else if (userRole == RolesConstants.CHEF)
         {
             excludedRoleIds.Add(1);
             excludedRoleIds.Add(2);
         }
 
-        List<Role>? allRoles = await _rolesRepository.GetAllRolesAsync();
+        List<Role>? allRoles = await _rolesRepository.GetAllRolesAsQueryable().ToListAsync();
 
         return allRoles
             .Where(r => !excludedRoleIds.Contains(r.RoleId))

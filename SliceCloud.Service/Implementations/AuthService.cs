@@ -1,8 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -11,9 +13,10 @@ using SliceCloud.Service.Utils;
 
 namespace SliceCloud.Service.Implementations;
 
-public class AuthService(IUsersLoginRepository usersLoginRepository, IConfiguration configuration) : IAuthService
+public class AuthService(IUsersLoginRepository usersLoginRepository, IConfiguration configuration, IUsersRepository usersRepository) : IAuthService
 {
     private readonly IUsersLoginRepository _usersLoginRepository = usersLoginRepository;
+    private readonly IUsersRepository _usersRepository = usersRepository;
     private readonly IConfiguration _configuration = configuration;
 
     #region AuthenticateUser
@@ -21,7 +24,14 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
     public async Task<UsersLogin?> AuthenticateUserAsync(string userEmail, string userPassword)
     {
         string hashedPassword = PasswordUtils.HashPassword(userPassword);
-        UsersLogin? usersLogin = await _usersLoginRepository.GetUserLoginAsync(userEmail, hashedPassword);
+
+        UsersLogin? usersLogin = await _usersLoginRepository.GetUsersLoginWithUserAsQueryable().FirstOrDefaultAsync(
+            u => u.Email == userEmail
+            && u.PasswordHash == hashedPassword
+            && u.IsFirstLogin == false
+            && u.User!.IsDeleted == false
+            && u.User.Status == (int)UserStatus.Active
+            );
 
         if (usersLogin == null) return null;
 
@@ -34,9 +44,12 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
 
     public async Task<UsersLogin?> GetUserLoginByEmailAsync(string userEmail)
     {
-        UsersLogin? usersLogin = await _usersLoginRepository.GetUserLoginByEmailAsync(userEmail);
+        UsersLogin? usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable()
+                        .FirstOrDefaultAsync(u => u.Email!.ToLower() == userEmail.ToLower());
+
         if (usersLogin is null)
             return null;
+
         return usersLogin;
     }
 
@@ -46,14 +59,16 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
 
     public async Task<string> GeneratePasswordResetTokenAsync(string userEmail)
     {
-        UsersLogin? usersLogin = await _usersLoginRepository.GetUserLoginByEmailAsync(userEmail) ?? throw new InvalidOperationException("User not found with the provided email.");
+        UsersLogin? usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable()
+                               .FirstOrDefaultAsync(u => u.Email!.Equals(userEmail.Equals(userEmail, StringComparison.CurrentCultureIgnoreCase))) ?? throw new InvalidOperationException("User not found with the provided email.");
 
         string token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 
-        await _usersLoginRepository.SavePasswordResetTokenAsync(usersLogin.UserLoginId,
-          token,
-          DateTime.UtcNow.AddHours(24),
-          false);
+        usersLogin.ResetToken = token;
+        usersLogin.ResetTokenExpiration = DateTime.UtcNow.AddHours(24);
+        usersLogin.IsResetTokenUsed = false;
+
+        await _usersLoginRepository.UpdateUsersLoginAsync(usersLogin);
 
         return token;
     }
@@ -64,7 +79,8 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
 
     public async Task<bool> ValidatePasswordResetTokenAsync(string token)
     {
-        UsersLogin? usersLogin = await _usersLoginRepository.GetUserByResetTokenAsync(token);
+        UsersLogin? usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable().FirstOrDefaultAsync(u => u.ResetToken == token);
+
         if (usersLogin == null || usersLogin.ResetTokenExpiration.GetValueOrDefault() < DateTime.UtcNow || usersLogin.IsResetTokenUsed == true)
         {
             return false;
@@ -78,7 +94,8 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
 
     public async Task<bool> UpdateUserPasswordAsync(string token, string newPassword)
     {
-        UsersLogin? usersLogin = await _usersLoginRepository.GetUserByResetTokenAsync(token);
+        UsersLogin? usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable().FirstOrDefaultAsync(u => u.ResetToken == token);
+
 
         if (usersLogin == null || usersLogin.ResetTokenExpiration.GetValueOrDefault() < DateTime.UtcNow || usersLogin.IsResetTokenUsed == true)
         {
@@ -86,22 +103,22 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
         }
 
         string hashedPassword = PasswordUtils.HashPassword(newPassword);
-        bool passwordUpdated = await _usersLoginRepository.SetUserPasswordAsync(usersLogin.UserLoginId, hashedPassword);
-        if (!passwordUpdated)
-        {
-            return false;
-        }
 
+
+        usersLogin.PasswordHash = hashedPassword;
         usersLogin.IsResetTokenUsed = true;
         usersLogin.IsFirstLogin = false;
 
-        bool isResetTokenInvalidated = await _usersLoginRepository.InvalidateResetTokenAsync(usersLogin.UserLoginId);
-        if (!isResetTokenInvalidated)
+
+        User? user = await _usersRepository.GetUserByIdAsync(usersLogin.UserId ?? 0);
+
+        if (user is not null)
         {
-            return false;
+            user.PasswordHash = hashedPassword;
+            await _usersRepository.UpdateUserAsync(user);
         }
 
-        return true;
+        return await _usersLoginRepository.UpdateUsersLoginAsync(usersLogin);
     }
 
     public UserCredentialViewModel DecodeJwtToken(string token)
