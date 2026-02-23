@@ -2,6 +2,20 @@
     ViewData[index: "Title"] = "TableAndSection";
 }
 
-<div class="d-flex align-items-center justify-content-center">
-    <h1 class="custom-body-text-color">Table And Section</h1>
+<div class="d-flex flex-column w-100 p-4">
+    <div class="d-flex justify-content-between w-100 mb-3 d-sm-row d-column flex-wrap flex-sm-nowrap ">
+        <h1 class="custom-body-text-color">Section/Table</h1>
+    </div>
+    <div class="bg-white " id="tableSectionContainer">
+
+    </div>
 </div>
+
+
+<div id="modalPlaceholder"></div>
+
+<input type="hidden" id="sectionIdHidden">
+
+@section Scripts {
+    <script src="~/js/table-and-section.js"></script>
+}

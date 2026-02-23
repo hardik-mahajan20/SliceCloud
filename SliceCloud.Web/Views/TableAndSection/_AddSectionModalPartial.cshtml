@@ -1,0 +1,32 @@
+@model SliceCloud.Repository.ViewModels.SectionViewModel
+<div class="modal fade" id="addSection" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="addSectionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addSectionLabel">Add Section</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addSectionForm" asp-action="AddSection" asp-controller="TableAndSection" method="post">
+                <div class="modal-body d-flex flex-column align-items-center">
+                    <div class="mb-3 w-100 form-floating">
+                        <input type="text" class="form-control w-100" id="SectionNameAdd" name="SectionName"
+                            asp-for="SectionName" placeholder="Section Name" />
+                        <span asp-validation-for="SectionName" class="text-danger"></span>
+                        <label for="SectionName" class="form-label offscreen">Name*</label>
+                    </div>
+                    <div class="mb-3 w-100 form-floating">
+                        <textarea class="w-100 form-control" id="DescriptionAdd" name="Description"
+                            asp-for="Description" placeholder="DescriptionAdd"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <label for="Description" class="form-label offscreen">Description</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn custom-navbar-bg-color text-white p-2">Save</button>
+                    <button type="button" class="btn  btn-outline-primary p-2" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
