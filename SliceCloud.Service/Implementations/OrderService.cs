@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
@@ -63,22 +64,22 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
 
         query = sortColumn switch
         {
-            "CustomerName"
-              => sortDirection == "asc"
+            OrderConstants.CUSTOMER_NAME
+              => sortDirection == GenralConstants.ASCENDING
                   ? query.OrderBy(o => o.Customer.CustomerName ?? string.Empty)
                   : query.OrderByDescending(o => o.Customer.CustomerName ?? string.Empty),
-            "OrderDate"
-              => sortDirection == "asc"
+            OrderConstants.ORDER_DATE
+              => sortDirection == GenralConstants.ASCENDING
                   ? query.OrderBy(o => o.OrderDate).ThenBy(o => o.OrderId)
                   : query.OrderByDescending(o => o.OrderDate).ThenByDescending(o => o.OrderId),
-            "TotalAmount"
-              => sortDirection == "asc"
+            OrderConstants.TOTAL_AMOUNT
+              => sortDirection == GenralConstants.ASCENDING
                   ? query.OrderBy(o => o.TotalAmount).ThenBy(o => o.OrderId)
                   : query
                     .OrderByDescending(o => o.TotalAmount)
                     .ThenByDescending(o => o.OrderId),
             _
-              => sortDirection == "asc"
+              => sortDirection == GenralConstants.ASCENDING
                   ? query.OrderBy(o => o.OrderId)
                   : query.OrderByDescending(o => o.OrderId),
         };
@@ -91,11 +92,11 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
                     new OrderViewModel
                     {
                         OrderId = o.OrderId,
-                        CustomerName = o.Customer?.CustomerName ?? "Unknown",
+                        CustomerName = o.Customer?.CustomerName ?? GenralConstants.NA,
                         OrderDate = o.OrderDate ?? DateTime.Now,
                         TotalAmount = o.TotalAmount,
                         Rating = o.Rating ?? 0m,
-                        PaymentMode = o.PaymentMode ?? "NA",
+                        PaymentMode = o.PaymentMode ?? GenralConstants.NA,
                         Status = (OrderStatus)o.Status
                     }
             )
@@ -142,27 +143,27 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         }
         switch (sortColumn)
         {
-            case "CustomerName":
+            case OrderConstants.CUSTOMER_NAME:
                 query =
-                    sortOrder == "asc"
+                    sortOrder == GenralConstants.ASCENDING
                         ? query.OrderBy(o => o.Customer.CustomerName)
                         : query.OrderByDescending(o => o.Customer.CustomerName);
                 break;
-            case "OrderDate":
+            case OrderConstants.ORDER_DATE:
                 query =
-                    sortOrder == "asc"
+                    sortOrder == GenralConstants.ASCENDING
                         ? query.OrderBy(o => o.OrderDate)
                         : query.OrderByDescending(o => o.OrderDate);
                 break;
-            case "TotalAmount":
+            case OrderConstants.TOTAL_AMOUNT:
                 query =
-                    sortOrder == "asc"
+                    sortOrder == GenralConstants.ASCENDING
                         ? query.OrderBy(o => o.TotalAmount)
                         : query.OrderByDescending(o => o.TotalAmount);
                 break;
             default:
                 query =
-                    sortOrder == "asc"
+                    sortOrder == GenralConstants.ASCENDING
                         ? query.OrderBy(o => o.OrderId)
                         : query.OrderByDescending(o => o.OrderId);
                 break;
@@ -221,7 +222,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
                 t =>
                     new TaxBreakdownViewModel
                     {
-                        TaxName = t.TaxId == 0 ? "Other" : t.Tax?.TaxName ?? "Unknown",
+                        TaxName = t.TaxId == 0 ? OrderConstants.OTHER : t.Tax?.TaxName ?? GenralConstants.NA,
                         TaxValue = (decimal)(t.TaxValue ?? 0),
                     }
             )
@@ -238,7 +239,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
             .ToList();
 
         if (sections == null)
-            throw new Exception("Sections are empty");
+            throw new Exception(OrderConstants.SECTIONS_ARE_EMPTY);
 
         List<string>? tables = order.OrderTables
             .Where(ot => ot.Table != null)
@@ -250,11 +251,11 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         {
             OrderId = order.OrderId,
             OrderStatus = ((OrderStatus)order.Status).ToString(),
-            CustomerName = order.Customer?.CustomerName ?? "Unknown Customer",
-            CustomerPhone = order.Customer?.PhoneNo ?? "N/A",
-            CustomerEmail = order.Customer?.Email ?? "N/A",
+            CustomerName = order.Customer?.CustomerName ?? GenralConstants.NA,
+            CustomerPhone = order.Customer?.PhoneNo ?? GenralConstants.NA,
+            CustomerEmail = order.Customer?.Email ?? GenralConstants.NA,
             NoOfPersons = order.NoOfPerson ?? 0,
-            InvoiceNumber = order.InvoiceNumber ?? "N/A",
+            InvoiceNumber = order.InvoiceNumber ?? GenralConstants.NA,
             PaidOn = order.ModifiedAt,
             OrderDate = order.CreatedAt ?? DateTime.MinValue,
             ModifiedOn = order.ModifiedAt ?? DateTime.MinValue,
@@ -264,8 +265,8 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
             Items = orderDetails,
             SubTotal = subTotal,
             TotalAmountDue = totalAmountDue,
-            TaxBreakdown = taxBreakdown, // <-- new
-            PaymentMethod = order.PaymentMode ?? "Pending"
+            TaxBreakdown = taxBreakdown, 
+            PaymentMethod = order.PaymentMode ?? OrderConstants.PENDING
         };
     }
 
@@ -282,7 +283,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
             int minutes = duration.Minutes;
             return $"{hours} Hours {minutes} Minutes";
         }
-        return "0 Hours 0 Minutes";
+        return OrderConstants.ZERO_TIME;
     }
 
     #endregion

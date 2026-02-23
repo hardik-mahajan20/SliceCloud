@@ -9,6 +9,7 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
+    #region Get UserId
     public int UserId
     {
         get
@@ -22,6 +23,9 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
                 : throw new UnauthorizedAccessException(ErrorConstants.USER_ID_CLAIM_MISSING);
         }
     }
+    #endregion
+
+    #region Get UserName
 
     public string? UserName
     {
@@ -30,5 +34,7 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
             return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
         }
     }
+
+    #endregion
 
 }

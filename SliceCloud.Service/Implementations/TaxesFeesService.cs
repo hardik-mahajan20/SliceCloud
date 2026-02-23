@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -54,16 +54,16 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
         query = sortColumn switch
         {
-            "TaxName"
-              => sortDirection == "asc"
+            TaxConstants.TAX_NAME
+              => sortDirection == GenralConstants.ASCENDING
                   ? query.OrderBy(t => t.TaxName)
                   : query.OrderByDescending(t => t.TaxName),
-            "Value"
-              => sortDirection == "asc"
+            TaxConstants.TAX_VALUE
+              => sortDirection == GenralConstants.ASCENDING
                   ? query.OrderBy(t => t.TaxValue)
                   : query.OrderByDescending(t => t.TaxValue),
             _
-              => sortDirection == "asc"
+              => sortDirection == GenralConstants.ASCENDING
                   ? query.OrderBy(t => t.TaxId)
                   : query.OrderByDescending(t => t.TaxId),
         };
@@ -167,7 +167,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task<bool> DeleteTaxAsync(int taxId)
     {
-        Taxis? taxis = await _taxesFeesRepository.GetTaxByIdAsync(taxId) ?? throw new Exception("Tax not found");
+        Taxis? taxis = await _taxesFeesRepository.GetTaxByIdAsync(taxId) ?? throw new Exception(ErrorConstants.TAX_NOT_FOUND);
 
         taxis.IsDeleted = true;
         taxis.ModifiedBy = _currentUserService.UserId;
@@ -182,21 +182,21 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task ToggleTaxFieldAsync(int taxId, bool isChecked, string field)
     {
-        Taxis? taxis = await _taxesFeesRepository.GetTaxByIdAsync(taxId) ?? throw new Exception("Tax not found");
+        Taxis? taxis = await _taxesFeesRepository.GetTaxByIdAsync(taxId) ?? throw new Exception(ErrorConstants.TAX_NOT_FOUND);
 
         switch (field)
         {
-            case "IsEnabled":
+            case TaxConstants.TAX_IS_ENABLE:
                 taxis.IsEnabled = isChecked;
                 break;
-            case "IsDefault":
+            case TaxConstants.TAX_IS_DEFAULT:
                 taxis.IsDefault = isChecked;
                 break;
-            case "IsInclusive":
+            case TaxConstants.TAX_IS_INCLUSIVE:
                 taxis.IsInclusive = isChecked;
                 break;
             default:
-                throw new Exception("Invalid field type.");
+                throw new Exception(ErrorConstants.INVALID_FIELD_TYPE);
         }
         taxis.ModifiedBy = _currentUserService.UserId;
         taxis.ModifiedAt = DateTime.UtcNow;
@@ -241,7 +241,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
                          {
                              ItemId = i.ItemId,
                              Percentage = i.TaxPercentage,
-                             TaxName = "Other"
+                             TaxName = TaxConstants.OTHER
                          }
                  )
                  .ToListAsync();

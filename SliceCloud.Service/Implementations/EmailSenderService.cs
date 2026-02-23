@@ -3,6 +3,7 @@ using System.Net.Mail;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Service.Implementations;
@@ -29,7 +30,7 @@ public class EmailSenderService(IConfiguration configuration, IWebHostEnvironmen
 
             MailMessage mailMessage = new()
             {
-                From = new MailAddress(fromEmail ?? string.Empty, "SliceCloud Support"),
+                From = new MailAddress(fromEmail ?? string.Empty, EmailConstants.SLICECLOUD_SUPPORT),
                 Subject = subject,
                 IsBodyHtml = true
             }
@@ -65,7 +66,7 @@ public class EmailSenderService(IConfiguration configuration, IWebHostEnvironmen
     {
         string? imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "logo.png");
 
-        string subject = "Reset Your Password - SliceCloud";
+        string subject = EmailConstants.EMAIL_SUBJECT;
 
         string body = $@"
 <html>

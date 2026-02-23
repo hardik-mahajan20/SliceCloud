@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Service.Interfaces;
@@ -21,13 +22,13 @@ public class JwtService : IJwtService
     public JwtService(IConfiguration configuration, IUsersLoginRepository userLoginRepository, IRolesService rolesService)
     {
         _key = configuration["Jwt:Key"]
-                ?? throw new ArgumentNullException(nameof(configuration), "JWT key is missing in configuration.");
+                ?? throw new ArgumentNullException(nameof(configuration), ErrorConstants.JWT_KEY_MISSING);
 
         _issuer = configuration["Jwt:Issuer"]
-            ?? throw new ArgumentNullException(nameof(configuration), "JWT issuer is missing in configuration.");
+            ?? throw new ArgumentNullException(nameof(configuration), ErrorConstants.JWT_ISSUER_MISSING);
 
         _audience = configuration["Jwt:Audience"]
-            ?? throw new ArgumentNullException(nameof(configuration), "JWT audience is missing in configuration.");
+            ?? throw new ArgumentNullException(nameof(configuration), ErrorConstants.JWT_AUDIENCE_MISSING);
 
         _userLoginRepository = userLoginRepository;
         _rolesService = rolesService;
@@ -44,15 +45,15 @@ public class JwtService : IJwtService
 
         UsersLogin? userDetail = await _userLoginRepository.GetUsersLoginAsQueryable()
                                 .FirstOrDefaultAsync(u => u.Email!.ToLower() == email.ToLower())
-                                 ?? throw new Exception("User not found while generating JWT token.");
+                                 ?? throw new Exception(ErrorConstants.JWT_USER_NOT_FOUND);
 
         Role? role = await _rolesService.GetRoleByIdAsync(userDetail.RoleId)
-        ?? throw new Exception("User role not found while generating JWT token.");
+        ?? throw new Exception(ErrorConstants.JWT_USER_ROLE_NOT_FOUND);
 
         int? userId = userDetail.UserId;
         if (userId is null || userId == 0)
         {
-            throw new Exception("User id not found while generating JWT token.");
+            throw new Exception(ErrorConstants.JWT_USER_ID_NOT_FOUND);
         }
         List<Claim>? claims = new List<Claim>
         {
@@ -64,7 +65,7 @@ public class JwtService : IJwtService
 
         if (rememberMe)
         {
-            claims.Add(new Claim("RememberMe", "True"));
+            claims.Add(new Claim(GenralConstants.REMEMBERME, GenralConstants.TRUE));
         }
 
         SecurityTokenDescriptor? tokenDescriptor = new SecurityTokenDescriptor

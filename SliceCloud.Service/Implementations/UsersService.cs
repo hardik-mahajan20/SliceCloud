@@ -8,6 +8,7 @@ using SliceCloud.Repository.Enums;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
 using Microsoft.EntityFrameworkCore;
+using SliceCloud.Repository.Constants;
 
 namespace SliceCloud.Service.Implementations;
 
@@ -39,18 +40,18 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
         usersQuery = sortColumn switch
         {
-            "CreateDate"
-              => sortOrder == "asc"
+            UserConstants.CREATEDATE
+              => sortOrder == GenralConstants.ASCENDING
                   ? usersQuery.OrderBy(o => o.CreatedAt)
                   : usersQuery.OrderByDescending(o => o.CreatedAt),
-            "Email"
-              => sortOrder == "asc"
+            UserConstants.EMAIL
+              => sortOrder == GenralConstants.ASCENDING
                   ? usersQuery.OrderBy(o => o.Email).ThenBy(o => o.UserId)
                   : usersQuery
                     .OrderByDescending(o => o.Email)
                     .ThenByDescending(o => o.UserId),
-            "Phone"
-              => sortOrder == "asc"
+            UserConstants.PHONE
+              => sortOrder == GenralConstants.ASCENDING
                   ? usersQuery.OrderBy(o => o.PhoneNumber)
                   : usersQuery.OrderByDescending(o => o.PhoneNumber),
             _ => usersQuery.OrderByDescending(o => o.CreatedAt)
@@ -80,20 +81,20 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == createUserViewModel.Email);
         if (isEmailExists)
         {
-            errors.Add(nameof(createUserViewModel.Email), "Email already exists.");
+            errors.Add(nameof(createUserViewModel.Email), ErrorConstants.EMAIL_ALREADY_EXISTS);
         }
 
         bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == createUserViewModel.UserName);
         if (isUsernameExists)
         {
-            errors.Add(nameof(createUserViewModel.UserName), "UserName already exists.");
+            errors.Add(nameof(createUserViewModel.UserName), ErrorConstants.USERNAME_ALREADY_EXISTS);
         }
 
         bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == createUserViewModel.Phone);
 
         if (isPhoneExists)
         {
-            errors.Add(nameof(createUserViewModel.Phone), "Phone number already exists.");
+            errors.Add(nameof(createUserViewModel.Phone), ErrorConstants.PHONE_NUMBER_ALREADY_EXISTS);
         }
 
         return errors;
@@ -110,19 +111,19 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == updateUserViewModel.Email && u.UserId == updateUserViewModel.Id);
         if (isEmailExists)
         {
-            errors.Add(nameof(updateUserViewModel.Email), "Email already exists.");
+            errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.EMAIL_ALREADY_EXISTS);
         }
 
         bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == updateUserViewModel.UserName && u.UserId == updateUserViewModel.Id);
         if (isUsernameExists)
         {
-            errors.Add(nameof(updateUserViewModel.Email), "Email already exists.");
+            errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.USERNAME_ALREADY_EXISTS);
         }
 
         bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == updateUserViewModel.PhoneNumber && u.UserId == updateUserViewModel.Id);
         if (isPhoneExists)
         {
-            errors.Add(nameof(updateUserViewModel.Email), "Email already exists.");
+            errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.PHONE_NUMBER_ALREADY_EXISTS);
         }
 
         return errors;
@@ -193,7 +194,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         {
 
             user.ProfileImage = string.IsNullOrEmpty(user.ProfileImage)
-               ? ""
+               ? string.Empty
                : "images/uploads/" + user.ProfileImage;
             UpdateUserViewModel updateUserViewModel = new()
             {
@@ -288,11 +289,11 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         string? userRole = user.FindFirst(ClaimTypes.Role)?.Value;
         HashSet<int> excludedRoleIds = [];
 
-        if (userRole == "Manager")
+        if (userRole == RolesConstants.MANAGER)
         {
             excludedRoleIds.Add(1);
         }
-        else if (userRole == "Chef")
+        else if (userRole == RolesConstants.CHEF)
         {
             excludedRoleIds.Add(1);
             excludedRoleIds.Add(2);

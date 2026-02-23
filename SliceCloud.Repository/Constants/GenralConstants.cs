@@ -23,4 +23,9 @@ public static class GenralConstants
     public const string TOAST = "Toast";
     public const string NA = "NA";
     public const string ASCENDING = "asc";
+    public const string WWWROOT = "wwwroot";
+    public const string IMAGES = "images";
+    public const string UPLOADS = "uploads";
+    public const string REMEMBERME = "RememberMe";
+    public const string TRUE = "True";
 }

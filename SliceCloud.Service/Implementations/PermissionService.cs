@@ -69,7 +69,7 @@ public class PermissionService(IPermissionRepository permissionRepository, IRole
             List<Permission>? dbPermissions = await _permissionRepository.GetAllPermissionAsQueryable().Where(p => p.RoleId == roleId && permissionIds.Contains(p.PermissionId)).ToListAsync();
 
             if (dbPermissions.Count != roleAndPermissionsViewModel.Permissions.Count)
-                throw new InvalidOperationException("Invalid permission update request.");
+                throw new InvalidOperationException(ErrorConstants.INVALID_PERMISSION_UPDATE_REQUEST);
 
             foreach (var dbPermission in dbPermissions)
             {
