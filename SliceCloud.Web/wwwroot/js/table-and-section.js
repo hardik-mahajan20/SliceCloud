@@ -343,24 +343,27 @@ $(document).on("submit", "#editSectionForm", function (e) {
 $(document).on("click", ".delete-section-btn", function () {
   var sectionId = $(this).data("id");
 
-  $.ajax({
-    type: "GET",
-    url: "/TableAndSection/CheckSectionTablesAvailability/",
-    data: { sectionId: sectionId },
-    success: function (response) {
-      if (response.success) {
-        $("#deleteSectionId").val(sectionId);
-        $("#deleteSectionModal").modal("show");
-      } else {
-        toastr.error(
-          "All tables in this section must have the status 'Available' to delete the section."
-        );
-      }
-    },
-    error: function () {
-      toastr.error("Error checking table availability in the section.");
-    },
-  });
+  $("#deleteSectionId").val(sectionId);
+  $("#deleteSectionModal").modal("show");
+
+  // $.ajax({
+  //   type: "GET",
+  //   url: "/TableAndSection/CheckSectionTablesAvailability/",
+  //   data: { sectionId: sectionId },
+  //   success: function (response) {
+  //     if (response.success) {
+  //       $("#deleteSectionId").val(sectionId);
+  //       $("#deleteSectionModal").modal("show");
+  //     } else {
+  //       toastr.error(
+  //         "All tables in this section must have the status 'Available' to delete the section."
+  //       );
+  //     }
+  //   },
+  //   error: function () {
+  //     toastr.error("Error checking table availability in the section.");
+  //   },
+  // });
 });
 $("#deleteSectionForm").submit(function (e) {
   e.preventDefault();

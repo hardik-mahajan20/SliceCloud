@@ -105,4 +105,23 @@ public class SectionService(ISectionRepository sectionRepository, ICurrentUserSe
     }
 
     #endregion
+
+    #region DeleteSection
+
+    public async Task<bool> DeleteSectionAsync(int sectionId)
+    {
+        Section? section = await _sectionRepository.GetSectionByIdAsync(sectionId);
+        if (section == null)
+        {
+            return false;
+        }
+
+        section.IsDeleted = true;
+        section.ModifiedAt = DateTime.UtcNow;
+        section.ModifiedBy = _currentUserService.UserId;
+
+        return await _sectionRepository.UpdateSectionAsync(section);
+    }
+
+    #endregion
 }

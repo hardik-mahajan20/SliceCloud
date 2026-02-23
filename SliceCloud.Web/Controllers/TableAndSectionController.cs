@@ -34,6 +34,7 @@ public class TableAndSectionController(ISectionService sectionService) : Control
     #endregion
 
     #region LoadTableSection Partial View
+
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public async Task<IActionResult> LoadTableSection()
@@ -52,10 +53,12 @@ public class TableAndSectionController(ISectionService sectionService) : Control
             return Json(new { success = false, message = ex.Message });
         }
     }
+
     #endregion
 
 
     #region GetAddSectionModal
+
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public IActionResult GetAddSectionModal()
@@ -69,10 +72,12 @@ public class TableAndSectionController(ISectionService sectionService) : Control
             return Json(new { success = false, message = ex.Message });
         }
     }
+
     #endregion
 
 
     #region AddSection
+
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
     public async Task<IActionResult> AddSection([FromBody] SectionViewModel model)
@@ -118,10 +123,11 @@ public class TableAndSectionController(ISectionService sectionService) : Control
             return Json(new { success = false, message = ex.Message });
         }
     }
+
     #endregion
 
-
     #region GetSectionById
+
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public async Task<IActionResult> GetSectionById(int id)
@@ -140,10 +146,11 @@ public class TableAndSectionController(ISectionService sectionService) : Control
             return Json(new { success = false, message = ex.Message });
         }
     }
+
     #endregion
 
-
     #region Edit Section
+
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
     public async Task<IActionResult> EditSection(SectionViewModel sectionViewModel)
@@ -191,6 +198,36 @@ public class TableAndSectionController(ISectionService sectionService) : Control
             return Json(new { success = false, message = ex.Message });
         }
     }
+
     #endregion
 
+    #region DeleteSection
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteSection(int sectionId)
+    {
+        if (sectionId <= 0)
+        {
+            return Json(new { success = false, message = "Invalid section ID." });
+        }
+        try
+        {
+            bool isDeleted = await _sectionService.DeleteSectionAsync(sectionId);
+            if (isDeleted)
+            {
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false });
+            }
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    #endregion
 }
