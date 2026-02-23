@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Models;
 
 namespace SliceCloud.Web;
@@ -10,15 +11,15 @@ public static class DependencyInjection
     {
         services.AddDbContext<SliceCloudContext>(options => options.UseNpgsql(connectionString));
         services.AddHttpContextAccessor();
-        RegisterImplementations(services, "SliceCloud.Repository");
-        RegisterImplementations(services, "SliceCloud.Service");
+        RegisterImplementations(services, GenralConstants.SLICECLOUD_REPOSITORY);
+        RegisterImplementations(services, GenralConstants.SLICECLOUD_SERVICE);
 
     }
     public static void RegisterImplementations(IServiceCollection services, string assemblyName)
     {
         if (string.IsNullOrEmpty(assemblyName))
         {
-            throw new ArgumentException("Assembly name cannot be null or empty", nameof(assemblyName));
+            throw new ArgumentException(ErrorConstants.ASSEMBLY_NAME_EMPTY, nameof(assemblyName));
         }
         Assembly? assembly = Assembly.Load(assemblyName);
         Type[]? types = assembly.GetTypes();

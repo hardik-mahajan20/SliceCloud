@@ -7,7 +7,8 @@ namespace SliceCloud.Repository.Constants;
 public static class GenralConstants
 {
     public const string ACCESS_DENIED = "Access Denied.";
-    public const string ERROR = "Error";
+    public const string ERROR = "error";
+    public const string SUCCESS = "success";
     public const string UNAUTHORIZED = "You are Unauthorized.";
     public const string X_REQUESTED_WITH = "X-Requested-With";
     public const string XML_HTTP_REQUEST = "XMLHttpRequest";
@@ -28,4 +29,6 @@ public static class GenralConstants
     public const string UPLOADS = "uploads";
     public const string REMEMBERME = "RememberMe";
     public const string TRUE = "True";
+    public const string SLICECLOUD_REPOSITORY = "SliceCloud.Repository";
+    public const string SLICECLOUD_SERVICE = "SliceCloud.Service";
 }

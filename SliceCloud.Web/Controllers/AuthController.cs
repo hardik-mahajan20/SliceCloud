@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Interfaces;
@@ -30,7 +31,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
 
 
             ClaimsPrincipal? principal = null;
-            string? token = Request.Cookies["AuthToken"];
+            string? token = Request.Cookies[GenralConstants.AUTH_TOKEN];
             if (token != null)
             {
                 principal = _jwtService.ValidateToken(token);
@@ -38,16 +39,16 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
 
             if (principal == null)
             {
-                Response.Cookies.Delete("AuthToken");
+                Response.Cookies.Delete(GenralConstants.AUTH_TOKEN);
                 CookieUtils.ClearCookies(HttpContext);
                 SessionUtils.ClearSession(HttpContext);
                 return View();
             }
-            return RedirectToAction("Dashboard", "Dashboard");
+            return RedirectToAction(SideBarOptionConstants.DASHBOARD, SideBarOptionConstants.DASHBOARD);
         }
         catch (Exception)
         {
-            TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
+            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return View();
         }
     }
@@ -91,16 +92,16 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
                     else
                     {
                         ModelState.AddModelError(
-                          "Password",
-                          "Invalid password. Try again or reset your password."
+                          UserConstants.PASSWORD,
+                          ErrorConstants.INVALID_PASSWORD
                       );
                     }
                 }
                 else
                 {
                     ModelState.AddModelError(
-                       "Email",
-                       "No user found with the provided email."
+                       UserConstants.EMAIL,
+                       ErrorConstants.NO_USER_FOUND_WITH_PROVIDED_EMAIL
                    );
                 }
                 return View(loginViewModel);
@@ -114,12 +115,12 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
                 CookieUtils.SaveUserData(Response, usersLogin);
             }
 
-            HttpContext.Session.SetString("username", usersLogin.User!.UserName!);
+            HttpContext.Session.SetString(UserConstants.USER_NAME, usersLogin.User!.UserName!);
             return RedirectToAction("Dashboard", "Dashboard");
         }
         catch
         {
-            TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
+            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return View("Error");
         }
     }
@@ -137,7 +138,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch (Exception)
         {
-            TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
+            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return View("Error");
         }
     }
@@ -159,7 +160,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
             UsersLogin? userExists = await _authService.GetUserLoginByEmailAsync(model.Email);
             if (userExists is null)
             {
-                ModelState.AddModelError("Email", "No user found with the provided email.");
+                ModelState.AddModelError(UserConstants.EMAIL, ErrorConstants.NO_USER_FOUND_WITH_PROVIDED_EMAIL);
                 return View(model);
             }
 
@@ -173,12 +174,12 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
 
             await _emailSenderService.SendResetPasswordEmailAsync(model.Email, resetLink);
 
-            TempData.SetToast("success", "A password reset link has been sent to your email.");
+            TempData.SetToast(GenralConstants.SUCCESS, SuccessConstants.PASSWORD_RESET_LINK_SENT);
             return RedirectToAction("Login", "Auth");
         }
         catch (Exception)
         {
-            TempData.SetToast("error", "Failed to send reset email.");
+            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.FAILED_TO_SEND_RESET_EMAIL);
             return View(model);
         }
     }
@@ -194,14 +195,14 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         {
             if (string.IsNullOrEmpty(token))
             {
-                TempData.SetToast("error", "An error occurred. Please try again.");
+                TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
                 return RedirectToAction("Login");
             }
 
             bool isValid = await _authService.ValidatePasswordResetTokenAsync(token);
             if (!isValid)
             {
-                TempData.SetToast("error", "Invalid or expired reset link.");
+                TempData.SetToast(GenralConstants.ERROR, ErrorConstants.INVALID_EXPIRED_LINK);
                 return RedirectToAction("Login");
             }
 
@@ -212,7 +213,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch (Exception)
         {
-            TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
+            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return RedirectToAction("Login");
         }
     }
@@ -234,23 +235,23 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
             bool isValid = await _authService.ValidatePasswordResetTokenAsync(model.Token ?? string.Empty);
             if (!isValid)
             {
-                ModelState.AddModelError("", "Invalid or expired reset link.");
+                ModelState.AddModelError(string.Empty, ErrorConstants.INVALID_EXPIRED_LINK);
                 return View(model);
             }
 
             bool result = await _authService.UpdateUserPasswordAsync(model.Token ?? string.Empty, model.NewPassword!);
             if (!result)
             {
-                ModelState.AddModelError("", "Failed to reset password.");
+                ModelState.AddModelError(string.Empty, ErrorConstants.FAILED_TO_SEND_RESET_PASSWORD);
                 return View(model);
             }
 
-            TempData.SetToast("success", "Your password has been successfully reset. Please log in with your new password.");
+            TempData.SetToast(GenralConstants.SUCCESS, SuccessConstants.PASSWORD_RESET_LINK_SENT_LOGIN_AGAIN);
             return RedirectToAction("Login", "Auth");
         }
         catch (Exception)
         {
-            TempData.SetToast("error", "An error occurred. Please try again.");
+            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return View(model);
         }
     }
@@ -269,7 +270,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch (Exception)
         {
-            TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
+            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return RedirectToAction("Login", "Auth");
         }
     }
@@ -283,7 +284,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
     {
         try
         {
-            string? oldToken = Request.Cookies["AuthToken"];
+            string? oldToken = Request.Cookies[GenralConstants.AUTH_TOKEN];
             if (string.IsNullOrEmpty(oldToken))
             {
                 return RedirectToAction("Login", "Auth");
@@ -305,7 +306,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch (Exception)
         {
-            TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
+            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return RedirectToAction("Login", "Auth");
         }
     }
