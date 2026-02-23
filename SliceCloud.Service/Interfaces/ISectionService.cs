@@ -11,6 +11,13 @@ public interface ISectionService
     Task<List<SectionViewModel>> GetAllSections();
 
     /// <summary>
+    /// Retrieves a section by its ID asynchronously.
+    /// </summary>
+    /// <param name="sectionId">The ID of the section to retrieve.</param>
+    /// <returns>A task that returns the section view model if found, otherwise null.</returns>
+    Task<SectionViewModel> GetSectionByIdAsync(int sectionId);
+
+    /// <summary>
     /// Checks if a section with the specified name exists, optionally excluding a specific section by ID.
     /// </summary>
     /// <param name="sectionName">The name of the section to check.</param>
@@ -24,4 +31,11 @@ public interface ISectionService
     /// <param name="sectionViewModel">The sectionViewModel to add.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task<bool> AddSectionAsync(SectionViewModel sectionViewModel);
+
+    /// <summary>
+    /// Updates a existing section asynchronously.
+    /// </summary>
+    /// <param name="sectionViewModel">The sectionViewModel to add.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task<bool> UpdateSectionAsync(SectionViewModel sectionViewModel);
 }

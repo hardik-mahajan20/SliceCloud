@@ -12,9 +12,23 @@ public interface ISectionRepository
     IQueryable<Section> GetAllSectionsAsQueryable();
 
     /// <summary>
+    /// Retrieves a section by its ID asynchronously.
+    /// </summary>
+    /// <param name="sectionId">The ID of the section to retrieve.</param>
+    /// <returns>A task that returns the section if found, otherwise null.</returns>
+    Task<Section?> GetSectionByIdAsync(int sectionId);
+
+    /// <summary>
     /// Adds a new section asynchronously.
     /// </summary>
     /// <param name="section">The section to add.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task<bool> AddSectionAsync(Section section);
+
+    /// <summary>
+    /// Updates a existing section asynchronously.
+    /// </summary>
+    /// <param name="section">The section to add.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task<bool> UpdateSectionAsync(Section section);
 }

@@ -119,4 +119,78 @@ public class TableAndSectionController(ISectionService sectionService) : Control
         }
     }
     #endregion
+
+
+    #region GetSectionById
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetSectionById(int id)
+    {
+        try
+        {
+            SectionViewModel? sectionViewModel = await _sectionService.GetSectionByIdAsync(id);
+            if (sectionViewModel == null)
+            {
+                return Json(new { success = false, message = "Section not found" });
+            }
+            return PartialView("_EditSectionModalPartial", sectionViewModel);
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+    #endregion
+
+
+    #region Edit Section
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> EditSection(SectionViewModel sectionViewModel)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+            );
+
+            return Json(new
+            {
+                success = false,
+                message = "Validation failed. Please fix the highlighted errors.",
+                errors
+            });
+        }
+
+        try
+        {
+            bool isDuplicate = await _sectionService.CheckDuplicateSectionNameAsync(sectionViewModel.SectionName, sectionViewModel.SectionId);
+            if (isDuplicate)
+            {
+                return Json(new
+                {
+                    success = false,
+                    validationErrors = new Dictionary<string, string[]>
+                    {
+                        { "SectionName", new[] { "A section with this name already exists." } }
+                    }
+                });
+            }
+
+            bool isUpdated = await _sectionService.UpdateSectionAsync(sectionViewModel);
+            if (!isUpdated)
+            {
+                return Json(new { success = false, message = "Failed to update section." });
+            }
+
+            return Json(new { success = true, message = "Section updated successfully!" });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+    #endregion
+
 }
