@@ -42,4 +42,18 @@ public interface ITableService
     /// <param name="tableViewModel">The view model containing table details.</param>
     /// <returns>A task that returns true if the addition was successful, otherwise false.</returns>
     Task<bool> AddTableAsync(TableViewModel tableViewModel);
+
+    /// <summary>
+    /// Retrieves a table by its ID asynchronously.
+    /// </summary>
+    /// <param name="tableId">The ID of the table to retrieve.</param>
+    /// <returns>The table if found, otherwise null.</returns>
+    Task<Repository.Models.Table?> GetTableByIdAsync(int tableId);
+
+    /// <summary>
+    /// Updates an existing table asynchronously.
+    /// </summary>
+    /// <param name="tableViewModel">The tableViewModel to update.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task<bool> UpdateTableAsync(TableViewModel tableViewModel);
 }

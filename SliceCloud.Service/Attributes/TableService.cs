@@ -105,4 +105,33 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
     }
 
     #endregion
+
+    #region GetTableById
+
+    public async Task<Repository.Models.Table?> GetTableByIdAsync(int tableId)
+    {
+        return await _tableRepository.GetAllTablesAsQueryable()
+                                .FirstOrDefaultAsync(table => table.TableId == tableId
+                                                            && table.IsDeleted == false);
+    }
+
+    #endregion
+
+    #region UpdateTable
+
+    public async Task<bool> UpdateTableAsync(TableViewModel tableViewModel)
+    {
+        Repository.Models.Table? table = await _tableRepository.GetTableByIdAsync(tableViewModel.TableId);
+        if (table == null) return false;
+
+        table.TableName = tableViewModel.TableName ?? string.Empty;
+        table.Capacity = tableViewModel.Capacity;
+        table.TableStatus = (int?)tableViewModel.Status;
+        table.ModifiedAt = DateTime.UtcNow;
+        table.ModifiedBy = _currentUserService.UserId;
+
+        return await _tableRepository.UpdateTableAsync(table);
+    }
+
+    #endregion
 }

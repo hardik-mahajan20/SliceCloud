@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SliceCloud.Repository.Constants;
+using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Implementations;
@@ -387,6 +388,103 @@ public class TableAndSectionController(ISectionService sectionService, ITableSer
             {
                 success = false,
                 message = "Failed to add table."
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    #endregion
+
+    #region GetTableById
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetTableById(int tableId)
+    {
+        try
+        {
+            Repository.Models.Table? table = await _tableService.GetTableByIdAsync(tableId);
+            if (table == null)
+            {
+                return Json(new { success = false, message = "No Table found" });
+            }
+
+            List<SectionViewModel>? sections = await _sectionService.GetAllSections();
+            SectionViewModel? selectedSection = sections.FirstOrDefault(s => s.SectionId == table.SectionId);
+
+            TableViewModel? viewModel = new()
+            {
+                TableId = table.TableId,
+                TableName = table.TableName,
+                Capacity = table.Capacity,
+                Status = table.TableStatus.HasValue ? (TableStatus)table.TableStatus.Value : TableStatus.Available,
+                Sections = sections,
+                SelectedSectionId = table.SectionId,
+                SelectedSectionName = selectedSection?.SectionName
+            };
+
+            return PartialView("_EditTableModalPartial", viewModel);
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    #endregion
+
+    #region EditTable
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> EditTable([FromForm] TableViewModel tableViewModel)
+    {
+        try
+        {
+            if (tableViewModel == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Model is null. Check AJAX request."
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var allErrors = ModelState
+                    .Where(x => x.Value?.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                return Json(new
+                {
+                    success = false,
+                    validationErrors = allErrors
+                });
+            }
+            if (await _tableService.IsDuplicateTableNameAsync(tableViewModel.TableName ?? string.Empty, tableViewModel.SectionId ?? 0, tableViewModel.TableId > 0 ? tableViewModel.TableId : null))
+            {
+                return Json(new
+                {
+                    success = false,
+                    validationErrors = new Dictionary<string, string[]>
+                    {
+                        { "TableName", new[] { "A table with this name already exists in the selected section." } }
+                    }
+                });
+            }
+
+            bool isTableUpdaed = await _tableService.UpdateTableAsync(tableViewModel);
+
+            return Json(new
+            {
+                success = isTableUpdaed
             });
         }
         catch (Exception ex)
