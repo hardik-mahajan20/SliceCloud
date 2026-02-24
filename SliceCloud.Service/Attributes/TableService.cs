@@ -3,12 +3,14 @@ using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Implementations;
+using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Service.Attributes;
 
-public class TableService(ITableRepository tableRepository) : ITableService
+public class TableService(ITableRepository tableRepository, ICurrentUserService currentUserService) : ITableService
 {
     ITableRepository _tableRepository = tableRepository;
+    ICurrentUserService _currentUserService = currentUserService;
 
     #region GetAllTables
 
@@ -65,6 +67,41 @@ public class TableService(ITableRepository tableRepository) : ITableService
                 .Select(table => table.TableId)
                 .ToListAsync();
         return tableIds;
+    }
+
+    #endregion
+
+    #region IsDuplicateTableName
+
+    public async Task<bool> IsDuplicateTableNameAsync(string tableName, int sectionId, int? excludeTableId = null)
+    {
+        bool isDuplicate = await _tableRepository.GetAllTablesAsQueryable()
+                                .AnyAsync(
+                                    table => table.TableName.ToLower() == tableName.ToLower()
+                                    && table.SectionId == sectionId
+                                    && (excludeTableId == null || table.TableId != excludeTableId));
+
+        return isDuplicate;
+    }
+
+    #endregion
+
+    #region AddTable
+
+    public async Task<bool> AddTableAsync(TableViewModel tableViewModel)
+    {
+        Repository.Models.Table? table = new()
+        {
+            SectionId = tableViewModel.SectionId,
+            TableName = tableViewModel.TableName!,
+            Capacity = tableViewModel.Capacity,
+            TableStatus = (int?)tableViewModel.Status,
+            IsDeleted = false,
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = _currentUserService.UserId
+        };
+
+        return await _tableRepository.AddTableAsync(table);
     }
 
     #endregion

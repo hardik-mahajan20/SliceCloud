@@ -307,4 +307,93 @@ public class TableAndSectionController(ISectionService sectionService, ITableSer
     }
 
     #endregion
+
+    #region GetTableData
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetTableData(int selectedSectionId)
+    {
+        try
+        {
+            List<SectionViewModel>? sections = await _sectionService.GetAllSections();
+            SectionViewModel? selectedSection = sections.FirstOrDefault(s => s.SectionId == selectedSectionId);
+
+            TableViewModel? tableViewModel = new()
+            {
+                Sections = sections,
+                SelectedSectionId = selectedSectionId,
+                SelectedSectionName = selectedSection?.SectionName ?? string.Empty
+            };
+
+            return PartialView("_AddTableModalPartial", tableViewModel);
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    #endregion
+
+    #region AddTable
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> AddTable(TableViewModel tableViewModel)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                var allErrors = ModelState
+                    .Where(x => x.Value?.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                return Json(new
+                {
+                    success = false,
+                    validationErrors = allErrors
+                });
+            }
+
+            if (await _tableService.IsDuplicateTableNameAsync(tableViewModel.TableName ?? string.Empty, tableViewModel.SectionId ?? 0))
+            {
+                return Json(new
+                {
+                    success = false,
+                    validationErrors = new Dictionary<string, string[]>
+            {
+                { "TableName", new[] { "A table with this name already exists in the selected section." } }
+            }
+                });
+            }
+
+            bool isTableAdded = await _tableService.AddTableAsync(tableViewModel);
+
+            if (isTableAdded)
+            {
+                return Json(new
+                {
+                    success = true,
+                    message = "Table added successfully!"
+                });
+            }
+
+            return Json(new
+            {
+                success = false,
+                message = "Failed to add table."
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    #endregion
 }

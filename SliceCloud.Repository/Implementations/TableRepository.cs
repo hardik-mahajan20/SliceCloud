@@ -15,4 +15,14 @@ public class TableRepository(SliceCloudContext sliceCloudContext) : ITableReposi
     }
 
     #endregion
+
+    #region AddTable
+
+    public async Task<bool> AddTableAsync(Table table)
+    {
+        await _sliceCloudContext.Tables.AddAsync(table);
+        return _sliceCloudContext.SaveChanges() > 0;
+    }
+
+    #endregion
 }
