@@ -1,0 +1,60 @@
+@model SliceCloud.Repository.ViewModels.TableViewModel
+
+<div class="modal fade" id="addTableModal" tabindex="-1" aria-labelledby="addTableModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTableModalLabel">Add Table</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTableForm">
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3 ">
+                            <div class="form-floating">
+                                <input id="tableName" asp-for="TableName" class="form-control"
+                                    placeholder="Enter table name" />
+                                <span asp-validation-for="TableName" class="text-danger"></span>
+                                <label asp-for="TableName" class="form-label">Name*</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input type="hidden" name="SectionId" id="tableSection"
+                                    value="@Model.SelectedSectionId" />
+                                <select asp-for="SectionId" class="form-select bg-light" disabled>
+                                    <option value="@Model.SelectedSectionId" selected>
+                                        @Model.SelectedSectionName
+                                    </option>
+                                </select>
+                                <label asp-for="SectionId" class="form-label">Section</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input id="tableCapacity" asp-for="Capacity" class="form-control" value="0" min="1" />
+                                <span asp-validation-for="Capacity" class="text-danger"></span>
+                                <label asp-for="Capacity" class="form-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input type="hidden" name="Status" id="tableStatus" value="Available" />
+                                <select asp-for="Status" class="form-select bg-light" disabled>
+                                    <option value="Available" selected>Available</option>
+                                </select>
+                                <label asp-for="Status" class="form-label">Status</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn custom-navbar-bg-color text-white" id="saveTableBtn">Save</button>
+                <button type="button" class="btn btn-outline-primary p-2" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
