@@ -2,6 +2,44 @@
     ViewData[index: "Title"] = "TableAndSection";
 }
 
-<div class="d-flex align-items-center justify-content-center">
-    <h1 class="custom-body-text-color">Table And Section</h1>
+<div class="d-flex flex-column w-100 p-4">
+    <div class="d-flex justify-content-between w-100 mb-3 d-sm-row d-column flex-wrap flex-sm-nowrap ">
+        <h1 class="custom-body-text-color">Section/Table</h1>
+    </div>
+    <div class="bg-white " id="tableSectionContainer">
+
+    </div>
 </div>
+
+
+<div id="modalPlaceholder"></div>
+
+<input type="hidden" id="sectionIdHidden">
+
+<div class="modal fade" id="deleteSectionModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Delete Confirmation</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deleteSectionForm">
+                <div class="modal-body text-center">
+                   <i class="bi bi-exclamation-triangle-fill fs-3 text-warning"></i>
+                    <p>Are you sure you want to delete this Section?</p>
+                    <input type="hidden" id="deleteSectionId">
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="submit" class="btn  custom-navbar-bg-color text-white">YES</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">NO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/table-and-section.js"></script>
+}
