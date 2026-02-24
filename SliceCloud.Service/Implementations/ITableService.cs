@@ -70,4 +70,10 @@ public interface ITableService
     /// <param name="sectionId">The ID of the section to retrieve tables for.</param>
     /// <returns>A collection of tables belonging to the specified section.</returns>
     Task<List<Repository.Models.Table>> GetTablesBySectionIdAsync(int sectionId);
+
+    /// <summary>
+    /// Deletes multiple tables by their IDs.
+    /// </summary>
+    /// <param name="tableIds">The list of table IDs to delete.</param>
+    Task<bool> DeleteMultipleTableAsync(List<int> tableIds);
 }

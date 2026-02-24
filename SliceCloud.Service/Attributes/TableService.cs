@@ -161,4 +161,24 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
     }
 
     #endregion
+
+    #region DeleteMultipleTable
+
+    public async Task<bool> DeleteMultipleTableAsync(List<int> tableIds)
+    {
+        List<Repository.Models.Table>? tables = await _tableRepository.GetAllTablesAsQueryable().Where(i => tableIds.Contains(i.TableId)).ToListAsync();
+
+        if (tables.Any())
+        {
+            foreach (Repository.Models.Table table in tables)
+            {
+                table.IsDeleted = true;
+                table.ModifiedAt = DateTime.UtcNow;
+                table.ModifiedBy = _currentUserService.UserId;
+            }
+        }
+        return await _tableRepository.SaveChangesAsync() > 0;
+    }
+
+    #endregion
 }

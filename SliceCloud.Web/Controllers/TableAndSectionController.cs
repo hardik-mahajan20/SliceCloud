@@ -539,6 +539,7 @@ public class TableAndSectionController(ISectionService sectionService, ITableSer
 
     #region CheckSectionTablesAvailability
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public async Task<IActionResult> CheckSectionTablesAvailability(int sectionId)
     {
@@ -556,6 +557,30 @@ public class TableAndSectionController(ISectionService sectionService, ITableSer
             {
                 return Json(new { success = false });
             }
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    #endregion
+
+    #region DeleteMultipleTable
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteMultipleTable([FromBody] List<int> tableIds)
+    {
+        if (tableIds == null || !tableIds.Any())
+        {
+            return Json(new { success = false, message = "No items selected." });
+        }
+
+        try
+        {
+            bool isAllDeleted = await _tableService.DeleteMultipleTableAsync(tableIds);
+            return Json(new { success = isAllDeleted });
         }
         catch (Exception ex)
         {

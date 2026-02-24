@@ -45,4 +45,13 @@ public class TableRepository(SliceCloudContext sliceCloudContext) : ITableReposi
     }
 
     #endregion
+
+    #region SaveChanges
+
+    public async Task<int> SaveChangesAsync()
+    {
+        return await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
 }
