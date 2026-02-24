@@ -62,6 +62,25 @@
     </div>
 </div>
 
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-exclamation-triangle-fill fs-3 text-warning"></i>
+                <p>Are you sure you want to delete the selected tables?</p>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn custom-navbar-bg-color text-white" id="confirmDelete">YES</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">NO</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script src="~/js/table-and-section.js"></script>
