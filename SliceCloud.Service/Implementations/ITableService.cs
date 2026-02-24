@@ -63,4 +63,11 @@ public interface ITableService
     /// <param name="tableId">The ID of the table to delete.</param>
     /// <returns>True if the deletion was successful, otherwise false.</returns>
     Task<bool> DeleteTableAsync(int tableId);
+
+    /// <summary>
+    /// Retrieves tables by the specified section ID.
+    /// </summary>
+    /// <param name="sectionId">The ID of the section to retrieve tables for.</param>
+    /// <returns>A collection of tables belonging to the specified section.</returns>
+    Task<List<Repository.Models.Table>> GetTablesBySectionIdAsync(int sectionId);
 }

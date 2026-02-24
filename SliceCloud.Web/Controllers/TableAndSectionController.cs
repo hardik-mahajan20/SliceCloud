@@ -536,4 +536,32 @@ public class TableAndSectionController(ISectionService sectionService, ITableSer
     }
 
     #endregion
+
+    #region CheckSectionTablesAvailability
+
+    [HttpGet]
+    public async Task<IActionResult> CheckSectionTablesAvailability(int sectionId)
+    {
+        try
+        {
+            List<Repository.Models.Table>? tables = await _tableService.GetTablesBySectionIdAsync(sectionId);
+
+            bool isAllTableAvailable = tables.All(t => t.TableStatus == (int)TableStatus.Available);
+
+            if (isAllTableAvailable)
+            {
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false });
+            }
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    #endregion
 }

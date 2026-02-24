@@ -150,4 +150,15 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
     }
 
     #endregion
+
+    #region GetTablesBySectionId
+
+    public async Task<List<Repository.Models.Table>> GetTablesBySectionIdAsync(int sectionId)
+    {
+        return await _tableRepository.GetAllTablesAsQueryable()
+                            .Where(t => t.SectionId == sectionId && t.IsDeleted == false)
+                            .ToListAsync();
+    }
+
+    #endregion
 }
