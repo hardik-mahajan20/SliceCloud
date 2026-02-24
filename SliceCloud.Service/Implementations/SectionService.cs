@@ -124,4 +124,29 @@ public class SectionService(ISectionRepository sectionRepository, ICurrentUserSe
     }
 
     #endregion
+
+    #region UpdateSectionOrder
+
+    public async Task UpdateSectionOrderAsync(List<int> sortedSectionIds)
+    {
+        List<Section>? sections = await _sectionRepository
+           .GetAllSectionsAsQueryable()
+           .Where(s => sortedSectionIds.Contains(s.SectionId) && !(s.IsDeleted ?? false))
+           .ToListAsync();
+
+        Dictionary<int, Section>? sectionDictionary = sections.ToDictionary(s => s.SectionId);
+
+        for (int i = 0; i < sortedSectionIds.Count; i++)
+        {
+            if (sectionDictionary.TryGetValue(sortedSectionIds[i], out var section))
+            {
+                section.SectionOrder = i + 1;
+            }
+        }
+
+        await _sectionRepository.SaveChangesAsync();
+    }
+
+    #endregion
+
 }

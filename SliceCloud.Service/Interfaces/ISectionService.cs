@@ -45,4 +45,11 @@ public interface ISectionService
     /// <param name="sectionId">The ID of the section to delete.</param>
     /// <returns>A task that returns true if the deletion was successful, otherwise false.</returns>
     Task<bool> DeleteSectionAsync(int sectionId);
+
+    /// <summary>
+    /// Updates the order of sections asynchronously.
+    /// </summary>
+    /// <param name="sortedSectionIds">The list of section IDs in the desired order.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task UpdateSectionOrderAsync(List<int> sortedSectionIds);
 }

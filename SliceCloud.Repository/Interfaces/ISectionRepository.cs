@@ -31,4 +31,10 @@ public interface ISectionRepository
     /// <param name="section">The section to add.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task<bool> UpdateSectionAsync(Section section);
+
+    /// <summary>
+    /// Saves changes to the data source asynchronously.
+    /// </summary>
+    /// <returns>A task representing the asynchronous save operation.</returns>
+    Task<int> SaveChangesAsync();
 }

@@ -45,4 +45,13 @@ public class SectionRepository(SliceCloudContext sliceCloudContext) : ISectionRe
     }
 
     #endregion
+
+    #region SaveChanges
+
+    public async Task<int> SaveChangesAsync()
+    {
+        return await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
 }

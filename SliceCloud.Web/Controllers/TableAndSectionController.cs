@@ -230,4 +230,23 @@ public class TableAndSectionController(ISectionService sectionService) : Control
     }
 
     #endregion
+
+    #region UpdateSectionOrder
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> UpdateSectionOrder([FromBody] List<int> sortedSectionIds)
+    {
+        try
+        {
+            await _sectionService.UpdateSectionOrderAsync(sortedSectionIds);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    #endregion
 }
