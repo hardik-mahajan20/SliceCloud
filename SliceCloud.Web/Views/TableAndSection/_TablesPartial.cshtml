@@ -1,0 +1,90 @@
+@using SliceCloud.Repository.Enums
+
+<div class="table-section-wrapper">
+    <table class="table">
+        <tr class="tableheader">
+            <th class="px-auto mt-2">
+                <div class="d-flex">
+                    <input class="form-check-input me-3" type="checkbox" id="mainCheckBoxTable" />
+                    Name
+                </div>
+            </th>
+            <th>Capacity</th>
+            <th>Status</th>
+                <th>Action</th>
+        </tr>
+        <tbody>
+            @if (Model.TablesPaginated.Count == 0)
+            {
+                <tr>
+                    <td colspan="4" class="text-center border-bottom-0">
+                        <div class="d-flex flex-column">
+                            <i class="bi bi-emoji-frown fs-4"></i>
+                            <div>No records found</div>
+                        </div>
+                    </td>
+                </tr>
+}
+else
+{
+    @foreach (dynamic table in Model.TablesPaginated)
+    {
+        <tr>
+            <td>
+                <div class="d-flex align-items-center">
+                    <input class="form-check-input me-3 child-checkbox" type="checkbox" name="child-checkbox-@table.TableId"
+                        id="child-checkbox-@table.TableId" />
+                    <input type="hidden" name="Tableid" value="@table.TableId">
+                    @table.TableName
+                </div>
+            </td>
+            <td>@table.Capacity</td>
+            <td>
+
+                <span
+                    class="rounded-pill px-2 status @(table.Status == TableStatus.Occupied ? "custom-table-status-occupied-bg-color text-white" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            table.Status == TableStatus.Available ? "custom-table-status-available-bg-color text-white" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            table.Status == TableStatus.Reserved ? "custom-table-status-reserved-bg-color text-white" : "")">
+            @table.Status
+        </span>
+    </td>
+                <td>
+                    <div class="d-flex justify-content-center align-items-center">
+                            <button class="btn edit-table-btn cursor-pointer" data-bs-toggle="modal" data-id="@table.TableId"
+                                data-status="@table.Status">
+                                <i class="bi bi-pen"></i>
+                            </button>
+                            <button class="btn delete-item-btn cursor-pointer" data-id="@table.TableId" data-status="@table.Status">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                    </div>
+                </td>
+        </tr>
+    }
+}
+</tbody>
+</table>
+</div>
+@if (Model.TablesPaginated.Count != 0)
+{
+    <div class="pagination-container d-flex flex-wrap flex-md-nowrap">
+        <span>Showing @ViewBag.FromRec - @ViewBag.ToRec of @ViewBag.TotalItems</span>
+        @{
+            int[] pageSizes = { 5, 10, 20 };
+        }
+
+        <select id="pageSizeDropdown" class="form-select">
+            @foreach (var size in pageSizes)
+            {
+                <option value="@size" selected="@(ViewBag.PageSize == size ? "selected" : null)">@size</option>
+            }
+        </select>
+        <input type="hidden" id="totalPages" value="@ViewBag.TotalPages" />
+        <button id="prevPageBtn">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <button id="nextPageBtn">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+}

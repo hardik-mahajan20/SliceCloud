@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
+using SliceCloud.Service.Implementations;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
 
@@ -10,10 +11,11 @@ namespace SliceCloud.Web.Controllers;
 /// <summary>
 /// This controller is referenced for the tables and section module related end points.
 /// </summary>
-public class TableAndSectionController(ISectionService sectionService) : Controller
+public class TableAndSectionController(ISectionService sectionService, ITableService tableService) : Controller
 {
 
     private readonly ISectionService _sectionService = sectionService;
+    private readonly ITableService _tableService = tableService;
 
     #region TableAndSection GET
 
@@ -43,6 +45,7 @@ public class TableAndSectionController(ISectionService sectionService) : Control
         {
             TableSectionViewModel tableSectionViewModel = new()
             {
+                Tables = await _tableService.GetAllTablesAsync(),
                 Sections = await _sectionService.GetAllSections()
             };
 
@@ -56,6 +59,61 @@ public class TableAndSectionController(ISectionService sectionService) : Control
 
     #endregion
 
+    #region LoadTablesPaginated
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    public async Task<IActionResult> LoadTablesPaginated(int sectionId, int pageNumber, int pageSize, string searchQuery = "")
+    {
+        try
+        {
+            PaginatedList<TableViewModel>? paginatedTables = await _tableService.GetPaginatedTablesBySectionIdAsync(sectionId, pageNumber, pageSize, searchQuery);
+
+            ViewBag.TotalItems = paginatedTables.TotalItems;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalPages = paginatedTables.TotalPages;
+            if (paginatedTables.TotalItems == 0)
+            {
+                ViewBag.FromRec = 0;
+                ViewBag.ToRec = 0;
+            }
+            else
+            {
+                ViewBag.FromRec = paginatedTables.FromRec;
+                ViewBag.ToRec = paginatedTables.ToRec;
+            }
+            var model = new TableViewModel
+            {
+                Sections = await _sectionService.GetAllSections(),
+                TablesPaginated = paginatedTables
+            };
+
+            return PartialView("_TablesPartial", model);
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    #endregion
+
+    #region GetAllTableIds
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllTableIds(int sectionId)
+    {
+        try
+        {
+            List<int>? itemIds = await _tableService.GetAllTableIdsAsync(sectionId);
+            return Json(itemIds);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    #endregion
 
     #region GetAddSectionModal
 
