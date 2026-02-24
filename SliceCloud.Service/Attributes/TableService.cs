@@ -134,4 +134,20 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
     }
 
     #endregion
+
+    #region DeleteTable
+
+    public async Task<bool> DeleteTableAsync(int tableId)
+    {
+        Repository.Models.Table? table = await _tableRepository.GetTableByIdAsync(tableId);
+        if (table == null) return false;
+
+        table.IsDeleted = true;
+        table.ModifiedAt = DateTime.UtcNow;
+        table.ModifiedBy = _currentUserService.UserId;
+
+        return await _tableRepository.UpdateTableAsync(table);
+    }
+
+    #endregion
 }

@@ -494,4 +494,46 @@ public class TableAndSectionController(ISectionService sectionService, ITableSer
     }
 
     #endregion
+
+    #region DeleteTable
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteTable([FromBody] int tableId)
+    {
+        try
+        {
+            if (tableId <= 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid Table ID."
+                });
+            }
+
+            bool isTableDeleted = await _tableService.DeleteTableAsync(tableId);
+
+            if (isTableDeleted)
+            {
+                return Json(new
+                {
+                    success = true,
+                    message = "Table deleted successfully."
+                });
+            }
+
+            return Json(new
+            {
+                success = false,
+                message = "Failed to delete table."
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    #endregion
 }

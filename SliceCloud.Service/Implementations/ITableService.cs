@@ -56,4 +56,11 @@ public interface ITableService
     /// <param name="tableViewModel">The tableViewModel to update.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task<bool> UpdateTableAsync(TableViewModel tableViewModel);
+
+    /// <summary>
+    /// Deletes a table by its ID asynchronously.
+    /// </summary>
+    /// <param name="tableId">The ID of the table to delete.</param>
+    /// <returns>True if the deletion was successful, otherwise false.</returns>
+    Task<bool> DeleteTableAsync(int tableId);
 }
