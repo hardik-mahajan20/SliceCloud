@@ -1,0 +1,39 @@
+.category-name {
+  max-width: 150px;
+}
+
+.active-category {
+  color: #007bff !important;
+}
+
+.category-btn:hover {
+  color: #0066a7 !important;
+}
+
+.category-btn:hover .drag-icon {
+  filter: invert(21%) sepia(99%) saturate(1065%) hue-rotate(181deg)
+    brightness(92%) contrast(94%);
+}
+
+.active-category {
+  color: #0066a7 !important;
+}
+
+.active-category .drag-icon {
+  filter: invert(21%) sepia(99%) saturate(1065%) hue-rotate(181deg)
+    brightness(92%) contrast(94%);
+}
+
+.category-btn .edit-category-btn,
+.category-btn .delete-category-btn {
+  display: none;
+}
+
+.category-btn:hover .edit-category-btn,
+.category-btn:hover .delete-category-btn {
+  display: inline-block;
+}
+
+.sort-handle {
+  cursor: grab;
+}

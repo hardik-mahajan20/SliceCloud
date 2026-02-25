@@ -1,0 +1,20 @@
+.panel-border {
+  border-right: 1px solid #0066a7;
+  width: 285px;
+}
+
+.search-input {
+  gap: 5px;
+  width: 220px;
+  height: 38px;
+}
+
+.trash-input {
+  height: 38px;
+  width: 38px;
+}
+
+.add-input {
+  height: 38px;
+  padding: 6px 12px;
+}

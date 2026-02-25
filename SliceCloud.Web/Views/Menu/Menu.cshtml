@@ -2,6 +2,49 @@
     ViewData[index: "Title"] = "Menu";
 }
 
-<div class="d-flex align-items-center justify-content-center">
-    <h1 class="custom-body-text-color">Menu</h1>
-</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/menu.css" />
+    <link rel="stylesheet" href="~/css/category.css" />
+    <link rel="stylesheet" href="~/css/item-section.css" />
+}
+
+<div class="d-flex flex-column w-100 p-4">
+	<div class="d-flex justify-content-between w-100 mb-3 d-sm-row d-column flex-wrap flex-sm-nowrap ">
+		<h1 class="custom-body-text-color">Menu</h1>
+	</div>
+	<div class="table-responsive">
+		<section class="bg-white mb-2 ">
+			<ul class="nav nav-tabs custom-tabs border-bottom-0 " role="tablist">
+
+				<li class="nav-item " style="cursor: pointer;">
+					<a class="nav-link active d-flex align-items-center " id="pills-home-tab" data-bs-toggle="tab"
+						data-bs-target="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">
+						<div class="d-flex align-items-center gap-1 p-1 ">
+							<div><i class="bi bi-list-check  tab-icon fs-lg"></i> </div>
+							<div class="custom-text">Items</div>
+						</div>
+					</a>
+				</li>
+
+				<li class="nav-item" style="cursor: pointer;">
+					<a class="nav-link d-flex align-items-center" id="pills-profile-tab" data-bs-toggle="tab"
+						data-bs-target="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">
+						<div class="d-flex align-items-center gap-1 p-1">
+							<div><i class="bi bi-ui-checks-grid me- tab-icon"></i></div>
+							<div class="custom-text">Modifiers</div>
+						</div>
+					</a>
+				</li>
+			</ul>
+		</section>
+		<div class="tab-content bg-white" id="pills-tabContent">
+			<div id="menu-content" class="">
+			</div>
+		</div>
+	</div>
+</div
+
+@section Scripts {
+    <script src="~/js/menu.js"></script>
+}
+
