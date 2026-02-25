@@ -24,4 +24,23 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
             Description = item.Description
         }).ToList();
     }
+
+    public async Task UpdateCategoryOrderAsync(List<int> sortedCategoryIds)
+    {
+        List<Category>? categories = await _categoryRepository.GetAllCategoriesAsQueryable()
+                                .Where(s => sortedCategoryIds.Contains(s.CategoryId) && !(s.IsDeleted ?? false))
+                                    .ToListAsync();
+
+        Dictionary<int, Category>? categoryDictionary = categories.ToDictionary(s => s.CategoryId);
+
+        for (int i = 0; i < sortedCategoryIds.Count; i++)
+        {
+            if (categoryDictionary.TryGetValue(sortedCategoryIds[i], out var section))
+            {
+                section.SortOrder = i + 1;
+            }
+        }
+
+        await _categoryRepository.SaveChangesAsync();
+    }
 }

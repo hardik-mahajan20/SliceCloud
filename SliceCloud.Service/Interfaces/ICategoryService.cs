@@ -9,4 +9,11 @@ public interface ICategoryService
     /// </summary>
     /// <returns>A collection of category view models asynchronously.</returns>
     Task<List<CategoryViewModel>> GetAllCategoriesAsync();
+
+    /// <summary>
+    /// Updates the order of categories asynchronously.
+    /// </summary>
+    /// <param name="sortedCategoryIds">The list of category IDs in the desired order.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task UpdateCategoryOrderAsync(List<int> sortedCategoryIds);
 }

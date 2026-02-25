@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.ViewModels;
-using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Web.Controllers;
@@ -36,5 +34,21 @@ public class MenuController(ICategoryService categoryService) : Controller
 
     #endregion
 
+    #region UpdateCategoryOrder POST
 
+    [HttpPost]
+    public async Task<IActionResult> UpdateCategoryOrder([FromBody] List<int> orderedCategoryIds)
+    {
+        try
+        {
+            await _categoryService.UpdateCategoryOrderAsync(orderedCategoryIds);
+            return Ok();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return BadRequest(new { success = false, message = "You are not authorized to perform this action." });
+        }
+    }
+
+    #endregion
 }

@@ -15,5 +15,14 @@ public class CategoryRepository(SliceCloudContext sliceCloudContext) : ICategory
     }
 
     #endregion
-    
+
+    #region SaveChanges
+
+    public async Task<int> SaveChangesAsync()
+    {
+        return await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
+
 }
