@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.ViewModels;
+using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Web.Controllers;
@@ -13,6 +15,7 @@ public class MenuController(ICategoryService categoryService) : Controller
 
     #region Menu GET
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     public IActionResult Menu()
     {
         return View();
@@ -22,6 +25,7 @@ public class MenuController(ICategoryService categoryService) : Controller
 
     #region LoadItems
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     public async Task<IActionResult> LoadItems(int pageNumber, int pageSize)
     {
         var model = new MenuViewModel
@@ -36,6 +40,7 @@ public class MenuController(ICategoryService categoryService) : Controller
 
     #region UpdateCategoryOrder POST
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
     public async Task<IActionResult> UpdateCategoryOrder([FromBody] List<int> orderedCategoryIds)
     {
@@ -47,6 +52,70 @@ public class MenuController(ICategoryService categoryService) : Controller
         catch (UnauthorizedAccessException)
         {
             return BadRequest(new { success = false, message = "You are not authorized to perform this action." });
+        }
+    }
+
+    #endregion
+
+    #region LoadAddCategoryModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadAddCategoryModal()
+    {
+        CategoryViewModel? categoryViewModel = new();
+        return PartialView("_AddCategoryModal", categoryViewModel);
+    }
+
+    #endregion
+
+    #region Add Category POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> AddCategory(CategoryViewModel categoryViewModel)
+    {
+        if (categoryViewModel == null)
+        {
+            return Json(new { success = false, message = "Invalid request: No data received." });
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+            );
+
+            return Json(new { success = false, errors });
+        }
+
+        try
+        {
+            int newCategoryId = await _categoryService.AddCategoryAsync(categoryViewModel);
+
+            return Json(new
+            {
+                success = true,
+                message = "Category added successfully!",
+                categoryId = newCategoryId
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message,
+                errors = new Dictionary<string, List<string>>
+            {
+                { "CategoryName", new List<string> { ex.Message } }
+            }
+            });
+        }
+        catch (Exception)
+        {
+            return Json(new { success = false, message = "An unexpected error occurred while adding the category." });
         }
     }
 

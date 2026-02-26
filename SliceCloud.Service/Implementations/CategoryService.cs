@@ -6,10 +6,11 @@ using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Service.Implementations;
 
-public class CategoryService(ICategoryRepository categoryRepository) : ICategoryService
+public class CategoryService(ICategoryRepository categoryRepository, ICurrentUserService currentUserService) : ICategoryService
 {
     private readonly ICategoryRepository _categoryRepository = categoryRepository;
 
+    private readonly ICurrentUserService _currentUserService = currentUserService;
 
     public async Task<List<CategoryViewModel>> GetAllCategoriesAsync()
     {
@@ -42,5 +43,30 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
         }
 
         await _categoryRepository.SaveChangesAsync();
+    }
+
+    public async Task<int> AddCategoryAsync(CategoryViewModel categoryViewModel)
+    {
+        bool isCategoryNameExists = await _categoryRepository.GetAllCategoriesAsQueryable().AsNoTracking()
+                        .AnyAsync(c => c.CategoryName == categoryViewModel.CategoryName && (c.IsDeleted == false));
+
+        if (isCategoryNameExists)
+        {
+            throw new InvalidOperationException("A category with the same name already exists.");
+        }
+
+        int maxOrder = await _categoryRepository.GetAllCategoriesAsQueryable().Where(s => !s.IsDeleted == false).Select(s => (int?)s.SortOrder).MaxAsync() ?? 0;
+
+        Category category = new()
+        {
+            CategoryName = categoryViewModel.CategoryName ?? string.Empty,
+            Description = categoryViewModel.Description,
+            IsDeleted = false,
+            CreatedBy = _currentUserService.UserId,
+            CreatedAt = DateTime.UtcNow,
+            SortOrder = maxOrder + 1
+        };
+
+        return await _categoryRepository.AddCategoryAsync(category);
     }
 }
