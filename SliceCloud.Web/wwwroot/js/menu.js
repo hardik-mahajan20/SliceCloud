@@ -195,4 +195,64 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Delete Category
+  $(document).on("click", ".delete-category-btn", function () {
+    var categoryId = $(this).data("id");
+    $.ajax({
+      type: "GET",
+      url: "/Menu/LoadDeleteCategoryModal",
+      success: function (response) {
+        $("#modalContainer").empty();
+        $("#modalContainer").html(response);
+        $("#deleteCategoryId").val(categoryId);
+        let deleteCategoryModal = document.getElementById(
+          "deleteCategoryModal"
+        );
+        let deleteCategoryModalInstance = new bootstrap.Modal(
+          deleteCategoryModal
+        );
+        deleteCategoryModalInstance.show();
+        // @* loadPartialView('@Url.Action("LoadItems", "Menu")'); *@
+      },
+      error: function (xhr, status, error) {
+        console.log("Status:", xhr.status);
+        console.log("Response:", xhr.responseText);
+        toastr.error("Failed to load delete category modal.");
+      },
+    });
+  });
+
+  // Delete Category Submission
+  $(document).on("submit", "#deleteCategoryForm", function (e) {
+    e.preventDefault();
+    var categoryId = $("#deleteCategoryId").val();
+    $.ajax({
+      type: "POST",
+      url: "/Menu/DeleteCategory/" + categoryId,
+      data: {
+        categoryId: categoryId,
+      },
+      dataType: "json",
+      success: function (response) {
+        if (response.success) {
+          toastr.success("Category deleted successfully!");
+
+          // Close modal properly
+          $("#deleteCategoryModal").modal("hide");
+          $("body").removeClass("modal-open");
+          $(".modal-backdrop").remove();
+
+          // loadPartialView('@Url.Action("LoadItems", "Menu")');
+        } else {
+          toastr.error("Error deleting category.");
+        }
+      },
+      error: function () {
+        toastr.error(
+          "An unexpected error occurred while deleting the category."
+        );
+      },
+    });
+  });
 });

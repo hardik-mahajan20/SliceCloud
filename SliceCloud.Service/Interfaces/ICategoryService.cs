@@ -37,4 +37,11 @@ public interface ICategoryService
     /// <param name="categoryViewModel">The category view model to update.</param>
     /// <returns>A task that returns true if the update was successful, otherwise false.</returns>
     Task<bool> UpdateAsync(CategoryViewModel categoryViewModel);
+
+    /// <summary>
+    /// Deletes a category by its ID asynchronously.
+    /// </summary>
+    /// <param name="categoryId">The ID of the category to delete.</param>
+    /// <returns>A task that returns true if the deletion was successful, otherwise false.</returns>
+    Task<bool> DeleteCategoryAsync(int categoryId);
 }

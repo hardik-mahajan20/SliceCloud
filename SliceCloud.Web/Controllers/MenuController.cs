@@ -139,7 +139,7 @@ public class MenuController(ICategoryService categoryService) : Controller
     #endregion
 
     #region Edit Category 
-    
+
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
     public async Task<IActionResult> EditCategory(CategoryViewModel model)
@@ -190,6 +190,33 @@ public class MenuController(ICategoryService categoryService) : Controller
         {
             return Json(new { success = false, message = "An unexpected error occurred while updating the category." });
         }
+    }
+
+    #endregion
+
+    #region LoadDeleteCategoryModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadDeleteCategoryModal()
+    {
+        return PartialView("_DeleteCategoryModal");
+    }
+
+    #endregion
+
+    #region Delete Category 
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteCategory(int categoryId)
+    {
+        bool isCategoryDeleted = await _categoryService.DeleteCategoryAsync(categoryId);
+        if (isCategoryDeleted)
+        {
+            return Json(new { success = true });
+        }
+        return Json(new { success = false });
     }
     #endregion
 }

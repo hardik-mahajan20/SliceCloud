@@ -97,7 +97,7 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
         }
 
         bool isCategoryNameExists = await _categoryRepository.GetAllCategoriesAsQueryable().AsNoTracking()
-                      .AnyAsync(c => c.CategoryName == categoryViewModel.CategoryName && (c.IsDeleted == false));
+                      .AnyAsync(c => c.CategoryName == categoryViewModel.CategoryName && (c.IsDeleted == false) && c.CategoryId != categoryViewModel.CategoryId);
 
         if (isCategoryNameExists)
         {
@@ -108,6 +108,23 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
         category.Description = categoryViewModel.Description;
         category.ModifiedBy = _currentUserService.UserId;
         category.ModifiedAt = DateTime.UtcNow;
+
+        return await _categoryRepository.UpdateCategoryAsync(category);
+    }
+
+    public async Task<bool> DeleteCategoryAsync(int categoryId)
+    {
+
+        Category? category = await _categoryRepository.GetCategoryByIdAsync(categoryId);
+
+        if (category == null)
+        {
+            return false;
+        }
+
+        category.IsDeleted = true;
+        category.ModifiedAt = DateTime.UtcNow;
+        category.ModifiedBy = _currentUserService.UserId;
 
         return await _categoryRepository.UpdateCategoryAsync(category);
     }
