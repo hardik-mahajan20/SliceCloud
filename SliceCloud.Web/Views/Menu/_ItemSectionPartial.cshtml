@@ -1,0 +1,30 @@
+<div class="row p-3 p-xl-0 mw-100">
+    <div class=" col-auto py-3 panel-border" id="categoryPartial">
+        <partial name="_CategoryPartial" model="Model.Categories" />
+    </div>
+    <div class="col bg-white table-responsive  py-xl-3 py-2  ">
+        <div class="d-flex justify-content-between w-100 mb-3 d-sm-row d-column flex-wrap  ">
+            <div class="d-flex flex-wrap gap-1">
+                <div class="d-block d-xl-none">
+                    <i class="bi bi-list"></i>
+                </div>
+                <h4 class="custom-body-text-color ">Items</h4>
+            </div>
+            <div class="d-flex align-items-center  gap-2 d-sm-row d-column  flex-wrap flex-sm-nowrap">
+                <div class="d-flex align-items-center border rounded px-2 bg-white search-input">
+                    <input class="form-control border-0 shadow-none p-0" type="text" placeholder="Search"
+                        id="iteSsearch">
+                    <i class="bi bi-search"></i>
+                </div>
+                <button class="btn bg-white border-secondary p-0 trash-input" id="massDeleteBtn">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button class="btn custom-navbar-bg-color text-white d-flex align-items-center add-item-btn add-input">
+                    + New Item
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive" id="items-container">
+        </div>
+    </div>
+</div>
