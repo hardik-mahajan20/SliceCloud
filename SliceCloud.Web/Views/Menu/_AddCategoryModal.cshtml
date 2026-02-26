@@ -1,0 +1,36 @@
+@model SliceCloud.Repository.ViewModels.CategoryViewModel
+
+<div class="modal fade" id="addCategory" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="addCategoryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addCategoryLabel">Add Category</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="addCategoryForm" asp-action="AddCategory" asp-controller="Menu" method="post">
+                <div class="modal-body">
+                    <div class="mb-3 form-floating">
+                        <input asp-for="CategoryName" class="form-control" placeholder="Name*" />
+                        <span asp-validation-for="CategoryName" class="text-danger"></span>
+                        <label asp-for="CategoryName" class="form-label">Category Name*</label>
+                    </div>
+                    <div class="form-floating">
+                        <textarea asp-for="Description" class=" form-control" placeholder="Multiple lines"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <label asp-for="Description" class="form-label">Description</label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" id="saveCategoryBtn"
+                        class="btn custom-navbar-bg-color text-white d-flex align-items-center p-2">
+                        Save
+                    </button>
+                    <button type="button" class="btn btn-outline-primary p-2" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

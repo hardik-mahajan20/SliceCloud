@@ -1,0 +1,39 @@
+.nav-tabs .nav-link {
+  border: none;
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link.active {
+  border-bottom: 2px solid #0066a7;
+  color: #0066a7;
+  font-weight: 600;
+}
+
+.tab-icon {
+  color: #6c757d;
+}
+
+.nav-tabs .nav-link.active .tab-icon {
+  color: #0066a7;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.list-unstyled {
+  padding: 0;
+  margin: 0;
+}
+
+.badge {
+  font-size: 14px;
+  padding: 5px 10px;
+}
+
+.modal {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
