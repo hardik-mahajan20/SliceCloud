@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 
@@ -23,6 +24,27 @@ public class CategoryRepository(SliceCloudContext sliceCloudContext) : ICategory
         await _sliceCloudContext.Categories.AddAsync(category);
         await _sliceCloudContext.SaveChangesAsync();
         return category.CategoryId;
+    }
+
+    #endregion
+
+    #region GetCategoryById
+
+    public async Task<Category?> GetCategoryByIdAsync(int categoryId)
+    {
+        return await _sliceCloudContext.Categories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
+    }
+
+    #endregion
+
+    #region UpdateCategory
+
+    public async Task<bool> UpdateCategoryAsync(Category category)
+    {
+        _sliceCloudContext.Categories.Update(category);
+        return await _sliceCloudContext.SaveChangesAsync() > 0;
     }
 
     #endregion

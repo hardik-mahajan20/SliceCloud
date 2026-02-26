@@ -131,4 +131,68 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Edit Cateogry
+  $(document).on("click", ".edit-category-btn", function () {
+    var categoryId = $(this).data("id");
+
+    $.ajax({
+      type: "GET",
+      url: "/Menu/GetCategoryById/" + categoryId,
+      success: function (response) {
+        $("#modalContainer").empty();
+        $("#modalContainer").html(response);
+        let editCategoryModal = document.getElementById("editCategory");
+        let editCategoryModalInstance = new bootstrap.Modal(editCategoryModal);
+        editCategoryModalInstance.show();
+        // @* loadPartialView('@Url.Action("LoadItems", "Menu")'); *@
+      },
+      error: function (xhr, status, error) {
+        toastr.error("Failed to load category details.");
+      },
+    });
+  });
+
+  // Edit Category Submission
+  $(document).on("submit", "#editCategoryForm", function (e) {
+    e.preventDefault();
+    var categoryId = $("#editCategoryForm input[name='CategoryId']").val();
+    const form = $(this)[0];
+    const formData = new FormData(form);
+
+    $.ajax({
+      type: "POST",
+      url: "/Menu/EditCategory",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        if (response.success) {
+          toastr.success(response.message);
+          let editCategoryModal = document.getElementById("editCategory");
+          let modalInstance =
+            bootstrap.Modal.getOrCreateInstance(editCategoryModal);
+          modalInstance.hide();
+
+          // @* loadPartialView('@Url.Action("LoadItems", "Menu")'); *@
+          // @* loadPartialView('@Url.Action("LoadItems", "Menu")'); *@
+          // loadItems(categoryId, currentPage, pageSize);
+        } else {
+          // Clear all old errors first
+          $("#editCategoryForm .text-danger").text("");
+
+          // Display validation errors inline
+          if (response.errors) {
+            for (const key in response.errors) {
+              const errorMessages = response.errors[key].join(", ");
+              $(`[name="${key}"]`).siblings(".text-danger").text(errorMessages);
+            }
+          }
+        }
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
 });

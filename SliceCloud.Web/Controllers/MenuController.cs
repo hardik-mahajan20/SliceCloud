@@ -120,4 +120,76 @@ public class MenuController(ICategoryService categoryService) : Controller
     }
 
     #endregion
+
+    #region GetCategoryById
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetCategoryById(int id)
+    {
+        CategoryViewModel? categoryViewModel = await _categoryService.GetCategoryByIdAsync(id);
+
+        if (categoryViewModel == null)
+        {
+            return Json(new { success = false, message = "NO category found" });
+        }
+        return PartialView("_EditCategoryModal", categoryViewModel);
+    }
+
+    #endregion
+
+    #region Edit Category 
+    
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> EditCategory(CategoryViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+            );
+
+            return Json(new
+            {
+                success = false,
+                message = "Validation failed. Please fix the highlighted errors.",
+                errors
+            });
+        }
+
+        try
+        {
+            bool isCategoryUpdated = await _categoryService.UpdateAsync(model);
+            if (!isCategoryUpdated)
+            {
+                return Json(new { success = false, message = "Failed to update category." });
+            }
+
+            return Json(new { success = true, message = "Category updated successfully!" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message,
+                errors = new Dictionary<string, List<string>>
+            {
+                { "CategoryName", new List<string> { ex.Message } }
+            }
+            });
+        }
+
+        catch (KeyNotFoundException ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return Json(new { success = false, message = "An unexpected error occurred while updating the category." });
+        }
+    }
+    #endregion
 }

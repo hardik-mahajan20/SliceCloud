@@ -23,4 +23,18 @@ public interface ICategoryService
     /// <param name="categoryViewModel">The category view model to add.</param>
     /// <returns>A task the category of the new created category   asynchronous operation.</returns>
     Task<int> AddCategoryAsync(CategoryViewModel categoryViewModel);
+
+    /// <summary>
+    /// Retrieves a category by its ID asynchronously.
+    /// </summary>
+    /// <param name="categoryId">The ID of the category to retrieve.</param>
+    /// <returns>A task that returns the category view model if found, otherwise null.</returns>
+    Task<CategoryViewModel> GetCategoryByIdAsync(int categoryId);
+
+    /// <summary>
+    /// Updates an existing category asynchronously.
+    /// </summary>
+    /// <param name="categoryViewModel">The category view model to update.</param>
+    /// <returns>A task that returns true if the update was successful, otherwise false.</returns>
+    Task<bool> UpdateAsync(CategoryViewModel categoryViewModel);
 }

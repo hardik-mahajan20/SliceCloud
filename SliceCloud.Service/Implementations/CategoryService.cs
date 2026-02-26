@@ -69,4 +69,46 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
 
         return await _categoryRepository.AddCategoryAsync(category);
     }
+
+    public async Task<CategoryViewModel> GetCategoryByIdAsync(int categoryId)
+    {
+        Category? category = await _categoryRepository.GetCategoryByIdAsync(categoryId);
+
+        if (category == null)
+        {
+            return new CategoryViewModel();
+        }
+
+        return new CategoryViewModel
+        {
+            CategoryId = category.CategoryId,
+            CategoryName = category.CategoryName,
+            Description = category.Description
+        };
+    }
+
+    public async Task<bool> UpdateAsync(CategoryViewModel categoryViewModel)
+    {
+        Category? category = await _categoryRepository.GetCategoryByIdAsync(categoryViewModel.CategoryId);
+
+        if (category == null)
+        {
+            throw new KeyNotFoundException("Category not found.");
+        }
+
+        bool isCategoryNameExists = await _categoryRepository.GetAllCategoriesAsQueryable().AsNoTracking()
+                      .AnyAsync(c => c.CategoryName == categoryViewModel.CategoryName && (c.IsDeleted == false));
+
+        if (isCategoryNameExists)
+        {
+            throw new InvalidOperationException("A category with the same name already exists.");
+        }
+
+        category.CategoryName = categoryViewModel.CategoryName ?? string.Empty;
+        category.Description = categoryViewModel.Description;
+        category.ModifiedBy = _currentUserService.UserId;
+        category.ModifiedAt = DateTime.UtcNow;
+
+        return await _categoryRepository.UpdateCategoryAsync(category);
+    }
 }
