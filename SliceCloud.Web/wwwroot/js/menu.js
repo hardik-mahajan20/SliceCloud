@@ -7,6 +7,11 @@ $(document).ready(function () {
       type: "GET",
       success: function (data) {
         $("#menu-content").html(data);
+
+        // Load all the categories
+        loadAllCategories();
+
+        // Initialize sortable after loading categories
         initializeCategorySortable();
       },
       error: function () {
@@ -15,6 +20,7 @@ $(document).ready(function () {
     });
   }
 
+  // Initialize sortable for categories
   function initializeCategorySortable() {
     $("#categoryList").sortable({
       update: function (event, ui) {
@@ -32,20 +38,8 @@ $(document).ready(function () {
           success: function () {
             toastr.success("Category order updated successfully!");
           },
-          error: function (xhr, _status, _error) {
-            toastr.clear();
-            var response = xhr.responseJSON;
-            if (xhr.status === 401 && response && response.message) {
-              toastr.error(response.message);
-            } else if (xhr.status === 400) {
-              toastr.error("Bad Request: Please check your input.");
-            } else if (xhr.status === 500) {
-              toastr.error("Internal Server Error: Please try again later.");
-            } else {
-              toastr.error(
-                response?.message || "An unexpected error occurred!"
-              );
-            }
+          error: function () {
+            toastr.error("An unexpected error occurred.", "Error");
           },
         });
       },
@@ -63,20 +57,8 @@ $(document).ready(function () {
         let modalInstance = new bootstrap.Modal(addCategoryModal);
         modalInstance.show();
       },
-      error: function (xhr) {
-        try {
-          const response = JSON.parse(xhr.responseText);
-          if (response.message === "Unauthorized") {
-            toastr.warning(
-              "You are not authorized to perform this action.",
-              "Unauthorized"
-            );
-          } else {
-            toastr.error("Something went wrong.", "Error");
-          }
-        } catch {
-          toastr.error("An unexpected error occurred.", "Error");
-        }
+      error: function () {
+        toastr.error("An unexpected error occurred.", "Error");
       },
     });
   });
@@ -97,15 +79,6 @@ $(document).ready(function () {
           let modalInstance =
             bootstrap.Modal.getOrCreateInstance(addCategoryModal);
           modalInstance.hide();
-
-          const newCategoryId = response.categoryId;
-          loadPartialView("/Menu/LoadItems");
-          loadCategories(function (firstCategoryId) {
-            if (firstCategoryId) {
-              selectedCategoryId = firstCategoryId;
-              loadItems(selectedCategoryId, currentPage, pageSize);
-            }
-          });
         } else {
           // Display validation errors
           $(".text-danger").html(""); // Clear existing errors
@@ -116,18 +89,8 @@ $(document).ready(function () {
           });
         }
       },
-      error: function (xhr) {
-        try {
-          const response = JSON.parse(xhr.responseText);
-          if (xhr.status === 403 || response.message === "Access Denied") {
-            // Access Denied: Redirect to AccessDenied page
-            window.location.href = "/Error/AccessDenied";
-          } else {
-            toastr.error("Something went wrong: " + response.message, "Error");
-          }
-        } catch (err) {
-          toastr.error("Unexpected error.", "Error");
-        }
+      error: function () {
+        toastr.error("An unexpected error occurred.", "Error");
       },
     });
   });
@@ -145,10 +108,9 @@ $(document).ready(function () {
         let editCategoryModal = document.getElementById("editCategory");
         let editCategoryModalInstance = new bootstrap.Modal(editCategoryModal);
         editCategoryModalInstance.show();
-        // @* loadPartialView('@Url.Action("LoadItems", "Menu")'); *@
       },
-      error: function (xhr, status, error) {
-        toastr.error("Failed to load category details.");
+      error: function () {
+        toastr.error("An unexpected error occurred.", "Error");
       },
     });
   });
@@ -156,7 +118,6 @@ $(document).ready(function () {
   // Edit Category Submission
   $(document).on("submit", "#editCategoryForm", function (e) {
     e.preventDefault();
-    var categoryId = $("#editCategoryForm input[name='CategoryId']").val();
     const form = $(this)[0];
     const formData = new FormData(form);
 
@@ -173,10 +134,6 @@ $(document).ready(function () {
           let modalInstance =
             bootstrap.Modal.getOrCreateInstance(editCategoryModal);
           modalInstance.hide();
-
-          // @* loadPartialView('@Url.Action("LoadItems", "Menu")'); *@
-          // @* loadPartialView('@Url.Action("LoadItems", "Menu")'); *@
-          // loadItems(categoryId, currentPage, pageSize);
         } else {
           // Clear all old errors first
           $("#editCategoryForm .text-danger").text("");
@@ -213,12 +170,9 @@ $(document).ready(function () {
           deleteCategoryModal
         );
         deleteCategoryModalInstance.show();
-        // @* loadPartialView('@Url.Action("LoadItems", "Menu")'); *@
       },
-      error: function (xhr, status, error) {
-        console.log("Status:", xhr.status);
-        console.log("Response:", xhr.responseText);
-        toastr.error("Failed to load delete category modal.");
+      error: function () {
+        toastr.error("An unexpected error occurred.");
       },
     });
   });
@@ -237,22 +191,71 @@ $(document).ready(function () {
       success: function (response) {
         if (response.success) {
           toastr.success("Category deleted successfully!");
-
-          // Close modal properly
-          $("#deleteCategoryModal").modal("hide");
-          $("body").removeClass("modal-open");
-          $(".modal-backdrop").remove();
-
-          // loadPartialView('@Url.Action("LoadItems", "Menu")');
+          let deleteCategoryModal = document.getElementById(
+            "deleteCategoryModal"
+          );
+          let modalInstance =
+            bootstrap.Modal.getOrCreateInstance(deleteCategoryModal);
+          modalInstance.hide();
         } else {
           toastr.error("Error deleting category.");
         }
       },
       error: function () {
-        toastr.error(
-          "An unexpected error occurred while deleting the category."
-        );
+        toastr.error("An unexpected error occurred.");
       },
     });
   });
+
+  // Function to load items dynamically
+
+  function loadCategoryWiseItems(
+    categoryId,
+    pageNumber = 1,
+    pageSize = 5,
+    searchQuery = ""
+  ) {
+    $.ajax({
+      url: "/Menu/LoadItemsByCategory",
+      type: "GET",
+      data: {
+        categoryId: categoryId,
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        searchQuery: searchQuery,
+      },
+      success: function (data) {
+        $("#items-container").html(data);
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  }
+
+  function loadAllCategories(callback) {
+    $.ajax({
+      url: "/Menu/GetAllCategories",
+      type: "GET",
+      success: function (data) {
+        let firstCategoryId = null;
+
+        if (Array.isArray(data) && data.length > 0) {
+          firstCategoryId = data[0].id || data[0].categoryId;
+
+          if (firstCategoryId) {
+            selectedCategoryId = firstCategoryId;
+            loadCategoryWiseItems(selectedCategoryId, 1, 5);
+          }
+
+          if (callback) callback(firstCategoryId);
+        } else {
+          toastr.warning("No categories found!", "Warning");
+        }
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  }
 });

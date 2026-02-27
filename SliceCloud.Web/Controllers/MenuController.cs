@@ -9,9 +9,10 @@ namespace SliceCloud.Web.Controllers;
 /// <summary>
 /// This controller is referenced for the menu module related end points.
 /// </summary>
-public class MenuController(ICategoryService categoryService) : Controller
+public class MenuController(ICategoryService categoryService, IItemService itemService) : Controller
 {
     private readonly ICategoryService _categoryService = categoryService;
+    private readonly IItemService _itemService = itemService;
 
     #region Menu GET
 
@@ -26,9 +27,9 @@ public class MenuController(ICategoryService categoryService) : Controller
     #region LoadItems
 
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
-    public async Task<IActionResult> LoadItems(int pageNumber, int pageSize)
+    public async Task<IActionResult> LoadItems()
     {
-        var model = new MenuViewModel
+        MenuViewModel model = new()
         {
             Categories = await _categoryService.GetAllCategoriesAsync(),
         };
@@ -217,6 +218,32 @@ public class MenuController(ICategoryService categoryService) : Controller
             return Json(new { success = true });
         }
         return Json(new { success = false });
+    }
+    #endregion
+
+    #region LoadItemsByCategory
+
+    public async Task<IActionResult> LoadItemsByCategory(int categoryId, int pageNumber, int pageSize, string searchQuery = "")
+    {
+        PaginatedList<ItemViewModel>? paginatedItems = await _itemService.GetPaginatedItemsByGroupIdAsync(categoryId, pageNumber, pageSize, searchQuery);
+
+        ViewBag.FromRec = paginatedItems.FromRec;
+        ViewBag.ToRec = paginatedItems.ToRec;
+        ViewBag.TotalItems = paginatedItems.TotalItems;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalPages = paginatedItems.TotalPages;
+
+        return PartialView("_ItemsPartial", paginatedItems);
+    }
+
+    #endregion
+
+    #region GetAllCategories
+    [HttpGet]
+    public async Task<IActionResult> GetAllCategories()
+    {
+        List<CategoryViewModel>? categoryViewModels = await _categoryService.GetAllCategoriesAsync();
+        return Json(categoryViewModels);
     }
     #endregion
 }
