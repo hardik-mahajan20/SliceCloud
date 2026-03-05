@@ -45,4 +45,11 @@ public interface IItemService
     /// <param name="itemImage">The updated image file of the item.</param>
     /// <returns>A task that returns true if the update was successful, otherwise false.</returns>
     Task<bool> UpdateMenuItemAsync(EditMenuItemViewModel editMenuItemViewModel, IFormFile? itemImage);
+
+    /// <summary>
+    /// Deletes an item by its ID asynchronously.
+    /// </summary>
+    /// <param name="itemId">The ID of the item to soft delete.</param>
+    /// <returns>True if the deletion was successful, otherwise false.</returns>
+    Task<bool> DeleteItemAsync(int itemId);
 }

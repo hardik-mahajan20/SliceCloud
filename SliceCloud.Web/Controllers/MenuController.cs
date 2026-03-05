@@ -540,4 +540,41 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #endregion
 
+    #region LoadDeleteMenuItemModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadDeleteMenuItemModal()
+    {
+        return PartialView("_DeleteMenuItemModal");
+    }
+
+    #endregion
+
+    #region DeleteMenuItem POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteMenuItem(int itemId)
+    {
+        bool isDeleted = await _itemService.DeleteItemAsync(itemId);
+        if (isDeleted)
+        {
+            return Json(new
+            {
+                success = true,
+                message = "Item deleted successfully!"
+            });
+        }
+        else
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Error deleting item!"
+            });
+        }
+    }
+
+    #endregion
 }

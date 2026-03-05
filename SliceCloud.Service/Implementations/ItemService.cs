@@ -161,4 +161,18 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
     }
 
     #endregion
+
+    public async Task<bool> DeleteItemAsync(int itemId)
+    {
+        Item? item = await _itemRepository.GetItemByIdAsync(itemId);
+        if (item is null)
+        {
+            return false;
+        }
+        item.IsDeleted = true;
+        item.ModifiedAt = DateTime.UtcNow;
+        item.ModifiedBy = _currentUserService.UserId;
+
+        return await _itemRepository.UpdateMenuItemAsync(item);
+    }
 }

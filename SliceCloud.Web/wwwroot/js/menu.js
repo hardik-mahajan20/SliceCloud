@@ -886,4 +886,54 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Delete Menu Item
+  $(document).on("click", ".delete-item-btn", function () {
+    var menuItemId = $(this).data("id");
+    $.ajax({
+      type: "GET",
+      url: "/Menu/LoadDeleteMenuItemModal",
+      success: function (response) {
+        $("#modalContainer").empty();
+        $("#modalContainer").html(response);
+        $("#deleteItemId").val(menuItemId);
+        let deleteMenuItemModal = document.getElementById("deleteItemModal");
+        let deleteMenuItemModalInstance = new bootstrap.Modal(
+          deleteMenuItemModal
+        );
+        deleteMenuItemModalInstance.show();
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
+
+  // Delete Menu Item Submission
+  $(document).on("submit", "#deleteItemForm", function (e) {
+    e.preventDefault();
+    var menuItemId = $("#deleteItemId").val();
+    $.ajax({
+      type: "POST",
+      url: "/Menu/DeleteMenuItem/" + menuItemId,
+      data: {
+        itemId: menuItemId,
+      },
+      dataType: "json",
+      success: function (response) {
+        if (response.success) {
+          toastr.success("Category deleted successfully!");
+          let deleteCategoryModal = document.getElementById("deleteItemModal");
+          let modalInstance =
+            bootstrap.Modal.getOrCreateInstance(deleteCategoryModal);
+          modalInstance.hide();
+        } else {
+          toastr.error("Error deleting category.");
+        }
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
 });
