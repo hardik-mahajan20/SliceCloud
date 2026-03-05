@@ -52,4 +52,17 @@ public interface IItemService
     /// <param name="itemId">The ID of the item to soft delete.</param>
     /// <returns>True if the deletion was successful, otherwise false.</returns>
     Task<bool> DeleteItemAsync(int itemId);
+
+    /// <summary>
+    /// Retrieves all item IDs for a specific category asynchronously.
+    /// </summary>
+    /// <param name="categoryId">The ID of the category to retrieve item IDs for.</param>
+    /// <returns>A task that returns a list of item IDs.</returns>
+    Task<List<int>> GetAllItemIdsAsync(int categoryId);
+
+    /// <summary>
+    /// Deletes multiple items by their IDs asynchronously.
+    /// </summary>
+    /// <param name="itemIds">The list of item IDs to soft delete.</param>
+    Task<bool> DeleteMultipleMenuItemAsync(List<int> itemIds);
 }

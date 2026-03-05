@@ -227,6 +227,8 @@ $(document).ready(function () {
       },
       success: function (data) {
         $("#items-container").html(data);
+        applyMainCheckboxState();
+        fetchAllItemIds();
       },
       error: function () {
         toastr.error("An unexpected error occurred.");
@@ -246,6 +248,7 @@ $(document).ready(function () {
 
           if (firstCategoryId) {
             selectedCategoryId = firstCategoryId;
+            $("#categoryIdHidden").val(selectedCategoryId);
             loadCategoryWiseItems(selectedCategoryId, 1, 5);
           }
 
@@ -529,7 +532,7 @@ $(document).ready(function () {
           let addItemModal = document.getElementById("addItemModalContainer");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(addItemModal);
           modalInstance.hide();
-          loadItems(response.categoryId, 1, 5, "");
+          // loadItems(response.categoryId, 1, 5, "");
         } else {
           if (response.message.includes("already exists")) {
             toastr.warning(response.message);
@@ -861,7 +864,7 @@ $(document).ready(function () {
           let modalInstance =
             bootstrap.Modal.getOrCreateInstance(editItemModal);
           modalInstance.hide();
-          loadItems(response.categoryId, 1, 5, "");
+          // loadItems(response.categoryId, 1, 5, "");
         } else {
           if (response.message.includes("already exists")) {
             toastr.warning(response.message);
@@ -936,6 +939,149 @@ $(document).ready(function () {
       },
       error: function () {
         toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
+
+  // Item Mass Delete Start
+  let selectedItems = new Set();
+  let mainCheckboxState = { isChecked: false, isIndeterminate: false };
+  let allItemIds = new Set();
+
+  // === Fetch All Item IDs from the Server on Load ===
+  function fetchAllItemIds() {
+    let categoryId = selectedCategoryId || $("#categoryIdHidden").val();
+    $.ajax({
+      url: "/Menu/GetAllItemIds",
+      type: "GET",
+      data: { categoryId: categoryId },
+      success: function (response) {
+        allItemIds = new Set(response);
+      },
+      error: function () {
+        toastr.error("Failed to fetch item IDs.");
+      },
+    });
+  }
+
+  // === Main Checkbox Change Event ===
+  $(document).on("change", "#maincheckbox", function () {
+    const isChecked = this.checked;
+    mainCheckboxState.isChecked = isChecked;
+    mainCheckboxState.isIndeterminate = false;
+
+    if (isChecked) {
+      allItemIds.forEach((id) => selectedItems.add(id));
+    } else {
+      selectedItems.clear();
+    }
+
+    $(".item-checkbox").prop("checked", isChecked);
+    applyMainCheckboxState();
+  });
+
+  // === Individual Item Checkbox Change Event ===
+  $(document).on("change", ".item-checkbox", function () {
+    const itemId = parseInt(
+      $(this).closest("tr").find("input[name='Itemid']").val()
+    );
+
+    if (this.checked) {
+      selectedItems.add(itemId);
+    } else {
+      selectedItems.delete(itemId);
+    }
+
+    updateMainCheckboxState();
+  });
+
+  // === Update Main Checkbox State ===
+  function updateMainCheckboxState() {
+    if (selectedItems.size === 0) {
+      mainCheckboxState.isChecked = false;
+      mainCheckboxState.isIndeterminate = false;
+    } else if (selectedItems.size === allItemIds.size) {
+      mainCheckboxState.isChecked = true;
+      mainCheckboxState.isIndeterminate = false;
+    } else {
+      mainCheckboxState.isChecked = false;
+      mainCheckboxState.isIndeterminate = true;
+    }
+    applyMainCheckboxState();
+  }
+
+  // === Apply Main Checkbox State ===
+  function applyMainCheckboxState() {
+    $("#maincheckbox")
+      .prop("checked", mainCheckboxState.isChecked)
+      .prop("indeterminate", mainCheckboxState.isIndeterminate);
+  }
+
+  // Delete Menu Item
+  $(document).on("click", ".delete-multiple-item-btn", function () {
+    selectedItemsArray = Array.from(selectedItems);
+
+    if (selectedItemsArray.length === 0) {
+      toastr.warning("Please select at least one item to delete.");
+      return;
+    }
+    $.ajax({
+      type: "GET",
+      url: "/Menu/LoadDeleteMultipleMenuItemModal",
+      success: function (response) {
+        $("#modalContainer").empty();
+        $("#modalContainer").html(response);
+        let deleteMenuItemModal = document.getElementById(
+          "deleteConfirmationModalItems"
+        );
+        let deleteMenuItemModalInstance = new bootstrap.Modal(
+          deleteMenuItemModal
+        );
+        deleteMenuItemModalInstance.show();
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
+
+  // Confirm delete AJAX
+  $(document).on("click", "#confirmDelete", function () {
+    $("#deleteConfirmationModal").modal("hide");
+
+    $.ajax({
+      url: "/Menu/DeleteMultipleMenuItem",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(Array.from(selectedItems)),
+      success: function (response) {
+        if (response.success) {
+          toastr.success("Items deleted successfully.");
+          let deleteMultipleMenuItemModal = document.getElementById(
+            "deleteConfirmationModalItems"
+          );
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(
+            deleteMultipleMenuItemModal
+          );
+          modalInstance.hide();
+          // Clear selection data
+          selectedItems.clear();
+          mainCheckboxState = { isChecked: false, isIndeterminate: false };
+
+          // Uncheck all checkboxes
+          $("#maincheckbox")
+            .prop("checked", false)
+            .prop("indeterminate", false);
+          $(".item-checkbox").prop("checked", false);
+
+          // Optional: Refetch IDs if needed
+          fetchAllItemIds();
+        } else {
+          toastr.error("Error: " + response.message);
+        }
+      },
+      error: function () {
+        toastr.error("Something went wrong. Please try again.");
       },
     });
   });

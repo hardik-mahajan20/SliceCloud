@@ -162,6 +162,8 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
 
     #endregion
 
+    #region DeleteItem
+
     public async Task<bool> DeleteItemAsync(int itemId)
     {
         Item? item = await _itemRepository.GetItemByIdAsync(itemId);
@@ -175,4 +177,38 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
 
         return await _itemRepository.UpdateMenuItemAsync(item);
     }
+
+    #endregion
+
+    #region GetAllItemIds
+
+    public async Task<List<int>> GetAllItemIdsAsync(int categoryId)
+    {
+        return await _itemRepository.GetAllItemsAsQueryable()
+                                        .Where(item => item.IsDeleted == false && item.CategoryId == categoryId)
+                                            .Select(item => item.ItemId)
+                                                .ToListAsync();
+    }
+
+    #endregion
+
+    #region DeleteMultipleMultipleItem
+
+    public async Task<bool> DeleteMultipleMenuItemAsync(List<int> itemIds)
+    {
+        List<Item>? items = await _itemRepository.GetAllItemsAsQueryable().Where(i => itemIds.Contains(i.ItemId)).ToListAsync();
+
+        if (items.Any())
+        {
+            foreach (Item item in items)
+            {
+                item.IsDeleted = true;
+                item.ModifiedAt = DateTime.UtcNow;
+                item.ModifiedBy = _currentUserService.UserId;
+            }
+        }
+        return await _itemRepository.SaveChangesAsync() > 0;
+    }
+
+    #endregion
 }

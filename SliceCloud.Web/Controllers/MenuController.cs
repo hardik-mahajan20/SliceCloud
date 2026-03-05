@@ -577,4 +577,51 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region GetAllItemIds
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetAllItemIds(int categoryId)
+    {
+        try
+        {
+            List<int>? itemIds = await _itemService.GetAllItemIdsAsync(categoryId);
+            return Json(itemIds);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    #endregion
+
+    #region LoadMultipleDeleteMenuItemModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadDeleteMultipleMenuItemModal()
+    {
+        return PartialView("_DeleteMultipleMenuItemModal");
+    }
+
+    #endregion
+
+    #region DeleteMultipleItems POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteMultipleMenuItem([FromBody] List<int> itemIds)
+    {
+        if (itemIds == null || !itemIds.Any())
+        {
+            return Json(new { success = false, message = "No items selected." });
+        }
+
+        bool isAllItemsDeleted = await _itemService.DeleteMultipleMenuItemAsync(itemIds);
+        return Json(new { success = isAllItemsDeleted });
+    }
+
+    #endregion
 }

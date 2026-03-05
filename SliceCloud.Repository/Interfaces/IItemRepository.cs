@@ -30,4 +30,10 @@ public interface IItemRepository
     /// <param name="item">The menu item to update.</param>
     /// <returns>True if the update was successful, otherwise false.</returns>
     Task<bool> UpdateMenuItemAsync(Item item);
+
+    /// <summary>
+    /// Saves changes to the data source asynchronously.
+    /// </summary>
+    /// <returns>A task representing the asynchronous save operation.</returns>
+    Task<int> SaveChangesAsync();
 }
