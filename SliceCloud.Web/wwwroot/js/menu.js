@@ -297,6 +297,7 @@ $(document).ready(function () {
     });
   });
 
+  // bind modifier group change event for Add Item Modal
   function bindModifierGroupEventAdd() {
     $(document).on("change", "#ModifierGroupDropdown", function () {
       var selectedGroupIds = $(this).val() || [];
@@ -323,6 +324,7 @@ $(document).ready(function () {
     });
   }
 
+  // Function to update modifier items based on selected groups
   function updateModifierItems(data) {
     var container = $("#ModifierItemsContainer");
     container.find(".no-modifier-message").remove();
@@ -417,6 +419,7 @@ $(document).ready(function () {
     }
   }
 
+  // Handle changes in dropdowns to maintain min/max logic and enable/disable options
   $(document).on("change", ".dropdown1, .dropdown2", function () {
     var groupId = $(this).data("group");
     var dropdownType = $(this).hasClass("dropdown1")
@@ -466,6 +469,7 @@ $(document).ready(function () {
     });
   });
 
+  // Handle removing a modifier group
   $(document).on("click", ".remove-group", function () {
     var groupId = $(this).data("group");
 
@@ -484,5 +488,71 @@ $(document).ready(function () {
         "<p class='text-muted no-modifier-message'>Select a Modifier Group to load items.</p>"
       );
     }
+  });
+
+  // Add Item POST
+
+  $(document).on("submit", "#menuItemForm", function (event) {
+    event.preventDefault();
+
+    let formData = new FormData(this);
+
+    formData.set("IsAvailable", $("input[name='IsAvailable']").is(":checked"));
+    formData.set(
+      "IsDefaultTax",
+      $("input[name='IsDefaultTax']").is(":checked")
+    );
+
+    let modifierGroups = selectedModifierGroupData.map((group) => ({
+      ModifierGroupId: group.modifierGroupId,
+      MinValue: parseInt(group.min) || 0,
+      MaxValue: parseInt(group.max) || 0,
+      Modifiers: selectedModifiersData[group.modifierGroupId]?.modifiers || [],
+    }));
+
+    formData.append("ModifierGroupsJson", JSON.stringify(modifierGroups));
+
+    $(".text-danger").text(""); // Clear any text-danger (validation) messages
+    $(".is-invalid").removeClass("is-invalid"); // Remove the is-invalid class
+
+    $.ajax({
+      type: "POST",
+      url: "/Menu/AddMenuItem",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        if (response.success) {
+          toastr.success("Menu item added successfully!");
+          let addItemModal = document.getElementById("addItemModalContainer");
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(addItemModal);
+          modalInstance.hide();
+          loadItems(response.categoryId, 1, 5, "");
+        } else {
+          if (response.message.includes("already exists")) {
+            toastr.warning(response.message);
+          } else {
+            toastr.error("Error: " + response.message);
+          }
+
+          // Display validation errors
+          if (response.errors) {
+            for (const field in response.errors) {
+              let inputField = $("[name='" + field + "']");
+              if (inputField.length > 0) {
+                let errorMessage = response.errors[field];
+                let errorSpan = inputField
+                  .closest(".form-floating")
+                  .find("span.text-danger");
+                errorSpan.text(errorMessage);
+              }
+            }
+          }
+        }
+      },
+      error: function (xhr) {
+        toastr.error("An error occurred: " + xhr.responseText);
+      },
+    });
   });
 });

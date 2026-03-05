@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using SliceCloud.Repository.ViewModels;
 
 namespace SliceCloud.Service.Interfaces;
@@ -13,4 +14,20 @@ public interface IItemService
     /// <param name="searchQuery">An optional search query to filter items.</param>
     /// <returns>A task that returns a paginated list of item view models.</returns>
     Task<PaginatedList<ItemViewModel>> GetPaginatedItemsByGroupIdAsync(int categoryId, int pageNumber, int pageSize, string searchQuery = "");
+
+    /// <summary>
+    /// Checks if an item with the specified name already exists, optionally excluding a specific item by ID.
+    /// </summary>
+    /// <param name="itemName">The name of the item to check.</param>
+    /// <param name="itemId">The ID of the item to exclude from the check (optional).</param>
+    /// <returns>True if a duplicate item exists, otherwise false.</returns>
+    Task<bool> IsDuplicateItemAsync(string itemName, int? itemId = null);
+
+    /// <summary>
+    /// Adds a new menu item along with its image asynchronously.
+    /// </summary>
+    /// <param name="itemViewModel">The view model containing item details.</param>
+    /// <param name="itemImage">The image file of the item.</param>
+    /// <returns>A task that returns the ID of the newly added item.</returns>
+    Task<int> AddMenuItemAsync(ItemViewModel itemViewModel, IFormFile? itemImage);
 }

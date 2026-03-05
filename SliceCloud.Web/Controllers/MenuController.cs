@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Models;
@@ -11,13 +12,14 @@ namespace SliceCloud.Web.Controllers;
 /// <summary>
 /// This controller is referenced for the menu module related end points.
 /// </summary>
-public class MenuController(ICategoryService categoryService, IItemService itemService, IModifierGroupService modifierGroupService, IUnitService unitService, IModifierService modifierService) : Controller
+public class MenuController(ICategoryService categoryService, IItemService itemService, IModifierGroupService modifierGroupService, IUnitService unitService, IModifierService modifierService, IItemModifierGroupMapService itemModifierGroupMapService) : Controller
 {
     private readonly ICategoryService _categoryService = categoryService;
     private readonly IItemService _itemService = itemService;
     private readonly IModifierGroupService _modifierGroupService = modifierGroupService;
     private readonly IUnitService _unitService = unitService;
     private readonly IModifierService _modifierService = modifierService;
+    private readonly IItemModifierGroupMapService _iItemModifierGroupMapService = itemModifierGroupMapService;
 
     #region Menu GET
 
@@ -298,7 +300,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
         List<ModifierGroup>? groups = await _modifierGroupService.GetModifierGroupsByIdsAsync(modifierGroupIds);
         List<Modifier>? modifiers = await _modifierService.GetModifiersByGroupIdsAsync(modifierGroupIds);
-      
+
         var response = new
         {
             Groups = groups.Select(g => new
@@ -316,6 +318,79 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
             }).ToList()
         };
         return Json(response);
+    }
+
+    #endregion
+
+    #region AddMenuItem POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> AddMenuItem(ItemViewModel model, string ModifierGroupsJson, IFormFile? itemImage)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .Select(x => new
+                {
+                    Key = x.Key,
+                    Errors = x.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+                }).ToList();
+
+            return Json(new
+            {
+                success = false,
+                validationErrors = errors
+            });
+        }
+
+
+        try
+        {
+            bool isDuplicate = await _itemService.IsDuplicateItemAsync(model.ItemName);
+            if (isDuplicate)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Item name already exists!"
+                });
+            }
+
+            List<ItemModifierGroupMapViewModel>? itemModifierGroupMapViewModels = JsonConvert.DeserializeObject<List<ItemModifierGroupMapViewModel>>(ModifierGroupsJson) ?? new List<ItemModifierGroupMapViewModel>();
+
+            int itemId = await _itemService.AddMenuItemAsync(model, itemImage);
+            if (itemId <= 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Failed to add item."
+                });
+            }
+
+            foreach (ItemModifierGroupMapViewModel itemModifierGroupMapViewModel in itemModifierGroupMapViewModels)
+            {
+                itemModifierGroupMapViewModel.ItemId = itemId;
+                await _iItemModifierGroupMapService.AddItemModifierGroupMapAsync(itemModifierGroupMapViewModel);
+            }
+
+            return Json(new
+            {
+                success = true,
+                message = "Menu item added successfully!",
+                categoryId = model.CategoryId
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Error: " + ex.Message
+            });
+        }
     }
 
     #endregion
