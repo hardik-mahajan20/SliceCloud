@@ -281,8 +281,8 @@ $(document).ready(function () {
       success: function (data) {
         $("#modalContainer").html(data);
 
-        let addCategoryModal = document.getElementById("addItemModalContainer");
-        let modalInstance = new bootstrap.Modal(addCategoryModal);
+        let addMenuItemModal = document.getElementById("addItemModalContainer");
+        let modalInstance = new bootstrap.Modal(addMenuItemModal);
         modalInstance.show();
 
         $.validator.unobtrusive.parse("#addItemModalContainer");
@@ -555,4 +555,248 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Edit Item Get AJAX
+
+  $(document).on("click", ".edit-item-btn", function () {
+    // Initialize Select2 for Modifier Groups Dropdown
+    $("#EditModifierGroupDropdown").select2({
+      placeholder: "Select Modifier Groups",
+      allowClear: true,
+      width: "100%",
+      tags: true,
+      closeOnSelect: false,
+    });
+
+    var itemId = $(this).data("id");
+
+    $.ajax({
+      url: "/Menu/GetItemById",
+      type: "GET",
+      data: {
+        id: itemId,
+      },
+      success: function (response) {
+        // Once data is successfully returned, load the modal content
+        $("#modalContainer").html(response);
+        let editMenuItemModal = document.getElementById("editItemModal");
+        let modalInstance = new bootstrap.Modal(editMenuItemModal);
+        modalInstance.show();
+
+        setTimeout(function () {
+          bindModifierGroupEvent();
+          fetchModifierMappings(itemId);
+        }, 500);
+      },
+      error: function () {
+        toastr.error("Failed to load item data.", "Error");
+      },
+    });
+  });
+
+  // Fetch and prepopulated modifier groups & items
+  function fetchModifierMappings(itemId) {
+    $.ajax({
+      url: "/Menu/GetModifierMappingsByItemId",
+      type: "GET",
+      data: {
+        id: itemId,
+      },
+      success: function (modifierMappings) {
+        if (modifierMappings && modifierMappings.length > 0) {
+          prepopulatedModifierGroups(modifierMappings);
+        } else {
+          toastr.warning("No modifier mappings found for this item.", "Warning");
+        }
+      },
+      error: function () {
+        toastr.error("Failed to fetch modifier mappings.", "Error");
+      },
+    });
+  }
+
+  // Prepopulated Modifier Groups
+  function prepopulatedModifierGroups(modifierMappings) {
+    var modifierContainer = $("#modifierGroupContainer");
+    modifierContainer.empty();
+
+    let selectedGroupIds = [];
+
+    modifierMappings.forEach(function (mapping) {
+      selectedGroupIds.push(mapping.modifierGroupId);
+      addModifierGroupToUI(
+        mapping.modifierGroupId,
+        mapping.modifierGroupName,
+        mapping.minValue,
+        mapping.maxValue,
+        mapping.modifierItems
+      );
+    });
+
+    $("#EditModifierGroupDropdown").val(selectedGroupIds);
+  }
+
+  // Function to add modifier group to UI
+  function addModifierGroupToUI(groupId, groupName, min, max, items = []) {
+    var modifierContainer = $("#modifierGroupContainer");
+
+    if ($("#group-" + groupId).length) {
+      return;
+    }
+
+    var groupHtml = `
+       <div id="group-${groupId}" class="modifier-group px-3 mt-1">
+           <div class="d-flex justify-content-between align-items-center mb-2">
+               <strong class="text-muted">${groupName}</strong>
+               <button class="remove-group" data-group="${groupId}">
+                   <i class="fa-solid fa-trash" style="color:#808080;"></i>
+               </button>
+           </div>
+           <div class="row">
+               <div class="col-6 mb-2">
+                   <label class="small">Min</label>
+                   <select class="form-select form-select-sm dropdown1 rounded-pill" data-group="${groupId}">
+                       ${[...Array(6).keys()]
+                         .map(
+                           (i) =>
+                             `<option value="${i}" ${
+                               i == min ? "selected" : ""
+                             }>${i}</option>`
+                         )
+                         .join("")}
+                   </select>
+               </div>
+               <div class="col-6 mb-2">
+                   <label class="small">Max</label>
+                   <select class="form-select form-select-sm dropdown2 rounded-pill" data-group="${groupId}">
+                       ${[...Array(6).keys()]
+                         .map(
+                           (i) =>
+                             `<option value="${i}" ${
+                               i == max ? "selected" : ""
+                             }>${i}</option>`
+                         )
+                         .join("")}
+                   </select>
+               </div>
+           </div>
+           <ul>`;
+
+    items.forEach(function (item) {
+      groupHtml += `
+        <li>
+            <div class="d-flex justify-content-between align-items-center">
+            <span>${
+              item.modifierItemName
+            }</span>
+                <span>${item.Price || item.price || 0}</span>
+            </div>
+        </li>`;
+    });
+
+    groupHtml += `</ul></div>`;
+
+    modifierContainer.prepend(groupHtml);
+
+    let minDropdown = $(`#group-${groupId} .dropdown1`);
+    let maxDropdown = $(`#group-${groupId} .dropdown2`);
+
+    minDropdown.val(min).trigger("change");
+    maxDropdown.val(max).trigger("change");
+
+    updateDropdownConstraints(groupId);
+  }
+
+  // Bind Modifier Group Dropdown Events
+  function bindModifierGroupEvent() {
+    $(document).on("change", "#EditModifierGroupDropdown", function () {
+      var selectedGroups = $(this).val() || [];
+
+      if (selectedGroups.length === 0) {
+        toastr.warning("No modifier groups selected.", "Warning");
+        return;
+      }
+
+      $.ajax({
+        url: "/Menu/GetModifiersByGroup",
+        type: "GET",
+        data: {
+          modifierGroupIds: selectedGroups,
+        },
+        traditional: true,
+        success: function (response) {
+          if (response && response.groups) {
+            response.groups.forEach(function (group) {
+              if ($("#group-" + group.groupId).length === 0) {
+                addModifierGroupToUI(
+                  group.groupId,
+                  group.groupName,
+                  0,
+                  0,
+                  response.modifierItems.filter((m) =>
+                    m.groupId.some((id) => id === group.groupId)
+                  )
+                );
+              }
+            });
+          }
+        },
+        error: function (xhr, status, error) {
+          toastr.error("Error fetching modifiers: " + error, "Error");
+        },
+      });
+    });
+
+    // Handle Removal of Modifier Group
+    $(document).on("click", ".remove-group", function () {
+      var groupId = $(this).data("group");
+      $("#group-" + groupId).remove();
+
+      // Update dropdown after removal
+      var selectedValues = $("#EditModifierGroupDropdown").val() || [];
+      $("#EditModifierGroupDropdown").val(
+        selectedValues.filter((id) => id !== groupId)
+      );
+    });
+  }
+
+  $(document).on("change", ".dropdown1, .dropdown2", function () {
+    var groupId = $(this).data("group");
+    updateDropdownConstraints(groupId);
+  });
+
+  function updateDropdownConstraints(groupId) {
+    var minDropdown = $(`#group-${groupId} .dropdown1`);
+    var maxDropdown = $(`#group-${groupId} .dropdown2`);
+
+    var minValue = parseInt(minDropdown.val());
+    var maxValue = parseInt(maxDropdown.val());
+
+    if (minValue > maxValue) {
+      maxDropdown.val(minValue).trigger("change");
+    }
+
+    if (maxValue < minValue) {
+      minDropdown.val(maxValue).trigger("change");
+    }
+
+    // Disable invalid options and fade them
+    minDropdown.find("option").each(function () {
+      var val = parseInt($(this).val());
+      if (val > maxValue) {
+        $(this).prop("disabled", true).css("color", "#ccc"); // Fade out
+      } else {
+        $(this).prop("disabled", false).css("color", "black"); // Restore color
+      }
+    });
+
+    maxDropdown.find("option").each(function () {
+      var val = parseInt($(this).val());
+      if (val < minValue) {
+        $(this).prop("disabled", true).css("color", "#ccc"); // Fade out
+      } else {
+        $(this).prop("disabled", false).css("color", "black"); // Restore color
+      }
+    });
+  }
 });

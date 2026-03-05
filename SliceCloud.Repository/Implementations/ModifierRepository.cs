@@ -7,11 +7,11 @@ public class ModifierRepository(SliceCloudContext sliceCloudContext) : IModifier
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetModifierGroupModifierMapping
+    #region GetAllModifiersAsync
 
-    public IQueryable<ModifierGroupModifierMapping> GetModifierGroupModifierMappingAsQueryable()
+    public IQueryable<Modifier> GetAllModifiersAsQueryable()
     {
-        return _sliceCloudContext.ModifierGroupModifierMappings.AsQueryable();
+        return _sliceCloudContext.Modifiers.AsQueryable();
     }
 
     #endregion

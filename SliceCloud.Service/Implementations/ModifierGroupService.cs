@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
@@ -39,4 +40,34 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
 
     #endregion
 
+    #region GetModifierGroupById
+
+    public async Task<ModifierGroupViewModel> GetModifierGroupByIdAsync(int modifierGroupId)
+    {
+        ModifierGroup? modifierGroup = await _modifierGroupRepository.GetAllModifierGroupsAsQueryable()
+                                                    .Include(mg => mg.ModifierGroupModifierMappings)
+                                                        .ThenInclude(mgm => mgm.Modifier)
+                                                            .FirstOrDefaultAsync(mg => mg.ModifierGroupId == modifierGroupId);
+        if (modifierGroup == null)
+        {
+            return null!;
+        }
+
+        return new ModifierGroupViewModel
+        {
+
+            ModifierGroupId = modifierGroup.ModifierGroupId,
+            ModifierGroupName = modifierGroup.ModifierGroupName,
+            Description = modifierGroup.Description,
+            Modifiers = modifierGroup.ModifierGroupModifierMappings
+                .Select(mgm => new ModifierViewModel
+                {
+                    ModifierId = mgm.Modifier.ModifierId,
+                    ModifierName = mgm.Modifier.ModifierName,
+                    ModifierType = (ModifierType?)mgm.Modifier.ModifierType
+                }).ToList()
+        };
+    }
+
+    #endregion
 }

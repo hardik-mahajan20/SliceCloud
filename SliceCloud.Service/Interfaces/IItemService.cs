@@ -30,4 +30,11 @@ public interface IItemService
     /// <param name="itemImage">The image file of the item.</param>
     /// <returns>A task that returns the ID of the newly added item.</returns>
     Task<int> AddMenuItemAsync(ItemViewModel itemViewModel, IFormFile? itemImage);
+
+    /// <summary>
+    /// Retrieves an item by its ID asynchronously.
+    /// </summary>
+    /// <param name="itemId">The ID of the item to retrieve.</param>
+    /// <returns>The item view model if found, otherwise null.</returns>
+    Task<ItemViewModel> GetItemByIdAsync(int itemId);
 }

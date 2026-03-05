@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 
@@ -13,6 +14,17 @@ public class ItemModifierGroupMapRepository(SliceCloudContext sliceCloudContext)
     {
         await _sliceCloudContext.ItemModifierGroupMaps.AddAsync(itemModifierGroupMap);
         await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
+
+    #region GetMappingByItemId
+
+    public async Task<List<ItemModifierGroupMap>> GetMappingByItemIdAsync(int itemId)
+    {
+        return await _sliceCloudContext.ItemModifierGroupMaps
+            .Where(x => x.ItemId == itemId)
+            .ToListAsync();
     }
 
     #endregion

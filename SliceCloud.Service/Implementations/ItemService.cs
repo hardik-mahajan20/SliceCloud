@@ -14,7 +14,7 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
     #region GetPaginatedItemsByGroupId
-    
+
     public async Task<PaginatedList<ItemViewModel>> GetPaginatedItemsByGroupIdAsync(int categoryId, int pageNumber, int pageSize, string searchQuery = "")
     {
         IQueryable<Item>? query = _itemRepository.GetAllItemsAsQueryable().Where(item => item.CategoryId == categoryId && item.IsDeleted == false)
@@ -102,6 +102,33 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
             CreatedBy = _currentUserService.UserId
         };
         return await _itemRepository.AddMenuItemAsync(menuItem);
+    }
+
+    #endregion
+
+    #region GetItemById
+
+    public async Task<ItemViewModel> GetItemByIdAsync(int itemId)
+    {
+        Item? item = await _itemRepository.GetItemByIdAsync(itemId);
+        if (item == null) return new ItemViewModel();
+
+        return new ItemViewModel
+        {
+            ItemId = item.ItemId,
+            CategoryId = item.CategoryId,
+            ItemName = item.ItemName,
+            ItemType = item.ItemType,
+            Rate = item.Rate,
+            Quantity = item.Quantity,
+            UnitId = item.UnitId,
+            IsAvailable = item.IsAvailable ?? false,
+            IsDefaultTax = item.IsDefaultTax ?? false,
+            TaxPercentage = item.TaxPercentage,
+            ShortCode = item.ShortCode,
+            Description = item.Description,
+            ItemImg = item.ItemImage,
+        };
     }
 
     #endregion

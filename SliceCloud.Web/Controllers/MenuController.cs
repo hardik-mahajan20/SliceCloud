@@ -395,4 +395,92 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #endregion
 
+    #region GetItemById GET
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetItemById(int id)
+    {
+        ItemViewModel? item = await _itemService.GetItemByIdAsync(id);
+        if (item == null)
+        {
+            return Json(new { success = false, message = "Item not found" });
+        }
+
+        List<CategoryViewModel>? categories = await _categoryService.GetAllCategoriesAsync();
+        List<UnitViewModel>? units = await _unitService.GetUnitsAsync();
+        List<ModifierGroup>? modifierGroups = await _modifierService.GetAllModifierGroupsAsync();
+
+        List<ItemModifierGroupMapViewModel>? modifierGroupMappings = await _iItemModifierGroupMapService.GetMappingByItemIdAsync(id);
+
+        List<ItemModifierGroupMapViewModel>? modifierGroupMappingViewModels = modifierGroupMappings.Select(mapping => new ItemModifierGroupMapViewModel
+        {
+            ModifierGroupId = mapping.ModifierGroupId,
+            MinValue = mapping.MinValue,
+            MaxValue = mapping.MaxValue
+        }).ToList();
+
+        EditMenuItemViewModel? editMenuItemViewModel = new()
+        {
+            ItemId = item.ItemId,
+            ItemName = item.ItemName,
+            ItemType = item.ItemType,
+            CategoryId = item.CategoryId,
+            Rate = item.Rate,
+            Quantity = item.Quantity,
+            UnitId = item.UnitId,
+            IsAvailable = item.IsAvailable,
+            ItemImg = item.ItemImg,
+            IsDefaultTax = item.IsDefaultTax,
+            TaxPercentage = item.TaxPercentage,
+            ShortCode = item.ShortCode,
+            Description = item.Description,
+            Categories = categories,
+            Units = units,
+            ModifierGroups = modifierGroups,
+            ModifierGroupMappings = modifierGroupMappingViewModels
+        };
+
+        return PartialView("_EditItemModalPartialView", editMenuItemViewModel);
+    }
+
+    #endregion
+
+    #region GetModifierMappingsByItemId GET
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetModifierMappingsByItemId(int id)
+    {
+        List<ItemModifierGroupMapViewModel>? itemModifierGroupMapViewModels = await _iItemModifierGroupMapService.GetMappingByItemIdAsync(id);
+
+
+
+        foreach (var groupMapping in itemModifierGroupMapViewModels)
+        {
+            ModifierGroupViewModel? modifierGroup = await _modifierGroupService.GetModifierGroupByIdAsync(groupMapping.ModifierGroupId);
+
+            if (modifierGroup != null)
+            {
+                groupMapping.ModifierGroupName = modifierGroup.ModifierGroupName;
+
+                if (groupMapping.ModifierItems == null || !groupMapping.ModifierItems.Any())
+                {
+                    if (modifierGroup.ModifierItems != null)
+                    {
+                        groupMapping.ModifierItems = modifierGroup.ModifierItems.Select(item => new ModifierItemViewModel
+                        {
+                            ModifierItemId = item.ModifierItemId,
+                            ModifierItemName = item.ModifierItemName,
+                            Price = item.Price
+                        }).ToList();
+                    }
+                }
+            }
+        }
+
+        return Json(itemModifierGroupMapViewModels);
+    }
+
+    #endregion
 }
