@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-record-btn" viewBox="0 0 16 16">
+    <!-- Triangle Path -->
+    <path d="M8 4l4 7H4l4-7z" fill="#8B0000"/>
+    <!-- Square Path (reduced size) -->
+    <path d="M2 2h12v12H2z" fill="none" stroke="#8B0000" stroke-width="1"/>
+</svg>

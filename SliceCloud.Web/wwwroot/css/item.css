@@ -1,0 +1,60 @@
+.tableheader {
+  font-weight: bold;
+  font-size: large;
+  color: #585b5e;
+}
+
+.table td,
+.table th {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table td:nth-child(1),
+.table th:nth-child(1) {
+  width: 20%;
+}
+
+.table td:nth-child(2),
+.table th:nth-child(2) {
+  width: 15%;
+}
+
+.table td:nth-child(3),
+.table th:nth-child(3) {
+  width: 10%;
+}
+
+.table td:nth-child(4),
+.table th:nth-child(4) {
+  width: 10%;
+}
+
+.table td:nth-child(5),
+.table th:nth-child(5) {
+  width: 15%;
+}
+
+.table td:nth-child(6),
+.table th:nth-child(6) {
+  width: 20%;
+}
+
+.truncate-text {
+  text-align: start;
+  display: inline-block;
+  max-width: 190px !important;
+  min-width: 190px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-pointer-events {
+  pointer-events: none;
+  opacity: 0.6;
+  /* optional: makes the content look disabled */
+}

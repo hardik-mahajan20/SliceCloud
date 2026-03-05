@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 
@@ -16,4 +17,42 @@ public class ItemRepository(SliceCloudContext sliceCloudContext) : IItemReposito
 
     #endregion
 
+    #region AddMenuItem
+
+    public async Task<int> AddMenuItemAsync(Item item)
+    {
+        await _sliceCloudContext.Items.AddAsync(item);
+        await _sliceCloudContext.SaveChangesAsync();
+        return item.ItemId;
+    }
+
+    #endregion
+
+    #region GetItemById
+
+    public async Task<Item?> GetItemByIdAsync(int itemId)
+    {
+        return await _sliceCloudContext.Items.FirstOrDefaultAsync(m => m.ItemId == itemId && m.IsDeleted == false);
+    }
+
+    #endregion
+
+    #region UpdateMenuItem
+
+    public async Task<bool> UpdateMenuItemAsync(Item item)
+    {
+        _sliceCloudContext.Items.Update(item);
+        return await _sliceCloudContext.SaveChangesAsync() > 0;
+    }
+
+    #endregion
+
+    #region SaveChanges
+
+    public async Task<int> SaveChangesAsync()
+    {
+        return await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
 }
