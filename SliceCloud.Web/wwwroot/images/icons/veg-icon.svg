@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-record-btn" viewBox="0 0 16 16">
+    <!-- Circle Path -->
+    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8" fill="green"/>
+    <!-- Square Path (reduced size) -->
+    <path d="M2 2h12v12H2z" fill="none" stroke="green" stroke-width="1"/>
+</svg>

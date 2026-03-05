@@ -1,0 +1,11 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-leaf" viewBox="0 0 16 16">
+	<!-- Circle Path -->
+	<path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8" fill="#094D1C"/>
+
+	<!-- Leaf Symbol (Modified for vegan representation) -->
+	 <path d="M6 7c0 1.104.448 2 1 2s1-0.896 1-2S7.552 5 7 5 6 5.896 6 7zM9 8.618c-0.495-.17-.974-.388-1.417-.674C7.457 7.438 7 7 7 7s.404 1.296 1.074 2.076c.287.268.597.453.926.618z" fill="white"/>
+
+	<!-- Square Path (Outline) -->
+	<path d="M2 2h12v12H2z" fill="none" stroke="#094D1C" stroke-width="1"/>
+</svg>

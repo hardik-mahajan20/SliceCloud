@@ -1,0 +1,115 @@
+@using SliceCloud.Repository.ViewModels
+@model SliceCloud.Repository.ViewModels.PaginatedList<ItemViewModel>
+<div class="item-wrapper">
+    <table class="table">
+        <tr class="tableheader">
+            <td class="align-middle">
+                <div class="d-flex ">
+                    <input class="form-check-input me-3" type="checkbox" id="maincheckbox" />
+                    Name
+                </div>
+            </td>
+            <td class="ps-lg-0 ps-3 align-middle">Item Type</td>
+            <td class="align-middle">Rate</td>
+            <td class="align-middle">Quantity</td>
+            <td class="align-middle">Available</td>
+            <td class="align-middle">Action</td>
+        </tr>
+
+        <tbody>
+            @if (Model.Count == 0)
+            {
+                <tr>
+                    <td colspan="6" class="text-center border-bottom-0">
+                        <div class="d-flex flex-column">
+                            <i class="bi bi-emoji-frown fs-4"></i>
+                            <div>No records found</div>
+                        </div>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (ItemViewModel itemViewModel in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center ">
+                                <input class="form-check-input me-3 item-checkbox" type="checkbox"
+                                    name="item-checkbox-@itemViewModel.ItemId" id="item-checkbox-@itemViewModel.ItemId" />
+                                <input type="hidden" name="ItemId" value="@itemViewModel.ItemId">
+                                <img class="profilephotosmall me-3" src="@itemViewModel.ItemImg" alt="This is image"
+                                    height="50px" width="50px" />
+                                <span class="truncate-text" style="min-width: 190px;"
+                                    title="@itemViewModel.ItemName">@itemViewModel.ItemName</span>
+                            </div>
+                        </td>
+                        <td>
+                            @{
+                                string iconPath = "~/images/icons/veg-icon.svg";
+                                if (itemViewModel.ItemType == "Veg")
+                                {
+                                    iconPath = "~/images/icons/veg-icon.svg";
+                                }
+                                else if (itemViewModel.ItemType == "Non-Veg")
+                                {
+                                    iconPath = "~/images/icons/non-veg-icon.svg";
+                                }
+                                else if (itemViewModel.ItemType == "Vegan")
+                                {
+                                    iconPath = "~/images/icons/vegan-icon.svg";
+                                }
+                            }
+                            <img class="veg-icon mx-3" src="@Url.Content(iconPath)" alt="@itemViewModel.ItemType Icon"
+                                width="20px" />
+                        </td>
+                        <td>@itemViewModel.Rate</td>
+                        <td>@itemViewModel.Quantity</td>
+                        <td>
+                            <div class="form-check form-switch d-flex justify-content-center">
+                                <input class="form-check-input toggle-switch toggle-switch-quick" type="checkbox" role="switch"
+                                    name="toggle-switch-quick-@itemViewModel.ItemId"
+                                    id="toggle-switch-quick-@itemViewModel.ItemId" data-id="@itemViewModel.ItemId"
+                                    data-field="IsAvailable" @((bool)itemViewModel.IsAvailable ? "checked" : "")
+                                    style="width: 60px; height: 30px; opacity: 1;" />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center align-items-center ">
+                                <button class="btn edit-item-btn" data-id="@itemViewModel.ItemId">
+                                    <i class="bi bi-pen"></i>
+                                </button>
+                                <button class="btn delete-item-btn " data-id="@itemViewModel.ItemId">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+@if (Model.Count != 0)
+{
+    <div class="pagination-container d-flex flex-wrap flex-md-nowrap">
+        <span>Showing @ViewBag.FromRec - @ViewBag.ToRec of @ViewBag.TotalItems</span>
+        @{
+            int[] pageSizes = { 5, 10, 20 };
+        }
+        <select id="pageSizeDropdown" class="form-select">
+            @foreach (var size in pageSizes)
+            {
+                <option value="@size" selected="@(ViewBag.PageSize == size ? "selected" : null)">@size</option>
+            }
+        </select>
+        <input type="hidden" id="totalPages" value="@ViewBag.TotalPages" />
+        <button id="prevPageBtn">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <button id="nextPageBtn">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+}
