@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SliceCloud.Repository.Constants;
+using SliceCloud.Repository.Enums;
+using SliceCloud.Repository.Models;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Interfaces;
@@ -9,10 +11,13 @@ namespace SliceCloud.Web.Controllers;
 /// <summary>
 /// This controller is referenced for the menu module related end points.
 /// </summary>
-public class MenuController(ICategoryService categoryService, IItemService itemService) : Controller
+public class MenuController(ICategoryService categoryService, IItemService itemService, IModifierGroupService modifierGroupService, IUnitService unitService, IModifierService modifierService) : Controller
 {
     private readonly ICategoryService _categoryService = categoryService;
     private readonly IItemService _itemService = itemService;
+    private readonly IModifierGroupService _modifierGroupService = modifierGroupService;
+    private readonly IUnitService _unitService = unitService;
+    private readonly IModifierService _modifierService = modifierService;
 
     #region Menu GET
 
@@ -239,11 +244,80 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     #endregion
 
     #region GetAllCategories
+
     [HttpGet]
     public async Task<IActionResult> GetAllCategories()
     {
         List<CategoryViewModel>? categoryViewModels = await _categoryService.GetAllCategoriesAsync();
         return Json(categoryViewModels);
     }
+
     #endregion
+
+    #region 
+    public async Task<IActionResult> GetMenuData()
+    {
+        List<CategoryViewModel>? categories = await _categoryService.GetAllCategoriesAsync();
+
+        List<ModifierGroupViewModel>? modifierGroups = await _modifierGroupService.GetAllModifierGroupsAsync();
+
+        List<UnitViewModel>? units = await _unitService.GetUnitsAsync();
+
+        List<KeyValuePair<int, string>>? itemTypes = Enum.GetValues(typeof(ItemType))
+          .Cast<ItemType>()
+          .Select(it => new KeyValuePair<int, string>((int)it, it.ToString()))
+          .ToList();
+
+        ItemViewModel viewModel = new()
+
+        {
+            Categories = categories,
+            ModifierGroups = modifierGroups,
+            Units = units,
+            ItemTypes = itemTypes
+        };
+
+        return PartialView("_AddNewItemModalPartial", viewModel);
+    }
+
+    #endregion
+
+    #region GetModifierGroupsByIds
+
+    [HttpGet]
+    public async Task<JsonResult> GetModifiersByGroup([FromQuery] List<int> modifierGroupIds)
+    {
+
+        if (modifierGroupIds == null || !modifierGroupIds.Any())
+        {
+            return Json(new
+            {
+                Error = "No modifier groups selected."
+            });
+        }
+
+        List<ModifierGroup>? groups = await _modifierGroupService.GetModifierGroupsByIdsAsync(modifierGroupIds);
+        List<Modifier>? modifiers = await _modifierService.GetModifiersByGroupIdsAsync(modifierGroupIds);
+      
+        var response = new
+        {
+            Groups = groups.Select(g => new
+            {
+                GroupId = g.ModifierGroupId,
+                GroupName = g.ModifierGroupName
+            }).ToList(),
+
+            ModifierItems = modifiers.Select(m => new
+            {
+                m.ModifierId,
+                m.ModifierName,
+                Price = m.Rate,
+                GroupId = m.ModifierGroupModifierMappings.Select(mgm => mgm.ModifierGroupId).ToList()
+            }).ToList()
+        };
+        return Json(response);
+    }
+
+    #endregion
+
 }

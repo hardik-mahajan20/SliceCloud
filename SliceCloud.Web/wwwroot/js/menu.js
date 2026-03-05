@@ -95,7 +95,7 @@ $(document).ready(function () {
     });
   });
 
-  // Edit Cateogry
+  // Edit Category
   $(document).on("click", ".edit-category-btn", function () {
     var categoryId = $(this).data("id");
 
@@ -258,4 +258,231 @@ $(document).ready(function () {
       },
     });
   }
+
+  // Add Item GET
+  let selectedModifierGroupData = [];
+  let selectedModifiersData = {};
+
+  // Add Item GET
+
+  $("#ModifierGroupDropdown").select2({
+    placeholder: "Select Modifier Groups",
+    allowClear: true,
+    width: "100%",
+    tags: true,
+    closeOnSelect: false,
+  });
+
+  // Load Add Item Modal
+  $(document).on("click", ".add-item-btn", function () {
+    $.ajax({
+      url: "/Menu/GetMenuData",
+      type: "GET",
+      success: function (data) {
+        $("#modalContainer").html(data);
+
+        let addCategoryModal = document.getElementById("addItemModalContainer");
+        let modalInstance = new bootstrap.Modal(addCategoryModal);
+        modalInstance.show();
+
+        $.validator.unobtrusive.parse("#addItemModalContainer");
+
+        setTimeout(() => {
+          bindModifierGroupEventAdd();
+        }, 100);
+      },
+      error: function () {
+        toastr.error("Failed to load modal data.", "Error");
+      },
+    });
+  });
+
+  function bindModifierGroupEventAdd() {
+    $(document).on("change", "#ModifierGroupDropdown", function () {
+      var selectedGroupIds = $(this).val() || [];
+      if (selectedGroupIds && selectedGroupIds.length > 0) {
+        $.ajax({
+          url: "/Menu/GetModifiersByGroup",
+          type: "GET",
+          traditional: true,
+          data: {
+            modifierGroupIds: selectedGroupIds,
+          },
+          success: function (response) {
+            updateModifierItems(response);
+          },
+          error: function (xhr, status, error) {
+            toastr.error("AJAX Error: " + error, "Error");
+          },
+        });
+      } else {
+        $("#ModifierItemsContainer").html(
+          "<p class='text-muted'>Select a Modifier Group to load items.</p>"
+        );
+      }
+    });
+  }
+
+  function updateModifierItems(data) {
+    var container = $("#ModifierItemsContainer");
+    container.find(".no-modifier-message").remove();
+
+    if (data.groups && data.groups.length > 0) {
+      $.each(data.groups, function (index, group) {
+        if ($(`#group-${group.groupId}`).length === 0) {
+          selectedModifiersData[group.groupId] = {
+            groupName: group.groupName,
+            modifiers: [],
+            dropdown1Value: 0,
+            dropdown2Value: 0,
+          };
+          selectedModifierGroupData.push({
+            modifierGroupId: group.groupId,
+            min: 0,
+            max: 0,
+          });
+
+          var groupHtml = `
+                 <div id="group-${group.groupId}" class="px-3 mt-3">
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                         <strong class="text-muted">${group.groupName}</strong>
+                         <button class="remove-group" data-group="${
+                           group.groupId
+                         }">
+                             <i class="fa-solid fa-trash" style="color:#808080;"></i>
+                         </button>
+                     </div>
+                     <div>
+                         <div class="row">
+                             <div class="col-6 mb-2">
+                                 <select class="form-select form-select-sm modifier-quantity rounded-pill border dropdown1" data-group="${
+                                   group.groupId
+                                 }">
+                                     ${[...Array(6).keys()]
+                                       .map(
+                                         (i) =>
+                                           `<option value="${i}">${i}</option>`
+                                       )
+                                       .join("")}
+                                 </select>
+                             </div>
+                             <div class="col-6 mb-2">
+                                 <select class="form-select form-select-sm modifier-quantity rounded-pill border dropdown2" data-group="${
+                                   group.groupId
+                                 }">
+                                     ${[...Array(6).keys()]
+                                       .map(
+                                         (i) =>
+                                           `<option value="${i}">${i}</option>`
+                                       )
+                                       .join("")}
+                                 </select>
+                             </div>
+                         </div>
+                         <ul>`;
+
+          var groupModifiers = data.modifierItems.filter((m) =>
+            m.groupId.some((id) => id === group.groupId)
+          );
+          if (groupModifiers.length > 0) {
+            $.each(groupModifiers, function (idx, item) {
+              groupHtml += `
+                         <li>
+                             <div class="d-flex justify-content-between align-items-center">
+                                 <span>${item.modifierName}</span>
+                                 <span>${item.price}</span>
+                             </div>
+                         </li>`;
+
+              selectedModifiersData[group.groupId].modifiers.push({
+                modifierId: item.modifierId,
+                modifierName: item.modifierName,
+                price: item.price,
+              });
+            });
+          } else {
+            groupHtml += `<p class='text-muted'>No modifiers available for this group.</p>`;
+          }
+
+          groupHtml += `</ul></div></div>`;
+          container.prepend(groupHtml);
+        }
+      });
+    }
+
+    if ($("#ModifierItemsContainer").children().length === 0) {
+      container.append(
+        "<p class='text-muted no-modifier-message'>Select a Modifier Group to load items.</p>"
+      );
+    }
+  }
+
+  $(document).on("change", ".dropdown1, .dropdown2", function () {
+    var groupId = $(this).data("group");
+    var dropdownType = $(this).hasClass("dropdown1")
+      ? "dropdown1Value"
+      : "dropdown2Value";
+    var value = parseInt($(this).val(), 10);
+
+    let modifierGroup = selectedModifierGroupData.find(
+      (x) => x.modifierGroupId == groupId
+    );
+    if (!modifierGroup) return;
+
+    if (dropdownType === "dropdown1Value") {
+      modifierGroup.min = value;
+
+      if (modifierGroup.min > modifierGroup.max) {
+        modifierGroup.max = modifierGroup.min;
+        $(`.dropdown2[data-group='${groupId}']`).val(modifierGroup.min);
+      }
+    } else {
+      // Max changed
+      modifierGroup.max = value;
+
+      if (modifierGroup.max < modifierGroup.min) {
+        modifierGroup.min = modifierGroup.max;
+        $(`.dropdown1[data-group='${groupId}']`).val(modifierGroup.max);
+      }
+    }
+
+    // **Dynamically enable/disable options & fade invalid ones**
+    $(`.dropdown2[data-group='${groupId}'] option`).each(function () {
+      var optionVal = parseInt($(this).val(), 10);
+      if (optionVal < modifierGroup.min) {
+        $(this).prop("disabled", true).css("color", "#ccc");
+      } else {
+        $(this).prop("disabled", false).css("color", "");
+      }
+    });
+
+    $(`.dropdown1[data-group='${groupId}'] option`).each(function () {
+      var optionVal = parseInt($(this).val(), 10);
+      if (optionVal > modifierGroup.max) {
+        $(this).prop("disabled", true).css("color", "#ccc");
+      } else {
+        $(this).prop("disabled", false).css("color", "");
+      }
+    });
+  });
+
+  $(document).on("click", ".remove-group", function () {
+    var groupId = $(this).data("group");
+
+    $(`#group-${groupId}`).remove();
+    delete selectedModifiersData[groupId];
+    selectedModifierGroupData = selectedModifierGroupData.filter(
+      (x) => x.modifierGroupId != groupId
+    );
+
+    var selectedOptions = $("#ModifierGroupDropdown").val();
+    selectedOptions = selectedOptions.filter((id) => id != groupId);
+    $("#ModifierGroupDropdown").val(selectedOptions).trigger("change");
+
+    if ($("#ModifierItemsContainer").children().length === 0) {
+      $("#ModifierItemsContainer").html(
+        "<p class='text-muted no-modifier-message'>Select a Modifier Group to load items.</p>"
+      );
+    }
+  });
 });

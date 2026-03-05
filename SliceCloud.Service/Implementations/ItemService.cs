@@ -42,7 +42,7 @@ public class ItemService(IItemRepository itemRepository) : IItemService
                     ItemType = item.ItemType,
                     Rate = item.Rate,
                     Quantity = item.Quantity,
-                    Isavailable = item.IsAvailable ?? false,
+                    IsAvailable = item.IsAvailable ?? false,
                     ItemImg = hasImage
                         ? $"/images/uploads/{item.ItemImage}"
                         : "/images/dining-menu.png"
