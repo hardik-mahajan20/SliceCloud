@@ -52,6 +52,7 @@ $(document).ready(function () {
       url: "/Menu/LoadAddCategoryModal",
       type: "GET",
       success: function (data) {
+        $("#modalContainer").empty();
         $("#modalContainer").html(data);
         let addCategoryModal = document.getElementById("addCategory");
         let modalInstance = new bootstrap.Modal(addCategoryModal);
@@ -279,6 +280,7 @@ $(document).ready(function () {
       url: "/Menu/GetMenuData",
       type: "GET",
       success: function (data) {
+        $("#modalContainer").empty();
         $("#modalContainer").html(data);
 
         let addMenuItemModal = document.getElementById("addItemModalContainer");
@@ -578,6 +580,7 @@ $(document).ready(function () {
       },
       success: function (response) {
         // Once data is successfully returned, load the modal content
+        $("#modalContainer").empty();
         $("#modalContainer").html(response);
         let editMenuItemModal = document.getElementById("editItemModal");
         let modalInstance = new bootstrap.Modal(editMenuItemModal);
