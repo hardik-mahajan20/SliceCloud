@@ -37,4 +37,12 @@ public interface IItemService
     /// <param name="itemId">The ID of the item to retrieve.</param>
     /// <returns>The item view model if found, otherwise null.</returns>
     Task<ItemViewModel> GetItemByIdAsync(int itemId);
+
+    /// <summary>
+    /// Updates an existing menu item along with its image asynchronously.
+    /// </summary>
+    /// <param name="editMenuItemViewModel">The view model containing updated item details.</param>
+    /// <param name="itemImage">The updated image file of the item.</param>
+    /// <returns>A task that returns true if the update was successful, otherwise false.</returns>
+    Task<bool> UpdateMenuItemAsync(EditMenuItemViewModel editMenuItemViewModel, IFormFile? itemImage);
 }

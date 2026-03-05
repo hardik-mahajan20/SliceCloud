@@ -28,4 +28,31 @@ public class ItemModifierGroupMapRepository(SliceCloudContext sliceCloudContext)
     }
 
     #endregion
+
+    #region GetAllItemModifierGroupMaps
+
+    public IQueryable<ItemModifierGroupMap> GetAllItemModifierGroupMapsAsQueryable()
+    {
+        return _sliceCloudContext.ItemModifierGroupMaps.AsQueryable();
+    }
+
+    #endregion
+
+    #region RemoveItemModifierGroupMaps
+
+    public void RemoveItemModifierGroupMaps(IEnumerable<ItemModifierGroupMap> itemModifierGroupMaps)
+    {
+        _sliceCloudContext.ItemModifierGroupMaps.RemoveRange(itemModifierGroupMaps);
+    }
+
+    #endregion
+
+    #region SaveChanges
+
+    public async Task<int> SaveChangesAsync()
+    {
+        return await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
 }

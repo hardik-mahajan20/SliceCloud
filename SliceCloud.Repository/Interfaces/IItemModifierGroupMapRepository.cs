@@ -17,4 +17,21 @@ public interface IItemModifierGroupMapRepository
     /// <param name="itemId">The ID of the item to retrieve mappings for.</param>
     /// <returns>A task that returns a list of item-modifier group mappings.</returns>
     Task<List<ItemModifierGroupMap>> GetMappingByItemIdAsync(int itemId);
+
+    /// <summary>
+    /// Retrieves all itemModifierGroupMaps as quearyable.
+    /// </summary>
+    /// <returns>All itemModifierGroupMaps as quearyable.</returns>
+    IQueryable<ItemModifierGroupMap> GetAllItemModifierGroupMapsAsQueryable();
+
+    /// <summary>
+    /// Saves changes to the data source asynchronously.
+    /// </summary>
+    /// <returns>A task representing the asynchronous save operation.</returns>
+    Task<int> SaveChangesAsync();
+
+    /// <summary>
+    /// Removes itemModifierGroupMaps from the current context.
+    /// </summary>
+    void RemoveItemModifierGroupMaps(IEnumerable<ItemModifierGroupMap> itemModifierGroupMaps);
 }

@@ -36,4 +36,14 @@ public class ItemRepository(SliceCloudContext sliceCloudContext) : IItemReposito
     }
 
     #endregion
+
+    #region UpdateMenuItem
+
+    public async Task<bool> UpdateMenuItemAsync(Item item)
+    {
+        _sliceCloudContext.Items.Update(item);
+        return await _sliceCloudContext.SaveChangesAsync() > 0;
+    }
+
+    #endregion
 }

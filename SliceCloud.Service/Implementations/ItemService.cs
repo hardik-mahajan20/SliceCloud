@@ -132,4 +132,33 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
     }
 
     #endregion
+
+    #region UpdateMenuItem
+
+    public async Task<bool> UpdateMenuItemAsync(EditMenuItemViewModel model, IFormFile? itemImage)
+    {
+        string? itemImgPath = await _imageService.ImgPath(itemImage);
+        Item? menuItem = await _itemRepository.GetItemByIdAsync(model.ItemId);
+        if (menuItem == null) return false;
+
+        menuItem.ItemName = model.ItemName;
+        menuItem.CategoryId = model.CategoryId;
+        menuItem.ItemType = model.ItemType ?? "Veg";
+        menuItem.Rate = model.Rate;
+        menuItem.Quantity = model.Quantity;
+        menuItem.UnitId = model.UnitId;
+        menuItem.IsAvailable = model.IsAvailable;
+        menuItem.IsDefaultTax = model.IsDefaultTax;
+        menuItem.TaxPercentage = model.TaxPercentage;
+        menuItem.ShortCode = model.ShortCode;
+        menuItem.Description = model.Description;
+        menuItem.ItemImage = model.ItemImg;
+        menuItem.ItemImage = itemImgPath;
+        menuItem.ModifiedAt = DateTime.UtcNow;
+        menuItem.ModifiedBy = _currentUserService.UserId;
+
+        return await _itemRepository.UpdateMenuItemAsync(menuItem);
+    }
+
+    #endregion
 }

@@ -606,7 +606,10 @@ $(document).ready(function () {
         if (modifierMappings && modifierMappings.length > 0) {
           prepopulatedModifierGroups(modifierMappings);
         } else {
-          toastr.warning("No modifier mappings found for this item.", "Warning");
+          toastr.warning(
+            "No modifier mappings found for this item.",
+            "Warning"
+          );
         }
       },
       error: function () {
@@ -686,9 +689,7 @@ $(document).ready(function () {
       groupHtml += `
         <li>
             <div class="d-flex justify-content-between align-items-center">
-            <span>${
-              item.modifierItemName
-            }</span>
+            <span>${item.modifierItemName}</span>
                 <span>${item.Price || item.price || 0}</span>
             </div>
         </li>`;
@@ -799,4 +800,90 @@ $(document).ready(function () {
       }
     });
   }
+
+  // Edit Item POST
+  $(document).on("submit", "#editItemForm", function (event) {
+    event.preventDefault();
+
+    let formData = new FormData(this);
+
+    formData.set("IsAvailable", $("input[name='IsAvailable']").is(":checked"));
+    formData.set(
+      "IsDefaultTax",
+      $("input[name='IsDefaultTax']").is(":checked")
+    );
+
+    // Collect Modifier Group Data
+    let modifierGroups = [];
+    $(".modifier-group").each(function () {
+      let groupId = $(this).attr("id").replace("group-", "");
+      let min = parseInt($(this).find(".dropdown1").val()) || 0;
+      let max = parseInt($(this).find(".dropdown2").val()) || 0;
+
+      let modifiers = [];
+      $(this)
+        .find("ul li")
+        .each(function () {
+          let modifierId = $(this).data("modifier-id");
+          let modifierName = $(this).find(".modifier-name").text();
+          let price = parseFloat($(this).find(".modifier-price").text()) || 0;
+
+          modifiers.push({
+            ModifierId: modifierId,
+            ModifierName: modifierName,
+            Price: price,
+          });
+        });
+
+      modifierGroups.push({
+        ModifierGroupId: groupId,
+        MinValue: min,
+        MaxValue: max,
+        Modifiers: modifiers,
+      });
+    });
+
+    formData.append("ModifierGroupsJson", JSON.stringify(modifierGroups));
+
+    $.ajax({
+      type: "POST",
+      url: "/Menu/UpdateMenuItem",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        if (response.success) {
+          toastr.success("Menu item updated successfully!");
+          let editItemModal = document.getElementById("editItemModal");
+          let modalInstance =
+            bootstrap.Modal.getOrCreateInstance(editItemModal);
+          modalInstance.hide();
+          loadItems(response.categoryId, 1, 5, "");
+        } else {
+          if (response.message.includes("already exists")) {
+            toastr.warning(response.message);
+          } else {
+            toastr.error("Error: " + response.message);
+          }
+
+          // Display validation errors
+          if (response.errors) {
+            for (const field in response.errors) {
+              let inputField = $("[name='" + field + "']");
+              if (inputField.length > 0) {
+                let errorMessage = response.errors[field];
+                let errorSpan = inputField
+                  .closest(".form-floating")
+                  .find("span.text-danger");
+                errorSpan.text(errorMessage);
+              }
+            }
+          }
+        }
+      },
+      error: function (xhr) {
+        toastr.error("An error occurred: " + xhr.responseText);
+      },
+    });
+  });
 });

@@ -23,4 +23,11 @@ public interface IItemRepository
     /// <param name="itemId">The ID of the item to retrieve.</param>
     /// <returns>The item if found, otherwise null.</returns>
     Task<Item?> GetItemByIdAsync(int itemId);
+
+    /// <summary>
+    /// Updates an existing menu item asynchronously.
+    /// </summary>
+    /// <param name="item">The menu item to update.</param>
+    /// <returns>True if the update was successful, otherwise false.</returns>
+    Task<bool> UpdateMenuItemAsync(Item item);
 }

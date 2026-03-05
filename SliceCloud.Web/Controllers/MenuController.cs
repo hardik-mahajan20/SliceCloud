@@ -483,4 +483,61 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region 
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> UpdateMenuItem(EditMenuItemViewModel model, IFormFile? itemImage, string ModifierGroupsJson)
+    {
+        model.IsAvailable = Request.Form["Isavailable"].ToString().ToLower() == "true";
+        model.IsDefaultTax = Request.Form["Isdefaulttax"].ToString().ToLower() == "true";
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    e => e.Key,
+                    e => e.Value?.Errors.Select(x => x.ErrorMessage).FirstOrDefault()
+                );
+
+            return Json(new { success = false, message = "Invalid input data!", errors = errors });
+        }
+
+        try
+        {
+            bool isDuplicate = await _itemService.IsDuplicateItemAsync(model.ItemName, model.ItemId);
+            if (isDuplicate)
+            {
+                return Json(new { success = false, message = "An item with the same name already exists!" });
+            }
+
+            var modifierGroups = JsonConvert.DeserializeObject<List<ItemModifierGroupMapViewModel>>(ModifierGroupsJson) ?? new List<ItemModifierGroupMapViewModel>();
+
+
+            bool isUpdated = await _itemService.UpdateMenuItemAsync(model, itemImage);
+            if (!isUpdated)
+            {
+                return Json(new { success = false, message = "Failed to update item." });
+            }
+
+            await _iItemModifierGroupMapService.DeleteItemModifierGroupMapsByItemIdAsync(model.ItemId);
+
+            foreach (var modifierGroup in modifierGroups)
+            {
+                modifierGroup.ItemId = model.ItemId;
+                await _iItemModifierGroupMapService.AddItemModifierGroupMapAsync(modifierGroup);
+            }
+
+            return Json(new { success = true, message = "Menu item updated successfully!", categoryId = model.CategoryId });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "Error: " + ex.Message });
+        }
+    }
+
+    #endregion
+
 }

@@ -98,4 +98,21 @@ public class ItemModifierGroupMapService(IItemModifierGroupMapRepository itemMod
     }
 
     #endregion
+
+    #region DeleteItemModifierGroupMapsByItemId
+
+    public async Task DeleteItemModifierGroupMapsByItemIdAsync(int itemId)
+    {
+        List<ItemModifierGroupMap>? existingMappings = await _itemModifierGroupMapRepository.GetAllItemModifierGroupMapsAsQueryable()
+                                                                                                .Where(m => m.ItemId == itemId)
+                                                                                                    .ToListAsync();
+        if (existingMappings == null || !existingMappings.Any())
+            return;
+
+        _itemModifierGroupMapRepository.RemoveItemModifierGroupMaps(existingMappings);
+
+        await _itemModifierGroupMapRepository.SaveChangesAsync();
+    }
+
+    #endregion
 }
