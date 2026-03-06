@@ -78,7 +78,7 @@ $(document).on("click", ".section-btn", function () {
   $(this).addClass("addedit-section");
   $(".section-btn").removeClass("active-section");
   $(this).addClass("active-section");
-  $("#iteSsearch").val("");
+  $("#tableSearch").val("");
 
   selectedSectionId = $(this).data("id");
   currentPage = 1;

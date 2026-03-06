@@ -1,4 +1,15 @@
 $(document).ready(function () {
+  // Load category based on category click
+  $(document).on("click", ".category-btn", function () {
+    $(".category-btn").removeClass("active-category");
+    $(this).addClass("active-category");
+    $("#itemSearch").val("");
+
+    selectedCategoryId = $(this).data("id");
+
+    $("#categoryIdHidden").val(selectedCategoryId);
+    loadCategoryWiseItems(selectedCategoryId, 1, 5, "");
+  });
   // Add Category
   $(document).on("click", "#openAddCategoryModal", function () {
     $.ajax({
@@ -26,12 +37,13 @@ $(document).ready(function () {
       url: form.attr("action"),
       type: form.attr("method"),
       data: form.serialize(),
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success(response.message);
           let modal = document.getElementById("addCategory");
-          let modalInstance = new bootstrap.Modal(modal);
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
+          await loadAllCategories();
         } else {
           // Display validation errors
           $(".text-danger").html(""); // Clear existing errors
@@ -49,7 +61,8 @@ $(document).ready(function () {
   });
 
   // Edit Category
-  $(document).on("click", ".edit-category-btn", function () {
+  $(document).on("click", ".edit-category-btn", function (e) {
+    e.stopPropagation();
     var categoryId = $(this).data("id");
 
     $.ajax({
@@ -80,12 +93,19 @@ $(document).ready(function () {
       data: formData,
       processData: false,
       contentType: false,
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success(response.message);
           let modal = document.getElementById("editCategory");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
+          await loadAllCategories(function (firstCategoryId) {
+            if (firstCategoryId) {
+              selectedCategoryId = firstCategoryId;
+              $("#categoryIdHidden").val(selectedCategoryId);
+              loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+            }
+          });
         } else {
           // Display validation errors
           $(".text-danger").html(""); // Clear existing errors
@@ -103,7 +123,8 @@ $(document).ready(function () {
   });
 
   // Delete Category
-  $(document).on("click", ".delete-category-btn", function () {
+  $(document).on("click", ".delete-category-btn", function (e) {
+    e.stopPropagation();
     var categoryId = $(this).data("id");
 
     $.ajax({
@@ -134,7 +155,7 @@ $(document).ready(function () {
         categoryId: categoryId,
       },
       dataType: "json",
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Category deleted successfully!");
           let modal = document.getElementById("deleteCategoryModal");

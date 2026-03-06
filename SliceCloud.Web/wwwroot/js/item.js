@@ -1,6 +1,41 @@
 $(document).ready(function () {
   let selectedModifierGroupData = [];
   let selectedModifiersData = {};
+
+  // Item Search
+  $(document).on("keyup", "#itemSearch", function () {
+    let searchQuery = $(this).val();
+    loadCategoryWiseItems(
+      selectedCategoryId,
+      currentPage,
+      pageSize,
+      searchQuery
+    );
+  });
+
+  // PageSize Dropdown
+  $(document).on("change", "#pageSizeDropdown", function () {
+    pageSize = $(this).val();
+    currentPage = 1;
+    loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+  });
+
+  // Previous Page
+  $(document).on("click", "#prevPageBtn", function () {
+    if (currentPage > 1) {
+      currentPage--;
+      loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+    }
+  });
+
+  // Next Page
+  $(document).on("click", "#nextPageBtn", function () {
+    if (currentPage < totalPages) {
+      currentPage++;
+      loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+    }
+  });
+
   // Add Item
   $("#ModifierGroupDropdown").select2({
     placeholder: "Select Modifier Groups",
@@ -86,10 +121,10 @@ $(document).ready(function () {
                  <div id="group-${group.groupId}" class="px-3 mt-3">
                      <div class="d-flex justify-content-between align-items-center mb-2">
                          <strong class="text-muted">${group.groupName}</strong>
-                         <button class="remove-group" data-group="${
+                         <button class="remove-group border-0 bg-transparent" data-group="${
                            group.groupId
                          }">
-                             <i class="fa-solid fa-trash" style="color:#808080;"></i>
+                             <i class="bi bi-trash" style="color:#808080;"></i>
                          </button>
                      </div>
                      <div>
@@ -264,6 +299,8 @@ $(document).ready(function () {
           let modal = document.getElementById("addItemModalContainer");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
+
+          loadCategoryWiseItems(response.categoryId, 1, 5, "");
         } else {
           if (response.message.includes("already exists")) {
             toastr.warning(response.message);
@@ -316,8 +353,8 @@ $(document).ready(function () {
         // Once data is successfully returned, load the modal content
         $("#modalContainer").empty();
         $("#modalContainer").html(response);
-        let editMenuItemModal = document.getElementById("editItemModal");
-        let modalInstance = new bootstrap.Modal(editMenuItemModal);
+        let modal = document.getElementById("editItemModal");
+        let modalInstance = new bootstrap.Modal(modal);
         modalInstance.show();
 
         setTimeout(function () {
@@ -388,8 +425,8 @@ $(document).ready(function () {
        <div id="group-${groupId}" class="modifier-group px-3 mt-1">
            <div class="d-flex justify-content-between align-items-center mb-2">
                <strong class="text-muted">${groupName}</strong>
-               <button class="remove-group" data-group="${groupId}">
-                   <i class="fa-solid fa-trash" style="color:#808080;"></i>
+               <button class="remove-group border-0 bg-transparent" data-group="${groupId}">
+                   <i class="bi bi-trash" style="color:#808080;"></i>
                </button>
            </div>
            <div class="row">
@@ -479,7 +516,7 @@ $(document).ready(function () {
             });
           }
         },
-        error: function (xhr, status, error) {
+        error: function (_xhr, _status, error) {
           toastr.error("Error fetching modifiers: " + error, "Error");
         },
       });
@@ -591,11 +628,11 @@ $(document).ready(function () {
       success: function (response) {
         if (response.success) {
           toastr.success("Menu item updated successfully!");
-          let editItemModal = document.getElementById("editItemModal");
-          let modalInstance =
-            bootstrap.Modal.getOrCreateInstance(editItemModal);
+          let modal = document.getElementById("editItemModal");
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
-          // loadItems(response.categoryId, 1, 5, "");
+
+          loadCategoryWiseItems(response.categoryId, currentPage, pageSize, "");
         } else {
           if (response.message.includes("already exists")) {
             toastr.warning(response.message);
@@ -661,6 +698,8 @@ $(document).ready(function () {
           let modal = document.getElementById("deleteItemModal");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
+
+          loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
         } else {
           toastr.error("Error deleting category.");
         }
@@ -748,6 +787,7 @@ $(document).ready(function () {
             .prop("indeterminate", false);
           $(".item-checkbox").prop("checked", false);
 
+          loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
           // Optional: Refetch IDs if needed
           fetchAllItemIds();
         } else {
