@@ -230,7 +230,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #region LoadItemsByCategory
 
-    public async Task<IActionResult> LoadItemsByCategory(int categoryId, int pageNumber, int pageSize, string searchQuery = "")
+    public async Task<IActionResult> LoadItemsByCategory(int categoryId, int pageNumber = 1, int pageSize = 5, string searchQuery = "")
     {
         PaginatedList<ItemViewModel>? paginatedItems = await _itemService.GetPaginatedItemsByGroupIdAsync(categoryId, pageNumber, pageSize, searchQuery);
 

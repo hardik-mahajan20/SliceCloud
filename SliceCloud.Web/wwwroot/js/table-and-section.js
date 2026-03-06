@@ -325,7 +325,6 @@ $(document).on("submit", "#editSectionForm", function (e) {
         loadTableSection();
       } else {
         $("#editSectionForm .text-danger").text("");
-        console.log(response.error);
         if (response.errors) {
           for (const key in response.errors) {
             const errorMessages = response.errors[key].join(", ");

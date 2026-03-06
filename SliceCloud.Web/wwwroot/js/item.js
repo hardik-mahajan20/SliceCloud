@@ -690,7 +690,7 @@ $(document).ready(function () {
   // === Individual Item Checkbox Change Event ===
   $(document).on("change", ".item-checkbox", function () {
     const itemId = parseInt(
-      $(this).closest("tr").find("input[name='Itemid']").val()
+      $(this).closest("tr").find("input[name='ItemId']").val()
     );
 
     if (this.checked) {
@@ -728,8 +728,6 @@ $(document).ready(function () {
 
   // Confirm delete AJAX
   $(document).on("click", "#confirmDelete", function () {
-    console.log(selectedItems);
-
     $.ajax({
       url: "/Menu/DeleteMultipleMenuItem",
       type: "POST",
@@ -762,20 +760,20 @@ $(document).ready(function () {
     });
   });
 });
-// === Fetch All Item IDs from the Server on Load ===
-function fetchAllItemIds() {
+async function fetchAllItemIds() {
   let categoryId = selectedCategoryId || $("#categoryIdHidden").val();
-  $.ajax({
-    url: "/Menu/GetAllItemIds",
-    type: "GET",
-    data: { categoryId: categoryId },
-    success: function (response) {
-      allItemIds = new Set(response);
-    },
-    error: function () {
-      toastr.error("Failed to fetch item IDs.");
-    },
-  });
+
+  try {
+    const response = await $.ajax({
+      url: "/Menu/GetAllItemIds",
+      type: "GET",
+      data: { categoryId: categoryId },
+    });
+
+    allItemIds = new Set(response);
+  } catch (error) {
+    toastr.error("Failed to fetch item IDs.");
+  }
 }
 
 // === Update Main Checkbox State ===
@@ -794,7 +792,7 @@ function updateMainCheckboxState() {
 }
 
 // === Apply Main Checkbox State ===
-function applyMainCheckboxState() {
+async function applyMainCheckboxState() {
   $("#maincheckbox")
     .prop("checked", mainCheckboxState.isChecked)
     .prop("indeterminate", mainCheckboxState.isIndeterminate);

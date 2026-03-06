@@ -24,34 +24,6 @@ $(document).ready(function () {
     });
   }
 
-  // Function to load items dynamically
-
-  function loadCategoryWiseItems(
-    categoryId,
-    pageNumber = 1,
-    pageSize = 5,
-    searchQuery = ""
-  ) {
-    $.ajax({
-      url: "/Menu/LoadItemsByCategory",
-      type: "GET",
-      data: {
-        categoryId: categoryId,
-        pageNumber: pageNumber,
-        pageSize: pageSize,
-        searchQuery: searchQuery,
-      },
-      success: function (data) {
-        $("#items-container").html(data);
-        applyMainCheckboxState();
-        fetchAllItemIds();
-      },
-      error: function () {
-        toastr.error("An unexpected error occurred.");
-      },
-    });
-  }
-
   function loadAllCategories(callback) {
     $.ajax({
       url: "/Menu/GetAllCategories",
@@ -65,13 +37,34 @@ $(document).ready(function () {
           if (firstCategoryId) {
             selectedCategoryId = firstCategoryId;
             $("#categoryIdHidden").val(selectedCategoryId);
-            loadCategoryWiseItems(selectedCategoryId, 1, 5);
+            loadCategoryWiseItems(selectedCategoryId);
           }
 
           if (callback) callback(firstCategoryId);
         } else {
           toastr.warning("No categories found!", "Warning");
         }
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  }
+
+  // Function to load items dynamically
+
+  function loadCategoryWiseItems(categoryId) {
+    $.ajax({
+      url: "/Menu/LoadItemsByCategory",
+      type: "GET",
+      data: {
+        categoryId: categoryId,
+      },
+      success: async function (data) {
+        $("#items-container").html(data);
+
+        await applyMainCheckboxState();
+        await fetchAllItemIds();
       },
       error: function () {
         toastr.error("An unexpected error occurred.");
