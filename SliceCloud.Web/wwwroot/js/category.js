@@ -150,3 +150,29 @@ $(document).ready(function () {
     });
   });
 });
+
+// Initialize sortable for categories
+function initializeCategorySortable() {
+  $("#categoryList").sortable({
+    update: function (event, ui) {
+      var sortedIDs = $(this)
+        .sortable("toArray")
+        .map(function (id) {
+          return id.split("-")[1];
+        });
+
+      $.ajax({
+        url: "/Menu/UpdateCategoryOrder",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(sortedIDs),
+        success: function () {
+          toastr.success("Category order updated successfully!");
+        },
+        error: function () {
+          toastr.error("An unexpected error occurred.", "Error");
+        },
+      });
+    },
+  });
+}
