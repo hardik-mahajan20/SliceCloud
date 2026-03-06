@@ -15,4 +15,13 @@ public class ModifierGroupRepository(SliceCloudContext sliceCloudContext) : IMod
     }
 
     #endregion
+
+    #region SaveChanges
+
+    public async Task<int> SaveChangesAsync()
+    {
+        return await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
 }

@@ -24,4 +24,11 @@ public interface IModifierGroupService
     /// <param name="modifierGroupId">The ID of the modifier group to retrieve.</param>
     /// <returns>A task that returns the modifier group view model if found, otherwise null.</returns>
     Task<ModifierGroupViewModel> GetModifierGroupByIdAsync(int modifierGroupId);
+
+    /// <summary>
+    /// Updates the order of modifier groups asynchronously.
+    /// </summary>
+    /// <param name="orderedModifierGroupIds">The list of modifier group IDs in the desired order.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task UpdateModifierGroupOrderAsync(List<int> orderedModifierGroupIds);
 }

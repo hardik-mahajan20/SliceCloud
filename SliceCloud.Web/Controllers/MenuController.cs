@@ -624,4 +624,56 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region LoadModifiers 
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> LoadModifiers()
+    {
+        MenuViewModel menuViewModel = new()
+        {
+            Modifiergroups = await _modifierGroupService.GetAllModifierGroupsAsync(),
+        };
+        return PartialView("_ModifierSectionPartial", menuViewModel);
+    }
+
+    #endregion
+
+    #region GetAllModifierGroups GET
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetAllModifierGroups()
+    {
+        List<ModifierGroupViewModel>? modifierGroupViewModels = await _modifierGroupService.GetAllModifierGroupsAsync();
+
+        if (modifierGroupViewModels == null || !modifierGroupViewModels.Any())
+        {
+            return Json(new { message = "No modifier groups found" });
+        }
+
+        return Json(modifierGroupViewModels);
+    }
+
+    #endregion
+
+    #region UpdateModifierGroupOrder POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> UpdateModifierGroupOrder([FromBody] List<int> orderedModifierGroupIds)
+    {
+        try
+        {
+            await _modifierGroupService.UpdateModifierGroupOrderAsync(orderedModifierGroupIds);
+            return Ok();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return BadRequest(new { success = false, message = "You are not authorized to perform this action." });
+        }
+    }
+
+    #endregion
 }

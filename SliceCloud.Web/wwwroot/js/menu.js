@@ -6,6 +6,8 @@ let currentPage = 1;
 let pageSize = 10;
 let totalPages = 1;
 let selectedCategoryId = null;
+// For the Modifiers
+let selectedModifierGroupId = null;
 $(document).ready(async function () {
   pageSize = $("#pageSizeDropdown").val();
 
@@ -18,6 +20,23 @@ $(document).ready(async function () {
       loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
     }
   });
+
+  // Pill Button Handling
+  $("#pills-home-tab").click(async function () {
+    await loadPartialView("/Menu/LoadItems");
+    loadAllCategories(function (firstCategoryId) {
+      if (firstCategoryId) {
+        selectedCategoryId = firstCategoryId;
+        $("#categoryIdHidden").val(selectedCategoryId);
+        loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+      }
+    });
+  });
+
+  $("#pills-profile-tab").click(async function () {
+    await loadPartialView("/Menu/LoadModifiers");
+    await loadAllModifierGroups();
+  });
 });
 
 async function loadPartialView(url) {
@@ -29,6 +48,8 @@ async function loadPartialView(url) {
 
       // Initialize sortable after loading categories
       initializeCategorySortable();
+      // Initialize sortable after loading modifier-groups
+      initializeModifierGroupSortable();
     },
     error: function () {
       toastr.error("Error loading content", "Error");
@@ -79,6 +100,57 @@ async function loadAllCategories(callback) {
     },
     error: function () {
       toastr.error("An unexpected error occurred.");
+    },
+  });
+}
+async function loadAllModifierGroups(callback) {
+  $.ajax({
+    url: "/Menu/GetAllModifierGroups",
+    type: "GET",
+    success: function (data) {
+      let modifierGroupList = $(".modifier-group-list");
+      modifierGroupList.empty();
+      let firstModifierGroupId = null;
+      console.log(data);
+
+      if (Array.isArray(data) && data.length > 0) {
+        firstModifierGroupId = data[0].modifierGroupId;
+
+        if (firstModifierGroupId) {
+          $.each(data, function (index, modifierGroup) {
+            let activeClass = index === 0 ? "active-modifier-group" : "";
+
+            modifierGroupList.append(`
+                    <li class="d-flex p-1 align-items-center justify-content-between modifier-btn btn ${activeClass}" 
+                        data-id="${modifierGroup.modifierGroupId}">
+                        <div class="d-flex align-items-center flex-wrap m-0 gap-2 ms-2">
+                            <div class="sort-handle">
+                                <i class="bi bi-grip-vertical"></i>
+                            </div>
+                            <div class="text-truncate modifier-group-name">${modifierGroup.modifierGroupName}</div>
+                        </div>
+                        <div class="d-flex">
+                            <button class="edit-modifier-group-btn btn p-0 m-1" 
+                                data-id="${modifierGroup.modifierGroupId}">
+                                <i class="bi bi-pen"></i>
+                            </button>
+                            <button class="delete-modifier-group-btn btn p-0 m-1" 
+                                data-id="${modifierGroup.modifierGroupId}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                `);
+          });
+
+          if (callback) callback(firstModifierGroupId);
+        }
+      } else {
+        toastr.warning("No modifier groups found!", "Warning");
+      }
+    },
+    error: function (xhr, status, error) {
+      toastr.error("Failed to load modifier groups!", "Error");
     },
   });
 }

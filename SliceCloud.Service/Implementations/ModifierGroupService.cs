@@ -70,4 +70,23 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
     }
 
     #endregion
+
+    public async Task UpdateModifierGroupOrderAsync(List<int> orderedModifierGroupIds)
+    {
+        List<ModifierGroup>? modifierGroups = await _modifierGroupRepository.GetAllModifierGroupsAsQueryable()
+                                .Where(s => orderedModifierGroupIds.Contains(s.ModifierGroupId) && !(s.IsDeleted ?? false))
+                                    .ToListAsync();
+
+        Dictionary<int, ModifierGroup>? modifierGroupDictionary = modifierGroups.ToDictionary(s => s.ModifierGroupId);
+
+        for (int i = 0; i < orderedModifierGroupIds.Count; i++)
+        {
+            if (modifierGroupDictionary.TryGetValue(orderedModifierGroupIds[i], out var section))
+            {
+                section.SortOrder = i + 1;
+            }
+        }
+
+        await _modifierGroupRepository.SaveChangesAsync();
+    }
 }
