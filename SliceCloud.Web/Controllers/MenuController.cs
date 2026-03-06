@@ -676,4 +676,68 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region LoadAddModifierGroupModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadAddModifierGroupModal()
+    {
+        ModifierGroupViewModel? modifierGroupViewModel = new();
+        return PartialView("_AddModifierGroupModal", modifierGroupViewModel);
+    }
+
+    #endregion
+
+    #region Add Modifier Group POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> AddModifierGroup(ModifierGroupViewModel modifierGroupViewModel)
+    {
+        if (modifierGroupViewModel == null)
+        {
+            return Json(new { success = false, message = "Invalid request: No data received." });
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+            );
+
+            return Json(new { success = false, errors });
+        }
+
+        try
+        {
+            int newModifierGroupId = await _modifierGroupService.AddModifierGroupAsync(modifierGroupViewModel);
+
+            return Json(new
+            {
+                success = true,
+                message = "ModifierGroup added successfully!",
+                categoryId = newModifierGroupId
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message,
+                errors = new Dictionary<string, List<string>>
+            {
+                { "ModifierGroupName", new List<string> { ex.Message } }
+            }
+            });
+        }
+        catch (Exception)
+        {
+            return Json(new { success = false, message = "An unexpected error occurred while adding the category." });
+        }
+    }
+
+    #endregion
 }

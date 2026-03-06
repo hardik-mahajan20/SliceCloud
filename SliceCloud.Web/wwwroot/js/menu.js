@@ -111,7 +111,6 @@ async function loadAllModifierGroups(callback) {
       let modifierGroupList = $(".modifier-group-list");
       modifierGroupList.empty();
       let firstModifierGroupId = null;
-      console.log(data);
 
       if (Array.isArray(data) && data.length > 0) {
         firstModifierGroupId = data[0].modifierGroupId;

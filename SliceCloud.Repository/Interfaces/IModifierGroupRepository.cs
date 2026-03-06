@@ -15,4 +15,11 @@ public interface IModifierGroupRepository
     /// </summary>
     /// <returns>A task representing the asynchronous save operation.</returns>
     Task<int> SaveChangesAsync();
+
+    /// <summary>
+    /// Adds a new modifier group asynchronously.
+    /// </summary>
+    /// <param name="modifierGroup">The modifier group to add.</param>
+    /// <returns>A task that returns true if the addition was successful, otherwise false.</returns>
+    Task<int> AddModifierGroupAsync(ModifierGroup modifierGroup);
 }
