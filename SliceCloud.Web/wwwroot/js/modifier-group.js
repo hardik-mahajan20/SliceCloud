@@ -48,6 +48,27 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Edit Modifier Group
+  $(document).on("click", ".edit-modifier-group-btn", function (e) {
+    e.stopPropagation();
+    var modifierGroupId = $(this).data("id");
+
+    $.ajax({
+      type: "GET",
+      url: "/Menu/GetModifierGroupById/" + modifierGroupId,
+      success: function (response) {
+        $("#modalContainer").empty();
+        $("#modalContainer").html(response);
+        let modal = document.getElementById("editModifierGroup");
+        let modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.", "Error");
+      },
+    });
+  });
 });
 
 // Initialize sortable for categories

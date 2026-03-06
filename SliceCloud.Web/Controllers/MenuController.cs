@@ -740,4 +740,21 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region GetModifierGroupById
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetModifierGroupById(int id)
+    {
+        ModifierGroupViewModel? modifierGroupViewModel = await _modifierGroupService.GetModifierGroupByIdAsync(id);
+
+        if (modifierGroupViewModel == null)
+        {
+            return Json(new { success = false, message = "NO Modifier Group found" });
+        }
+        return PartialView("_EditModifierGroupModal", modifierGroupViewModel);
+    }
+
+    #endregion
 }
