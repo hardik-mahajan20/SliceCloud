@@ -1046,4 +1046,15 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region LoadMultipleDeleteMenuModifierModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadDeleteMultipleMenuModifierModal()
+    {
+        return PartialView("_DeleteMultiplModifierModal");
+    }
+
+    #endregion
 }

@@ -266,6 +266,30 @@ $(document).ready(function () {
 
     updateMainCheckboxStateModifier();
   });
+
+  // Delete Menu Item
+  $(document).on("click", ".delete-multiple-modifier-btn", function () {
+    let selectedModifiersArray = Array.from(selectedModifiers);
+
+    if (selectedModifiersArray.length === 0) {
+      toastr.warning("Please select at least one modifier to delete.");
+      return;
+    }
+    $.ajax({
+      type: "GET",
+      url: "/Menu/LoadDeleteMultipleMenuModifierModal",
+      success: function (response) {
+        $("#modalContainer").empty();
+        $("#modalContainer").html(response);
+        let modal = document.getElementById("deleteConfirmationModalModifiers");
+        let modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
 });
 
 // Fetch All Modifier Ids
