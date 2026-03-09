@@ -1027,4 +1027,23 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region GetAllModifierIds
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetAllModifierIds(int modifierGroupId)
+    {
+        try
+        {
+            List<int>? modifierIds = await _modifierService.GetAllModifierIdsAsync(modifierGroupId);
+            return Json(modifierIds);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    #endregion
 }

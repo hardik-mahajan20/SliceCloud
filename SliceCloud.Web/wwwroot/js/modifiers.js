@@ -1,4 +1,50 @@
 $(document).ready(function () {
+  // Modifier Search
+  $(document).on("keyup", "#modifierSearch", function () {
+    let searchQuery = $(this).val();
+    laodModifierGroupWiseModifies(
+      selectedModifierGroupId,
+      currentPageModifier,
+      pageSizeModifier,
+      searchQuery
+    );
+  });
+
+  // PageSize Dropdown
+  $(document).on("change", "#pageSizeDropdownModifier", function () {
+    pageSize = $(this).val();
+    currentPageModifier = 1;
+    laodModifierGroupWiseModifies(
+      selectedModifierGroupId,
+      currentPageModifier,
+      pageSizeModifier
+    );
+  });
+
+  // Previous Page
+  $(document).on("click", "#prevPageBtnModifier", function () {
+    if (currentPageModifier > 1) {
+      currentPageModifier--;
+      laodModifierGroupWiseModifies(
+        selectedModifierGroupId,
+        currentPageModifier,
+        pageSizeModifier
+      );
+    }
+  });
+
+  // Next Page
+  $(document).on("click", "#nextPageBtnModifier", function () {
+    if (currentPageModifier < totalPagesModifier) {
+      currentPageModifier++;
+      laodModifierGroupWiseModifies(
+        selectedModifierGroupId,
+        currentPageModifier,
+        pageSizeModifier
+      );
+    }
+  });
+
   // Load Add Item Modal
   $(document).on("click", ".add-modifier-btn", function () {
     $.ajax({
@@ -171,7 +217,78 @@ $(document).ready(function () {
       },
     });
   });
+
+  // === Main Checkbox Change Event ===
+  $(document).on("change", "#maincheckboxModifier", function () {
+    const isChecked = this.checked;
+    mainCheckboxStateModifier.isChecked = isChecked;
+    mainCheckboxStateModifier.isIndeterminate = false;
+
+    if (isChecked) {
+      allModifierIds.forEach((id) => selectedModifiers.add(id));
+    } else {
+      selectedModifiers.clear();
+    }
+
+    $(".modifier-checkbox").prop("checked", isChecked);
+    applyMainCheckboxStateModifier();
+  });
+
+  // === Individual Item Checkbox Change Event ===
+  $(document).on("change", ".modifier-checkbox", function () {
+    const modifierId = parseInt(
+      $(this).closest("tr").find("input[name='ModifierId']").val()
+    );
+
+    if (this.checked) {
+      selectedModifiers.add(modifierId);
+    } else {
+      selectedModifiers.delete(modifierId);
+    }
+
+    updateMainCheckboxStateModifier();
+  });
 });
+
+// Fetch All Modifier Ids
+async function fetchAllModifierIds() {
+  let modifierGroupId =
+    selectedModifierGroupId || $("#modifierGroupIdHidden").val();
+
+  try {
+    const response = await $.ajax({
+      url: "/Menu/GetAllModifierIds",
+      type: "GET",
+      data: { modifierGroupId: modifierGroupId },
+    });
+
+    allModifierIds = new Set(response);
+  } catch (error) {
+    toastr.error("Failed to fetch item IDs.");
+  }
+}
+
+// === Update Main Checkbox State ===
+function updateMainCheckboxStateModifier() {
+  if (selectedModifiers.size === 0) {
+    mainCheckboxStateModifier.isChecked = false;
+    mainCheckboxStateModifier.isIndeterminate = false;
+  } else if (selectedModifiers.size === allModifierIds.size) {
+    mainCheckboxStateModifier.isChecked = true;
+    mainCheckboxStateModifier.isIndeterminate = false;
+  } else {
+    mainCheckboxStateModifier.isChecked = false;
+    mainCheckboxStateModifier.isIndeterminate = true;
+  }
+  applyMainCheckboxStateModifier();
+}
+
+// === Apply Main Checkbox State ===
+async function applyMainCheckboxStateModifier() {
+  $("#maincheckboxModifier")
+    .prop("checked", mainCheckboxStateModifier.isChecked)
+    .prop("indeterminate", mainCheckboxStateModifier.isIndeterminate);
+}
 
 function initializeEditModifierCheckboxes() {
   $(".edit-modifier-checkbox").change(function () {
@@ -288,6 +405,20 @@ function laodModifierGroupWiseModifies(
     },
     success: async function (data) {
       $("#modifiers-container").html(data);
+      updatePaginationControlsModifier();
+
+      $(".modifier-checkbox").each(function () {
+        const modifierId = parseInt(
+          $(this).closest("tr").find("input[name='ModifierId']").val()
+        );
+        $(this).prop("checked", selectedModifiers.has(modifierId));
+      });
+      if (searchQuery !== "") {
+        $("#maincheckboxModifier").addClass("d-none");
+      }
+
+      await applyMainCheckboxStateModifier();
+      await fetchAllItemIds();
     },
     error: function () {
       toastr.error("An unexpected error occurred.");

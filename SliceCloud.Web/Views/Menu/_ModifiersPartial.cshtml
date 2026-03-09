@@ -6,7 +6,7 @@
         <tr class="tableheader">
             <td class="align-middle">
                 <div class="d-flex ">
-                    <input class="form-check-input me-3" type="checkbox" id="maincheckbox" />
+                    <input class="form-check-input me-3" type="checkbox" id="maincheckboxModifier" />
                     Name
                 </div>
             </td>
@@ -70,17 +70,17 @@
         @{
             int[] pageSizes = { 5, 10, 20 };
         }
-        <select id="pageSizeDropdown" class="form-select">
+        <select id="pageSizeDropdownModifier" class="form-select">
             @foreach (var size in pageSizes)
             {
                 <option value="@size" selected="@(ViewBag.PageSize == size ? "selected" : null)">@size</option>
             }
         </select>
-        <input type="hidden" id="totalPages" value="@ViewBag.TotalPages" />
-        <button id="prevPageBtn">
+        <input type="hidden" id="totalPagesModifier" value="@ViewBag.TotalPages" />
+        <button id="prevPageBtnModifier">
             <i class="bi bi-chevron-left"></i>
         </button>
-        <button id="nextPageBtn">
+        <button id="nextPageBtnModifier">
             <i class="bi bi-chevron-right"></i>
         </button>
     </div>

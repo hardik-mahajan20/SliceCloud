@@ -213,4 +213,17 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
 
     #endregion
 
+    #region GetAllModifierIds
+
+    public async Task<List<int>> GetAllModifierIdsAsync(int modifierGroupId)
+    {
+        return await _modifierGroupModifierMappingsRepository.GetAllModifierGroupModifierMappingAsQueryable()
+                                                    .Where(item => item.ModifierGroupId == modifierGroupId)
+                                                        .Select(mgm => mgm.Modifier)
+                                                        .Where(item => item.IsDeleted == false)
+                                                        .Select(modifier => modifier.ModifierId)
+                                                        .ToListAsync();
+    }
+
+    #endregion
 }

@@ -55,4 +55,11 @@ public interface IModifierService
     /// <param name="modifierId">The ID of the modifier to soft delete.</param>
     /// <returns>True if the deletion was successful, otherwise false.</returns>
     Task<bool> DeleteModifierAsync(int modifierId);
+
+    /// <summary>
+    /// Retrieves all modifier IDs for a specific modifier-group asynchronously.
+    /// </summary>
+    /// <param name="modifierGroupId">The ID of the modifier-group to retrieve modifier IDs for.</param>
+    /// <returns>A task that returns a list of modifier IDs.</returns>
+    Task<List<int>> GetAllModifierIdsAsync(int modifierGroupId);
 }
