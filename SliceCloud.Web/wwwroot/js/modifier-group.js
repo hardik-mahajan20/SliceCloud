@@ -127,6 +127,35 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Delete Modifier Group Submission
+  $(document).on("submit", "#deleteModifierGroupForm", function (e) {
+    e.preventDefault();
+    var modifierGroupId = $("#deleteModifierGroupId").val();
+    $.ajax({
+      type: "POST",
+      url: "/Menu/DeleteModifierGroup/" + modifierGroupId,
+      data: {
+        modifierGroupId: modifierGroupId,
+      },
+      dataType: "json",
+      success: async function (response) {
+        if (response.success) {
+          toastr.success("Modifier Group deleted successfully!");
+          let modal = document.getElementById("deleteModifierGroupModal");
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
+          modalInstance.hide();
+          // Update later for modifiers
+          await loadAllModifierGroups();
+        } else {
+          toastr.error("Error deleting modifier group.");
+        }
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
 });
 
 // Initialize sortable for modifierGroup

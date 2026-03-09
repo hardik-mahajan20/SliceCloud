@@ -45,4 +45,11 @@ public interface IModifierGroupService
     /// <param name="modifierGroupViewModel">The modifierGroup view model to update.</param>
     /// <returns>A task that returns true if the update was successful, otherwise false.</returns>
     Task<bool> UpdateModifierGroupAsync(ModifierGroupViewModel modifierGroupViewModel);
+
+    /// <summary>
+    /// Deletes a modifierGroup by its ID asynchronously.
+    /// </summary>
+    /// <param name="modifierGroupId">The ID of the modifierGroup to delete.</param>
+    /// <returns>A task that returns true if the deletion was successful, otherwise false.</returns>
+    Task<bool> DeleteModifierGroupAsync(int modifierGroupId);
 }

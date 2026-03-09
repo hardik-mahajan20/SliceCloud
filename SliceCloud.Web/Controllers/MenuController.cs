@@ -824,4 +824,20 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region Delete Modifier Group 
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteModifierGroup(int modifierGroupId)
+    {
+        bool isModifierGroupDeleted = await _modifierGroupService.DeleteModifierGroupAsync(modifierGroupId);
+        if (isModifierGroupDeleted)
+        {
+            return Json(new { success = true });
+        }
+        return Json(new { success = false });
+    }
+
+    #endregion
 }
