@@ -933,6 +933,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #region GetModifierByIdEdit
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public async Task<ActionResult> GetModifierByIdEdit(int modifierId)
     {
@@ -953,6 +954,38 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
             Units = unitViewModels,
         };
         return PartialView("_EditNewModifierModalPartial", modifierSectionViewModel);
+    }
+
+    #endregion
+
+    #region UpdateModifier
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> UpdateModifier(ModifierSectionViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Value?.Errors.Select(e => e.ErrorMessage).FirstOrDefault()
+                );
+
+            return Json(new { success = false, validationErrors = errors });
+        }
+
+        int result = await _modifierService.UpdateModifierAsync(model);
+
+        if (result > 0)
+        {
+            return Json(new { success = true, modifierGroupIds = model.ModifierGroupIds });
+        }
+        else
+        {
+            return Json(new { success = false, message = "Failed to update modifier." });
+        }
     }
 
     #endregion

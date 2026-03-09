@@ -41,4 +41,11 @@ public interface IModifierService
     /// <param name="modifierId">The ID of the modifier to retrieve.</param>
     /// <returns>A task that returns the modifier view model if found, otherwise null.</returns>
     Task<ModifierViewModel> GetModifierByIdAsync(int modifierId);
+
+    /// <summary>
+    /// Update a existing modifier asynchronously.
+    /// </summary>
+    /// <param name="modifierSectionViewModel">The modifier view model to add.</param>
+    /// <returns>A task the modifier of the new created modifier   asynchronous operation.</returns>
+    Task<int> UpdateModifierAsync(ModifierSectionViewModel modifierSectionViewModel);
 }

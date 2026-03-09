@@ -80,7 +80,7 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
 
     #endregion
 
-    #region 
+    #region AddModifier
 
     public async Task<int> AddModifierAsync(ModifierSectionViewModel modifierSectionViewModel)
     {
@@ -139,6 +139,60 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
             ModifierGroupIds = modifier.ModifierGroupModifierMappings.Select(mgm => mgm.ModifierGroupId).ToList()
         };
 
+    }
+
+    #endregion
+
+    #region UpdateModifier
+
+    public async Task<int> UpdateModifierAsync(ModifierSectionViewModel modifierSectionViewModel)
+    {
+        Modifier modifier = new()
+        {
+            ModifierId = modifierSectionViewModel.ModifierId ?? 0,
+            ModifierName = modifierSectionViewModel.ModifierName ?? string.Empty,
+            UnitId = modifierSectionViewModel.UnitId ?? 0,
+            Rate = modifierSectionViewModel.Rate ?? 0,
+            Quantity = modifierSectionViewModel.Quantity,
+            Description = modifierSectionViewModel.Description,
+            ModifiedAt = DateTime.UtcNow,
+            ModifiedBy = _currentUserService.UserId
+        };
+
+        int modifieId = await _modifierRepository.UpdateModifierAsync(modifier);
+
+        if (modifierSectionViewModel.ModifierGroupIds != null && modifierSectionViewModel.ModifierGroupIds.Any())
+        {
+            List<ModifierGroupModifierMapping>? existingMappings = await _modifierGroupModifierMappingsRepository.GetAllModifierGroupModifierMappingAsQueryable().Where(m => m.ModifierId == modifier.ModifierId).ToListAsync();
+
+            List<int>? existingGroupIds = existingMappings.Select(m => m.ModifierGroupId).ToList();
+
+            List<int>? newGroupIds = modifierSectionViewModel.ModifierGroupIds.Except(existingGroupIds).ToList();
+
+            List<ModifierGroupModifierMapping>? mappingsToAdd = newGroupIds
+                   .Select(
+                       groupId =>
+                           new ModifierGroupModifierMapping
+                           {
+                               ModifierGroupId = groupId,
+                               ModifierId = modifier.ModifierId
+                           }
+                   )
+                   .ToList();
+
+            List<ModifierGroupModifierMapping>? mappingsToRemove = existingMappings
+                                        .Where(m => !modifierSectionViewModel.ModifierGroupIds.
+                                                Contains(m.ModifierGroupId))
+                                                .ToList();
+
+            if (mappingsToRemove.Any())
+                await _modifierGroupModifierMappingsRepository.RemoveModifierGroupMappingsAsync(mappingsToRemove);
+
+
+            if (mappingsToAdd.Any())
+                await _modifierGroupModifierMappingsRepository.AddModifierGroupMappingsAsync(mappingsToAdd);
+        }
+        return modifieId;
     }
 
     #endregion

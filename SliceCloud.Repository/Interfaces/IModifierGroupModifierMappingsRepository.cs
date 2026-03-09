@@ -15,4 +15,10 @@ public interface IModifierGroupModifierMappingsRepository
     /// </summary>
     /// <param name="modifierGroupModifierMappings">The list of ModifierGroupModifierMapping to add.</param>
     Task AddModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings);
+
+    /// <summary>
+    /// Removes a list of ModifierGroupModifierMapping asynchronously.
+    /// </summary>
+    /// <param name="modifierGroupModifierMappings">The list of ModifierGroupModifierMapping to add.</param>
+    Task RemoveModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings);
 }

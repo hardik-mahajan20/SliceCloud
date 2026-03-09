@@ -88,54 +88,91 @@ $(document).ready(function () {
     });
   });
 
-  function initializeEditModifierCheckboxes() {
-    $(".edit-modifier-checkbox").change(function () {
-      updateEditModifierDropdownText();
+  // Edit Modifier POST
+  $(document).on("submit", "#editModifierForm", function (e) {
+    e.preventDefault();
+
+    updateEditModifierDropdownText();
+    var modifierGroupId = $("#modifierGroupIdHidden").val();
+    let formData = $(this).serialize();
+
+    $.ajax({
+      type: "POST",
+      url: "/Menu/UpdateModifier",
+      data: formData,
+      success: function (response) {
+        if (response.success) {
+          toastr.success("Modifier Updated successfully");
+          let modal = document.getElementById("editModifierModalContainer");
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
+          modalInstance.hide();
+        } else if (response.validationErrors) {
+          // Loop through validation errors and show them under fields
+          for (let key in response.validationErrors) {
+            const messages = response.validationErrors[key];
+            const span = $(`[data-valmsg-for="${key}"]`);
+            if (span.length) {
+              span.text(messages.join(", "));
+            }
+          }
+        } else {
+          toastr.error("Error: " + response.message, "Error");
+        }
+      },
+      error: function () {
+        toastr.error("An error occurred while saving the modifier.", "Error");
+      },
     });
-
-    $("#editSearchModifier").on("keyup", function () {
-      let searchText = $(this).val().toLowerCase();
-      $("#editModifierCheckboxList li").each(function () {
-        $(this).toggle($(this).text().toLowerCase().includes(searchText));
-      });
-    });
-
-    updateEditModifierDropdownText(); // Update dropdown on modal load
-  }
-
-  function updateEditModifierDropdownText() {
-    let selectedValues = $(".edit-modifier-checkbox:checked")
-      .map(function () {
-        return $(this).val();
-      })
-      .get();
-
-    $("#editModifierForm input[name='ModifierGroupIds[]']").remove();
-
-    let form = $("#editModifierForm");
-    selectedValues.forEach((value) => {
-      form.append(
-        `<input type="hidden" name="ModifierGroupIds[]" value="${value}">`
-      );
-    });
-
-    let selectedText = $(".edit-modifier-checkbox:checked")
-      .map(function () {
-        return $(this).parent().text().trim();
-      })
-      .get();
-
-    let buttonText = "Select Modifier Groups";
-    if (selectedText.length > 0) {
-      buttonText = selectedText[0]; // Show first selected item
-      if (selectedText.length > 1) {
-        buttonText += ` +${selectedText.length - 1} Other`;
-      }
-    }
-
-    $("#editModifierDropdownBtn").text(buttonText);
-  }
+  });
 });
+
+function initializeEditModifierCheckboxes() {
+  $(".edit-modifier-checkbox").change(function () {
+    updateEditModifierDropdownText();
+  });
+
+  $("#editSearchModifier").on("keyup", function () {
+    let searchText = $(this).val().toLowerCase();
+    $("#editModifierCheckboxList li").each(function () {
+      $(this).toggle($(this).text().toLowerCase().includes(searchText));
+    });
+  });
+
+  updateEditModifierDropdownText(); // Update dropdown on modal load
+}
+
+function updateEditModifierDropdownText() {
+  let selectedValues = $(".edit-modifier-checkbox:checked")
+    .map(function () {
+      return $(this).val();
+    })
+    .get();
+
+  $("#editModifierForm input[name='ModifierGroupIds[]']").remove();
+
+  let form = $("#editModifierForm");
+  selectedValues.forEach((value) => {
+    form.append(
+      `<input type="hidden" name="ModifierGroupIds[]" value="${value}">`
+    );
+  });
+
+  let selectedText = $(".edit-modifier-checkbox:checked")
+    .map(function () {
+      return $(this).parent().text().trim();
+    })
+    .get();
+
+  let buttonText = "Select Modifier Groups";
+  if (selectedText.length > 0) {
+    buttonText = selectedText[0]; // Show first selected item
+    if (selectedText.length > 1) {
+      buttonText += ` +${selectedText.length - 1} Other`;
+    }
+  }
+
+  $("#editModifierDropdownBtn").text(buttonText);
+}
 
 function initializeModifierCheckboxes() {
   $(".modifier-checkbox").change(function () {

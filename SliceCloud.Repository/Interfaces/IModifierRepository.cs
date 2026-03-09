@@ -16,4 +16,11 @@ public interface IModifierRepository
     /// <param name="modifier">The modifier entity to add.</param>
     /// <returns>A task the modifierId of the new created modifier the asynchronous operation.</returns>
     Task<int> AddModifierAsync(Modifier modifier);
+
+    /// <summary>
+    /// Updates an existing modifier asynchronously to the database.
+    /// </summary>
+    /// <param name="modifier">The modifier entity to add.</param>
+    /// <returns>A task the modifierId of the existing updated modifier the asynchronous operation.</returns>
+    Task<int> UpdateModifierAsync(Modifier modifier);
 }
