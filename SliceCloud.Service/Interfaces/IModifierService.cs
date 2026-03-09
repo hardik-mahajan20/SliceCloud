@@ -48,4 +48,11 @@ public interface IModifierService
     /// <param name="modifierSectionViewModel">The modifier view model to add.</param>
     /// <returns>A task the modifier of the new created modifier   asynchronous operation.</returns>
     Task<int> UpdateModifierAsync(ModifierSectionViewModel modifierSectionViewModel);
+
+    /// <summary>
+    /// Deletes an modifier by its ID asynchronously.
+    /// </summary>
+    /// <param name="modifierId">The ID of the modifier to soft delete.</param>
+    /// <returns>True if the deletion was successful, otherwise false.</returns>
+    Task<bool> DeleteModifierAsync(int modifierId);
 }

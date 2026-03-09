@@ -195,6 +195,22 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
         return modifieId;
     }
 
+    public async Task<bool> DeleteModifierAsync(int modifierId)
+    {
+        Modifier? modifier = await _modifierRepository
+                                        .GetAllModifiersAsQueryable()
+                                            .FirstOrDefaultAsync(mod => mod.ModifierId == modifierId);
+        if (modifier is null)
+        {
+            return false;
+        }
+        modifier.IsDeleted = true;
+        modifier.ModifiedAt = DateTime.UtcNow;
+        modifier.ModifiedBy = _currentUserService.UserId;
+
+        return await _modifierRepository.UpdateModifierAsync(modifier) > 0;
+    }
+
     #endregion
 
 }

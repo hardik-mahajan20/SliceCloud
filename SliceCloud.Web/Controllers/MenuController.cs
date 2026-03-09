@@ -1000,4 +1000,31 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region Delete Modifier POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteModifier(int modifierId)
+    {
+        bool isDeleted = await _modifierService.DeleteModifierAsync(modifierId);
+        if (isDeleted)
+        {
+            return Json(new
+            {
+                success = true,
+                message = "Modifier deleted successfully!"
+            });
+        }
+        else
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Error deleting modifier!"
+            });
+        }
+    }
+
+    #endregion
 }

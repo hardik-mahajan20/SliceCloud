@@ -144,6 +144,33 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Delete Modifier Submission
+  $(document).on("submit", "#deleteModifierForm", function (e) {
+    e.preventDefault();
+    var modifierId = $("#deleteModifierId").val();
+    $.ajax({
+      type: "POST",
+      url: "/Menu/DeleteModifier/" + modifierId,
+      data: {
+        modifierId: modifierId,
+      },
+      dataType: "json",
+      success: function (response) {
+        if (response.success) {
+          toastr.success("Modifier deleted successfully!");
+          let modal = document.getElementById("deleteModifierModal");
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
+          modalInstance.hide();
+        } else {
+          toastr.error("Error deleting category.");
+        }
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
 });
 
 function initializeEditModifierCheckboxes() {
