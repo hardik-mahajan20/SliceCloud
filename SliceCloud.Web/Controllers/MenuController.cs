@@ -857,4 +857,24 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region GetAddModifier
+
+    public async Task<IActionResult> GetAddModifier()
+    {
+
+        List<ModifierGroupViewModel>? modifierGroups = await _modifierGroupService.GetAllModifierGroupsAsync();
+
+        List<UnitViewModel>? units = await _unitService.GetUnitsAsync();
+
+        ModifierSectionViewModel viewModel = new()
+        {
+            ModifierGroups = modifierGroups,
+            Units = units,
+        };
+
+        return PartialView("_AddNewModifierModalPartial", viewModel);
+    }
+
+    #endregion
 }
