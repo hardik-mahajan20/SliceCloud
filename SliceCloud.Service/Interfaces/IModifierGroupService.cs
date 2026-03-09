@@ -39,4 +39,10 @@ public interface IModifierGroupService
     /// <param name="modifierGroupViewModel">The view model containing modifier group details.</param>
     /// <returns>A task that returns new modifier groups id if the creation was successful.</returns>
     Task<int> AddModifierGroupAsync(ModifierGroupViewModel modifierGroupViewModel);
+    /// <summary>
+    /// Updates an existing modifierGroup asynchronously.
+    /// </summary>
+    /// <param name="modifierGroupViewModel">The modifierGroup view model to update.</param>
+    /// <returns>A task that returns true if the update was successful, otherwise false.</returns>
+    Task<bool> UpdateModifierGroupAsync(ModifierGroupViewModel modifierGroupViewModel);
 }

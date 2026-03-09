@@ -69,6 +69,42 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Edit Category Submission
+  $(document).on("submit", "#editModifierGroupForm", function (e) {
+    e.preventDefault();
+    const form = $(this)[0];
+    const formData = new FormData(form);
+
+    $.ajax({
+      type: "POST",
+      url: "/Menu/EditModifierGroup",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: async function (response) {
+        if (response.success) {
+          toastr.success(response.message);
+          let modal = document.getElementById("editModifierGroup");
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
+          modalInstance.hide();
+          // Update later for modifiers
+          await loadAllModifierGroups();
+        } else {
+          // Display validation errors
+          $(".text-danger").html(""); // Clear existing errors
+          $.each(response.errors, function (key, errorMessages) {
+            $("#" + key)
+              .next(".text-danger")
+              .html(errorMessages.join("<br>"));
+          });
+        }
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
 });
 
 // Initialize sortable for categories

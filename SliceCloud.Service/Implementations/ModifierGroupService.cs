@@ -116,4 +116,29 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
 
         return await _modifierGroupRepository.AddModifierGroupAsync(modifierGroup);
     }
+
+    public async Task<bool> UpdateModifierGroupAsync(ModifierGroupViewModel modifierGroupViewModel)
+    {
+        ModifierGroup? modifierGroup = await _modifierGroupRepository.GetModifierGroupByIdAsync(modifierGroupViewModel.ModifierGroupId);
+
+        if (modifierGroup == null)
+        {
+            throw new KeyNotFoundException("Modifier Group not found.");
+        }
+
+        bool isModifierGroupNameExists = await _modifierGroupRepository.GetAllModifierGroupsAsQueryable().AsNoTracking()
+                      .AnyAsync(c => c.ModifierGroupName == modifierGroupViewModel.ModifierGroupName && (c.IsDeleted == false) && c.ModifierGroupId != modifierGroupViewModel.ModifierGroupId);
+
+        if (isModifierGroupNameExists)
+        {
+            throw new InvalidOperationException("A Modifier group with the same name already exists.");
+        }
+
+        modifierGroup.ModifierGroupName = modifierGroupViewModel.ModifierGroupName ?? string.Empty;
+        modifierGroup.Description = modifierGroupViewModel.Description;
+        modifierGroup.ModifiedBy = _currentUserService.UserId;
+        modifierGroup.ModifiedAt = DateTime.UtcNow;
+
+        return await _modifierGroupRepository.UpdateModifierGroupAsync(modifierGroup);
+    }
 }

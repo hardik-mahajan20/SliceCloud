@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.Models;
 
@@ -16,6 +17,16 @@ public class ModifierGroupRepository(SliceCloudContext sliceCloudContext) : IMod
 
     #endregion
 
+    #region GetModifierGroupById
+
+    public async Task<ModifierGroup?> GetModifierGroupByIdAsync(int modifierGroupId)
+    {
+        return await _sliceCloudContext.ModifierGroups
+            .FirstOrDefaultAsync(c => c.ModifierGroupId == modifierGroupId);
+    }
+
+    #endregion
+
     #region AddModifierGroup
 
     public async Task<int> AddModifierGroupAsync(ModifierGroup modifierGroup)
@@ -23,6 +34,16 @@ public class ModifierGroupRepository(SliceCloudContext sliceCloudContext) : IMod
         await _sliceCloudContext.ModifierGroups.AddAsync(modifierGroup);
         await _sliceCloudContext.SaveChangesAsync();
         return modifierGroup.ModifierGroupId;
+    }
+
+    #endregion
+
+    #region UpdateModifierGroup
+
+    public async Task<bool> UpdateModifierGroupAsync(ModifierGroup modifierGroup)
+    {
+        _sliceCloudContext.ModifierGroups.Update(modifierGroup);
+        return await _sliceCloudContext.SaveChangesAsync() > 0;
     }
 
     #endregion

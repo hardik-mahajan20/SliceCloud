@@ -757,4 +757,60 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region Edit Modifier Group 
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> EditModifierGroup(ModifierGroupViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+            );
+
+            return Json(new
+            {
+                success = false,
+                message = "Validation failed. Please fix the highlighted errors.",
+                errors
+            });
+        }
+
+        try
+        {
+            bool ismodifierGroupNameUpdated = await _modifierGroupService.UpdateModifierGroupAsync(model);
+            if (!ismodifierGroupNameUpdated)
+            {
+                return Json(new { success = false, message = "Failed to update Modifier Group." });
+            }
+
+            return Json(new { success = true, message = "Modifier Group updated successfully!" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message,
+                errors = new Dictionary<string, List<string>>
+            {
+                { "ModifierGroupName", new List<string> { ex.Message } }
+            }
+            });
+        }
+
+        catch (KeyNotFoundException ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return Json(new { success = false, message = "An unexpected error occurred while updating the category." });
+        }
+    }
+
+    #endregion
 }
