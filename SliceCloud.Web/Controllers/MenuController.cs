@@ -230,7 +230,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #region LoadItemsByCategory
 
-    public async Task<IActionResult> LoadItemsByCategory(int categoryId, int pageNumber, int pageSize, string searchQuery = "")
+    public async Task<IActionResult> LoadItemsByCategory(int categoryId, int pageNumber = 1, int pageSize = 5, string searchQuery = "")
     {
         PaginatedList<ItemViewModel>? paginatedItems = await _itemService.GetPaginatedItemsByGroupIdAsync(categoryId, pageNumber, pageSize, searchQuery);
 
@@ -621,6 +621,222 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
         bool isAllItemsDeleted = await _itemService.DeleteMultipleMenuItemAsync(itemIds);
         return Json(new { success = isAllItemsDeleted });
+    }
+
+    #endregion
+
+    #region LoadModifiers 
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> LoadModifiers()
+    {
+        MenuViewModel menuViewModel = new()
+        {
+            Modifiergroups = await _modifierGroupService.GetAllModifierGroupsAsync(),
+        };
+        return PartialView("_ModifierSectionPartial", menuViewModel);
+    }
+
+    #endregion
+
+    #region GetAllModifierGroups GET
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetAllModifierGroups()
+    {
+        List<ModifierGroupViewModel>? modifierGroupViewModels = await _modifierGroupService.GetAllModifierGroupsAsync();
+
+        if (modifierGroupViewModels == null || !modifierGroupViewModels.Any())
+        {
+            return Json(new { message = "No modifier groups found" });
+        }
+
+        return Json(modifierGroupViewModels);
+    }
+
+    #endregion
+
+    #region UpdateModifierGroupOrder POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> UpdateModifierGroupOrder([FromBody] List<int> orderedModifierGroupIds)
+    {
+        try
+        {
+            await _modifierGroupService.UpdateModifierGroupOrderAsync(orderedModifierGroupIds);
+            return Ok();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return BadRequest(new { success = false, message = "You are not authorized to perform this action." });
+        }
+    }
+
+    #endregion
+
+    #region LoadAddModifierGroupModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadAddModifierGroupModal()
+    {
+        ModifierGroupViewModel? modifierGroupViewModel = new();
+        return PartialView("_AddModifierGroupModal", modifierGroupViewModel);
+    }
+
+    #endregion
+
+    #region Add Modifier Group POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> AddModifierGroup(ModifierGroupViewModel modifierGroupViewModel)
+    {
+        if (modifierGroupViewModel == null)
+        {
+            return Json(new { success = false, message = "Invalid request: No data received." });
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+            );
+
+            return Json(new { success = false, errors });
+        }
+
+        try
+        {
+            int newModifierGroupId = await _modifierGroupService.AddModifierGroupAsync(modifierGroupViewModel);
+
+            return Json(new
+            {
+                success = true,
+                message = "ModifierGroup added successfully!",
+                categoryId = newModifierGroupId
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message,
+                errors = new Dictionary<string, List<string>>
+            {
+                { "ModifierGroupName", new List<string> { ex.Message } }
+            }
+            });
+        }
+        catch (Exception)
+        {
+            return Json(new { success = false, message = "An unexpected error occurred while adding the category." });
+        }
+    }
+
+    #endregion
+
+    #region GetModifierGroupById
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetModifierGroupById(int id)
+    {
+        ModifierGroupViewModel? modifierGroupViewModel = await _modifierGroupService.GetModifierGroupByIdAsync(id);
+
+        if (modifierGroupViewModel == null)
+        {
+            return Json(new { success = false, message = "NO Modifier Group found" });
+        }
+        return PartialView("_EditModifierGroupModal", modifierGroupViewModel);
+    }
+
+    #endregion
+
+    #region Edit Modifier Group 
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> EditModifierGroup(ModifierGroupViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+            );
+
+            return Json(new
+            {
+                success = false,
+                message = "Validation failed. Please fix the highlighted errors.",
+                errors
+            });
+        }
+
+        try
+        {
+            bool ismodifierGroupNameUpdated = await _modifierGroupService.UpdateModifierGroupAsync(model);
+            if (!ismodifierGroupNameUpdated)
+            {
+                return Json(new { success = false, message = "Failed to update Modifier Group." });
+            }
+
+            return Json(new { success = true, message = "Modifier Group updated successfully!" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message,
+                errors = new Dictionary<string, List<string>>
+            {
+                { "ModifierGroupName", new List<string> { ex.Message } }
+            }
+            });
+        }
+
+        catch (KeyNotFoundException ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return Json(new { success = false, message = "An unexpected error occurred while updating the category." });
+        }
+    }
+
+    #endregion
+
+    #region LoadDeleteModifierGroupModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadDeleteModifierGroupModal()
+    {
+        return PartialView("_DeleteModifierGroupModal");
+    }
+
+    #endregion
+
+    #region Delete Modifier Group 
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteModifierGroup(int modifierGroupId)
+    {
+        bool isModifierGroupDeleted = await _modifierGroupService.DeleteModifierGroupAsync(modifierGroupId);
+        if (isModifierGroupDeleted)
+        {
+            return Json(new { success = true });
+        }
+        return Json(new { success = false });
     }
 
     #endregion

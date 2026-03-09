@@ -55,7 +55,7 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
             throw new InvalidOperationException("A category with the same name already exists.");
         }
 
-        int maxOrder = await _categoryRepository.GetAllCategoriesAsQueryable().Where(s => !s.IsDeleted == false).Select(s => (int?)s.SortOrder).MaxAsync() ?? 0;
+        int maxOrder = await _categoryRepository.GetAllCategoriesAsQueryable().Where(s => s.IsDeleted == false).Select(s => s.SortOrder).MaxAsync() ?? 0;
 
         Category category = new()
         {

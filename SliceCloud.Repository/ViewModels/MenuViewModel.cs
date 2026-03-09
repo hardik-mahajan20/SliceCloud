@@ -6,4 +6,5 @@ public class MenuViewModel
 
     public PaginatedList<ItemViewModel>? ItemsPaginated { get; set; }
 
+    public IEnumerable<ModifierGroupViewModel>? Modifiergroups { get; set; }
 }
