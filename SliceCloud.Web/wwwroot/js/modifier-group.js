@@ -183,3 +183,54 @@ function initializeModifierGroupSortable() {
     },
   });
 }
+
+async function loadAllModifierGroups(callback) {
+  $.ajax({
+    url: "/Menu/GetAllModifierGroups",
+    type: "GET",
+    success: function (data) {
+      let modifierGroupList = $(".modifier-group-list");
+      modifierGroupList.empty();
+      let firstModifierGroupId = null;
+
+      if (Array.isArray(data) && data.length > 0) {
+        firstModifierGroupId = data[0].modifierGroupId;
+
+        if (firstModifierGroupId) {
+          $.each(data, function (index, modifierGroup) {
+            let activeClass = index === 0 ? "active-modifier-group" : "";
+
+            modifierGroupList.append(`
+                    <li class="d-flex p-1 align-items-center justify-content-between modifier-btn btn ${activeClass}" 
+                        data-id="${modifierGroup.modifierGroupId}">
+                        <div class="d-flex align-items-center flex-wrap m-0 gap-2 ms-2">
+                            <div class="sort-handle">
+                                <i class="bi bi-grip-vertical"></i>
+                            </div>
+                            <div class="text-truncate modifier-group-name">${modifierGroup.modifierGroupName}</div>
+                        </div>
+                        <div class="d-flex">
+                            <button class="edit-modifier-group-btn btn p-0 m-1" 
+                                data-id="${modifierGroup.modifierGroupId}">
+                                <i class="bi bi-pen"></i>
+                            </button>
+                            <button class="delete-modifier-group-btn btn p-0 m-1" 
+                                data-id="${modifierGroup.modifierGroupId}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                `);
+          });
+
+          if (callback) callback(firstModifierGroupId);
+        }
+      } else {
+        toastr.warning("No modifier groups found!", "Warning");
+      }
+    },
+    error: function (xhr, status, error) {
+      toastr.error("Failed to load modifier groups!", "Error");
+    },
+  });
+}

@@ -10,6 +10,7 @@ $(document).ready(function () {
     $("#categoryIdHidden").val(selectedCategoryId);
     loadCategoryWiseItems(selectedCategoryId, 1, 5, "");
   });
+
   // Add Category
   $(document).on("click", "#openAddCategoryModal", function () {
     $.ajax({
@@ -194,6 +195,53 @@ function initializeCategorySortable() {
           toastr.error("An unexpected error occurred.", "Error");
         },
       });
+    },
+  });
+}
+
+async function loadAllCategories(callback) {
+  $.ajax({
+    url: "/Menu/GetAllCategories",
+    type: "GET",
+    success: function (data) {
+      let categoryList = $(".list-group");
+      categoryList.empty();
+      let firstCategoryId = null;
+
+      if (Array.isArray(data) && data.length > 0) {
+        firstCategoryId = data[0].id || data[0].categoryId;
+
+        if (firstCategoryId) {
+          $.each(data, function (index, category) {
+            let activeClass = index === 0 ? "active-category" : "";
+            categoryList.append(`
+                    <li class="d-flex p-1 align-items-center justify-content-between category-btn btn ${activeClass}" data-id="${category.categoryId}">
+                                       <div class="d-flex align-items-center flex-wrap m-0 gap-2 ms-2">
+                        <div class="sort-handle">
+                            <i class="bi bi-grip-vertical"></i>
+                        </div>
+                        <div class="text-truncate category-name">${category.categoryName}</div>
+                    </div>
+                    <div class="d-flex">
+                        <button class="edit-category-btn btn p-0 m-1" data-id="${category.categoryId}">
+                            <i class="bi bi-pen"></i>
+                        </button>
+                        <button class="delete-category-btn btn p-0 m-1" data-id="${category.categoryId}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    </li>
+                `);
+          });
+
+          if (callback) callback(firstCategoryId);
+        }
+      } else {
+        toastr.warning("No categories found!", "Warning");
+      }
+    },
+    error: function () {
+      toastr.error("An unexpected error occurred.");
     },
   });
 }

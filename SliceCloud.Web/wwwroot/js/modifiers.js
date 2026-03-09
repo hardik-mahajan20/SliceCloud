@@ -188,6 +188,7 @@ function initializeEditModifierCheckboxes() {
   updateEditModifierDropdownText(); // Update dropdown on modal load
 }
 
+// Function to update dropdown text and hidden inputs based on selected modifier groups in Edit Modifier Modal
 function updateEditModifierDropdownText() {
   let selectedValues = $(".edit-modifier-checkbox:checked")
     .map(function () {
@@ -221,6 +222,7 @@ function updateEditModifierDropdownText() {
   $("#editModifierDropdownBtn").text(buttonText);
 }
 
+// Initialize checkboxes in Add Modifier Modal
 function initializeModifierCheckboxes() {
   $(".modifier-checkbox").change(function () {
     updateModifierDropdownText();
@@ -234,6 +236,7 @@ function initializeModifierCheckboxes() {
   });
 }
 
+// Function to update dropdown text and hidden inputs based on selected modifier groups
 function updateModifierDropdownText() {
   let selectedValues = $(".modifier-checkbox:checked")
     .map(function () {
@@ -265,4 +268,29 @@ function updateModifierDropdownText() {
   }
 
   $("#modifierDropdownBtn").text(buttonText);
+}
+
+// Function to load modifiers dynamically based on selected modifier group
+function laodModifierGroupWiseModifies(
+  modifierGroupId,
+  pageNumber = 1,
+  pageSize = 5,
+  searchQuery = ""
+) {
+  $.ajax({
+    url: "/Menu/LoadModifiersByModifierGroup",
+    type: "GET",
+    data: {
+      modifierGroupId: modifierGroupId,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      searchQuery: searchQuery,
+    },
+    success: async function (data) {
+      $("#modifiers-container").html(data);
+    },
+    error: function () {
+      toastr.error("An unexpected error occurred.");
+    },
+  });
 }
