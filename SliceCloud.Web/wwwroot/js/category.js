@@ -1,6 +1,6 @@
 $(document).ready(function () {
   // Load category based on category click
-  $(document).on("click", ".category-btn", function () {
+  $(document).on("click", ".category-btn", async function () {
     $(".category-btn").removeClass("active-category");
     $(this).addClass("active-category");
     $("#itemSearch").val("");
@@ -8,7 +8,7 @@ $(document).ready(function () {
     selectedCategoryId = $(this).data("id");
 
     $("#categoryIdHidden").val(selectedCategoryId);
-    loadCategoryWiseItems(selectedCategoryId, 1, 5, "");
+    await loadCategoryWiseItems(selectedCategoryId, 1, 5, "");
   });
 
   // Add Category
@@ -100,11 +100,15 @@ $(document).ready(function () {
           let modal = document.getElementById("editCategory");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
-          await loadAllCategories(function (firstCategoryId) {
+          await loadAllCategories(async function (firstCategoryId) {
             if (firstCategoryId) {
               selectedCategoryId = firstCategoryId;
               $("#categoryIdHidden").val(selectedCategoryId);
-              loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+              await loadCategoryWiseItems(
+                selectedCategoryId,
+                currentPage,
+                pageSize
+              );
             }
           });
         } else {
@@ -162,6 +166,7 @@ $(document).ready(function () {
           let modal = document.getElementById("deleteCategoryModal");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
+          await loadAllCategories();
         } else {
           toastr.error("Error deleting category.");
         }
@@ -174,7 +179,7 @@ $(document).ready(function () {
 });
 
 // Initialize sortable for categories
-function initializeCategorySortable() {
+async function initializeCategorySortable() {
   $("#categoryList").sortable({
     update: function (event, ui) {
       var sortedIDs = $(this)

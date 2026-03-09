@@ -1,6 +1,6 @@
 $(document).ready(function () {
   // Load modifier-group based on modifier-group click
-  $(document).on("click", ".modifier-btn", function () {
+  $(document).on("click", ".modifier-btn", async function () {
     $(".modifier-btn").removeClass("active-category");
     $(this).addClass("active-category");
     $("#modifierSearch").val("");
@@ -8,7 +8,7 @@ $(document).ready(function () {
     selectedModifierGroupId = $(this).data("id");
 
     $("#modifierGroupIdHidden").val(selectedModifierGroupId);
-    laodModifierGroupWiseModifies(selectedModifierGroupId, 1, 5, "");
+    await laodModifierGroupWiseModifies(selectedModifierGroupId, 1, 5, "");
   });
 
   // Add Modifier Group
@@ -100,11 +100,11 @@ $(document).ready(function () {
           let modal = document.getElementById("editModifierGroup");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
-          await loadAllModifierGroups(function (firstModifierGroupId) {
+          await loadAllModifierGroups(async function (firstModifierGroupId) {
             if (firstModifierGroupId) {
               selectedModifierGroupId = firstModifierGroupId;
               $("#modifierGroupIdHidden").val(selectedModifierGroupId);
-              laodModifierGroupWiseModifies(
+              await laodModifierGroupWiseModifies(
                 selectedModifierGroupId,
                 currentPage,
                 pageSize
@@ -180,7 +180,7 @@ $(document).ready(function () {
 });
 
 // Initialize sortable for modifierGroup
-function initializeModifierGroupSortable() {
+async function initializeModifierGroupSortable() {
   $("#modifierGroupList").sortable({
     update: function (event, ui) {
       var sortedIDs = $(this)

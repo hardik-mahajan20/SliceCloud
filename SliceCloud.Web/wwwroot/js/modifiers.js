@@ -1,8 +1,8 @@
 $(document).ready(function () {
   // Modifier Search
-  $(document).on("keyup", "#modifierSearch", function () {
+  $(document).on("keyup", "#modifierSearch", async function () {
     let searchQuery = $(this).val();
-    laodModifierGroupWiseModifies(
+    await laodModifierGroupWiseModifies(
       selectedModifierGroupId,
       currentPageModifier,
       pageSizeModifier,
@@ -11,10 +11,10 @@ $(document).ready(function () {
   });
 
   // PageSize Dropdown
-  $(document).on("change", "#pageSizeDropdownModifier", function () {
-    pageSize = $(this).val();
+  $(document).on("change", "#pageSizeDropdownModifier", async function () {
+    pageSizeModifier = $(this).val();
     currentPageModifier = 1;
-    laodModifierGroupWiseModifies(
+    await laodModifierGroupWiseModifies(
       selectedModifierGroupId,
       currentPageModifier,
       pageSizeModifier
@@ -22,10 +22,10 @@ $(document).ready(function () {
   });
 
   // Previous Page
-  $(document).on("click", "#prevPageBtnModifier", function () {
+  $(document).on("click", "#prevPageBtnModifier", async function () {
     if (currentPageModifier > 1) {
       currentPageModifier--;
-      laodModifierGroupWiseModifies(
+      await laodModifierGroupWiseModifies(
         selectedModifierGroupId,
         currentPageModifier,
         pageSizeModifier
@@ -34,10 +34,10 @@ $(document).ready(function () {
   });
 
   // Next Page
-  $(document).on("click", "#nextPageBtnModifier", function () {
+  $(document).on("click", "#nextPageBtnModifier", async function () {
     if (currentPageModifier < totalPagesModifier) {
       currentPageModifier++;
-      laodModifierGroupWiseModifies(
+      await laodModifierGroupWiseModifies(
         selectedModifierGroupId,
         currentPageModifier,
         pageSizeModifier
@@ -82,12 +82,18 @@ $(document).ready(function () {
       type: "POST",
       url: "/Menu/AddModifier",
       data: formData,
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Modifier added successfully!");
           let modal = document.getElementById("addModifierModalContainer");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
+          await laodModifierGroupWiseModifies(
+            response.modifierGroupId,
+            1,
+            5,
+            ""
+          );
         } else if (response.validationErrors) {
           // Loop through validation errors and show them under fields
           for (let key in response.validationErrors) {
@@ -146,12 +152,18 @@ $(document).ready(function () {
       type: "POST",
       url: "/Menu/UpdateModifier",
       data: formData,
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Modifier Updated successfully");
           let modal = document.getElementById("editModifierModalContainer");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
+          await laodModifierGroupWiseModifies(
+            response.modifierGroupId,
+            currentPageModifier,
+            pageSizeModifier,
+            ""
+          );
         } else if (response.validationErrors) {
           // Loop through validation errors and show them under fields
           for (let key in response.validationErrors) {
@@ -202,12 +214,18 @@ $(document).ready(function () {
         modifierId: modifierId,
       },
       dataType: "json",
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Modifier deleted successfully!");
           let modal = document.getElementById("deleteModifierModal");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
+          await laodModifierGroupWiseModifies(
+            selectedModifierGroupId,
+            1,
+            1,
+            ""
+          );
         } else {
           toastr.error("Error deleting category.");
         }
@@ -388,7 +406,7 @@ function updateModifierDropdownText() {
 }
 
 // Function to load modifiers dynamically based on selected modifier group
-function laodModifierGroupWiseModifies(
+async function laodModifierGroupWiseModifies(
   modifierGroupId,
   pageNumber = 1,
   pageSize = 5,
@@ -405,7 +423,7 @@ function laodModifierGroupWiseModifies(
     },
     success: async function (data) {
       $("#modifiers-container").html(data);
-      updatePaginationControlsModifier();
+      await updatePaginationControlsModifier();
 
       $(".modifier-checkbox").each(function () {
         const modifierId = parseInt(

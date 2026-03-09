@@ -3,9 +3,9 @@ $(document).ready(function () {
   let selectedModifiersData = {};
 
   // Item Search
-  $(document).on("keyup", "#itemSearch", function () {
+  $(document).on("keyup", "#itemSearch", async function () {
     let searchQuery = $(this).val();
-    loadCategoryWiseItems(
+    await loadCategoryWiseItems(
       selectedCategoryId,
       currentPage,
       pageSize,
@@ -14,25 +14,25 @@ $(document).ready(function () {
   });
 
   // PageSize Dropdown
-  $(document).on("change", "#pageSizeDropdown", function () {
+  $(document).on("change", "#pageSizeDropdown", async function () {
     pageSize = $(this).val();
     currentPage = 1;
-    loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+    await loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
   });
 
   // Previous Page
-  $(document).on("click", "#prevPageBtn", function () {
+  $(document).on("click", "#prevPageBtn", async function () {
     if (currentPage > 1) {
       currentPage--;
-      loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+      await loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
     }
   });
 
   // Next Page
-  $(document).on("click", "#nextPageBtn", function () {
+  $(document).on("click", "#nextPageBtn", async function () {
     if (currentPage < totalPages) {
       currentPage++;
-      loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+      await loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
     }
   });
 
@@ -171,14 +171,14 @@ $(document).ready(function () {
       data: formData,
       processData: false,
       contentType: false,
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Menu item added successfully!");
           let modal = document.getElementById("addItemModalContainer");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
 
-          loadCategoryWiseItems(response.categoryId, 1, 5, "");
+          await loadCategoryWiseItems(response.categoryId, 1, 5, "");
         } else {
           if (response.message.includes("already exists")) {
             toastr.warning(response.message);
@@ -300,14 +300,19 @@ $(document).ready(function () {
       data: formData,
       processData: false,
       contentType: false,
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Menu item updated successfully!");
           let modal = document.getElementById("editItemModal");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
 
-          loadCategoryWiseItems(response.categoryId, currentPage, pageSize, "");
+          await loadCategoryWiseItems(
+            response.categoryId,
+            currentPage,
+            pageSize,
+            ""
+          );
         } else {
           if (response.message.includes("already exists")) {
             toastr.warning(response.message);
@@ -367,14 +372,14 @@ $(document).ready(function () {
         itemId: menuItemId,
       },
       dataType: "json",
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Category deleted successfully!");
           let modal = document.getElementById("deleteItemModal");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
 
-          loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
+          await loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
         } else {
           toastr.error("Error deleting category.");
         }
@@ -447,7 +452,7 @@ $(document).ready(function () {
       type: "POST",
       contentType: "application/json",
       data: JSON.stringify(Array.from(selectedItems)),
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Items deleted successfully.");
           let modal = document.getElementById("deleteConfirmationModalItems");
@@ -462,9 +467,9 @@ $(document).ready(function () {
             .prop("indeterminate", false);
           $(".item-checkbox").prop("checked", false);
 
-          loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
+          await loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
           // Optional: Refetch IDs if needed
-          fetchAllItemIds();
+          await fetchAllItemIds();
         } else {
           toastr.error("Error: " + response.message);
         }
@@ -837,7 +842,7 @@ function updateModifierItems(data) {
 }
 
 // Function to load items dynamically based on selected category
-function loadCategoryWiseItems(
+async function loadCategoryWiseItems(
   categoryId,
   pageNumber = 1,
   pageSize = 5,
@@ -854,7 +859,7 @@ function loadCategoryWiseItems(
     },
     success: async function (data) {
       $("#items-container").html(data);
-      updatePaginationControls();
+      await updatePaginationControls();
 
       $(".item-checkbox").each(function () {
         const itemId = parseInt(
