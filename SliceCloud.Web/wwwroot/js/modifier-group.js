@@ -1,4 +1,16 @@
 $(document).ready(function () {
+  // Load modifier-group based on modifier-group click
+  $(document).on("click", ".modifier-btn", function () {
+    $(".modifier-btn").removeClass("active-category");
+    $(this).addClass("active-category");
+    $("#modifierSearch").val("");
+
+    selectedModifierGroupId = $(this).data("id");
+
+    $("#modifierGroupIdHidden").val(selectedModifierGroupId);
+    laodModifierGroupWiseModifies(selectedModifierGroupId, 1, 5, "");
+  });
+
   // Add Modifier Group
   $(document).on("click", "#openAddModifierGroupModal", function () {
     $.ajax({
@@ -88,8 +100,17 @@ $(document).ready(function () {
           let modal = document.getElementById("editModifierGroup");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
-          // Update later for modifiers
-          await loadAllModifierGroups();
+          await loadAllModifierGroups(function (firstModifierGroupId) {
+            if (firstModifierGroupId) {
+              selectedModifierGroupId = firstModifierGroupId;
+              $("#modifierGroupIdHidden").val(selectedModifierGroupId);
+              laodModifierGroupWiseModifies(
+                selectedModifierGroupId,
+                currentPage,
+                pageSize
+              );
+            }
+          });
         } else {
           // Display validation errors
           $(".text-danger").html(""); // Clear existing errors
@@ -184,6 +205,7 @@ function initializeModifierGroupSortable() {
   });
 }
 
+// Load all modifier-groups and execute callback with the first modifier-group ID
 async function loadAllModifierGroups(callback) {
   $.ajax({
     url: "/Menu/GetAllModifierGroups",

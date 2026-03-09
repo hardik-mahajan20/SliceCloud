@@ -199,6 +199,7 @@ function initializeCategorySortable() {
   });
 }
 
+// Load all categories and execute callback with the first category ID
 async function loadAllCategories(callback) {
   $.ajax({
     url: "/Menu/GetAllCategories",
