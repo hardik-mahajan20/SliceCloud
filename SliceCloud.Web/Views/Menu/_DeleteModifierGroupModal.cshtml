@@ -1,0 +1,22 @@
+<div class="modal fade" id="deleteModifierGroupModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Delete Confimation</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deleteModifierGroupForm">
+                <div class="modal-body text-center">
+                    <i class="bi bi-exclamation-triangle-fill fs-3 text-warning"></i>
+                    <p>Are you sure you want to delete this modifier group?</p>
+                    <input type="hidden" id="deleteModifierGroupId">
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="submit" class="btn custom-navbar-bg-color text-white"> YES </button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"> NO </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

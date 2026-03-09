@@ -17,8 +17,10 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
 
     public async Task<PaginatedList<ItemViewModel>> GetPaginatedItemsByGroupIdAsync(int categoryId, int pageNumber, int pageSize, string searchQuery = "")
     {
-        IQueryable<Item>? query = _itemRepository.GetAllItemsAsQueryable().Where(item => item.CategoryId == categoryId && item.IsDeleted == false)
-               .AsQueryable();
+        IQueryable<Item>? query = _itemRepository.GetAllItemsAsQueryable()
+                                                    .Where(item => item.CategoryId == categoryId && item.IsDeleted == false)
+                                                        .OrderByDescending(item => item.CreatedAt)
+                                                            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {

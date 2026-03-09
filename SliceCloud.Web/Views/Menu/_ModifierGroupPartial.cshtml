@@ -1,0 +1,39 @@
+<div class="tab-pane fade show active " id="nav-modifier" role="tabpanel" aria-labelledby="pills-modifier-tab">
+
+    <div class="d-flex justify-content-between align-items-center px-3">
+        <h4 class="custom-body-text-color text-bold">Modifier Group</h4>
+        <button class="btn p-0" id="openAddModifierGroupModal">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+        <button type="button" class="btn-close  d-block d-xl-none" aria-label="Close" id="closeBtn"></button>
+    </div>
+    <div class="overflow-auto mt-4 modifier-group-wrapper">
+
+        <ul class="list-unstyled modifier-group-list" id="modifierGroupList">
+            @{
+                bool isFirstModifierGroup = true;
+            }
+            @foreach (dynamic modifiergroup in Model)
+            {
+                string activeClass = isFirstModifierGroup ? "active-modifier-group" : "";
+                isFirstModifierGroup = false;
+                <li class="d-flex p-1 align-items-center justify-content-between modifier-btn btn @activeClass"
+                    data-id="@modifiergroup.ModifierGroupId" id="modifierGroup-@modifiergroup.ModifierGroupId">
+                    <div class="d-flex align-items-center flex-wrap gap-2 ms-3">
+                        <div class="sort-handle"> <i class="bi bi-grip-vertical"></i>
+                        </div>
+                        <span class="text-truncate modifier-group-name">@modifiergroup.ModifierGroupName</span>
+                    </div>
+                    <div class="d-flex">
+                        <button class="edit-modifier-group-btn btn p-0 m-1" data-id="@modifiergroup.ModifierGroupId">
+                            <i class="bi bi-pen"></i>
+                        </button>
+                        <button class="delete-modifier-group-btn btn p-0 m-1" data-id="@modifiergroup.ModifierGroupId">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

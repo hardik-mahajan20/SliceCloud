@@ -24,4 +24,32 @@ public interface IModifierGroupService
     /// <param name="modifierGroupId">The ID of the modifier group to retrieve.</param>
     /// <returns>A task that returns the modifier group view model if found, otherwise null.</returns>
     Task<ModifierGroupViewModel> GetModifierGroupByIdAsync(int modifierGroupId);
+
+    /// <summary>
+    /// Updates the order of modifier groups asynchronously.
+    /// </summary>
+    /// <param name="orderedModifierGroupIds">The list of modifier group IDs in the desired order.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task UpdateModifierGroupOrderAsync(List<int> orderedModifierGroupIds);
+
+
+    /// <summary>
+    /// Creates a new modifier group asynchronously.
+    /// </summary>
+    /// <param name="modifierGroupViewModel">The view model containing modifier group details.</param>
+    /// <returns>A task that returns new modifier groups id if the creation was successful.</returns>
+    Task<int> AddModifierGroupAsync(ModifierGroupViewModel modifierGroupViewModel);
+    /// <summary>
+    /// Updates an existing modifierGroup asynchronously.
+    /// </summary>
+    /// <param name="modifierGroupViewModel">The modifierGroup view model to update.</param>
+    /// <returns>A task that returns true if the update was successful, otherwise false.</returns>
+    Task<bool> UpdateModifierGroupAsync(ModifierGroupViewModel modifierGroupViewModel);
+
+    /// <summary>
+    /// Deletes a modifierGroup by its ID asynchronously.
+    /// </summary>
+    /// <param name="modifierGroupId">The ID of the modifierGroup to delete.</param>
+    /// <returns>A task that returns true if the deletion was successful, otherwise false.</returns>
+    Task<bool> DeleteModifierGroupAsync(int modifierGroupId);
 }

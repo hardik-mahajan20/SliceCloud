@@ -1,0 +1,41 @@
+@model SliceCloud.Repository.ViewModels.ModifierGroupViewModel
+
+<div class="modal fade" id="addModifierGroup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="addModifierGroupLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addModifierGroupLabel">Add Modifier Group</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="addModifierGroupForm" asp-action="AddModifierGroup" asp-controller="Menu" method="post">
+                <div class="modal-body">
+                    <div class="mb-3 form-floating">
+                        <input asp-for="ModifierGroupName" class="form-control" placeholder="Name*" />
+                        <span asp-validation-for="ModifierGroupName" class="text-danger"></span>
+                        <label asp-for="ModifierGroupName" class="form-label">Name*</label>
+                    </div>
+                    <div class="form-floating">
+                        <textarea asp-for="Description" class=" form-control" placeholder="Multiple lines"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <label asp-for="Description" class="form-label">Description</label>
+                    </div>
+                    <div class="mb-3">
+                        <a class="text-decoration-none btn text-primary" id="addExistingModifiers">+ Add Existing
+                            Modifiers</a>
+                    </div>
+                    <div id="selectedModifiersContainer" class="mt-2"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" id="saveModifierGroupBtn"
+                        class="btn custom-navbar-bg-color text-white d-flex align-items-center p-2">
+                        Save
+                    </button>
+                    <button type="button" class="btn btn-outline-primary p-2" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

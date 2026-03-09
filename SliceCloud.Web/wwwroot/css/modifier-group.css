@@ -1,0 +1,43 @@
+.modifier-group-name {
+  max-width: 150px;
+}
+.modifier-btn:hover {
+  color: #0066a7 !important;
+}
+
+.modifier-btn:hover .drag-icon {
+  filter: invert(21%) sepia(99%) saturate(1065%) hue-rotate(181deg)
+    brightness(92%) contrast(94%);
+}
+
+.active-modifier-group {
+  color: #0066a7 !important;
+}
+
+.active-modifier-group .drag-icon {
+  filter: invert(21%) sepia(99%) saturate(1065%) hue-rotate(181deg)
+    brightness(92%) contrast(94%);
+}
+
+.modifier-btn .edit-modifier-group-btn,
+.modifier-btn .delete-modifier-group-btn {
+  display: none;
+}
+
+.modifier-btn:hover .edit-modifier-group-btn,
+.modifier-btn:hover .delete-modifier-group-btn {
+  display: inline-block;
+}
+
+.modifier-btn.addedit-modifier-group .edit-modifier-group-btn,
+.modifier-btn.addedit-modifier-group .delete-modifier-group-btn {
+  display: inline-block;
+}
+
+.modifier-btn {
+  height: 40px !important;
+}
+
+.sort-handle {
+  cursor: grab;
+}
