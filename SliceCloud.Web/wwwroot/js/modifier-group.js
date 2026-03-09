@@ -70,7 +70,7 @@ $(document).ready(function () {
     });
   });
 
-  // Edit Category Submission
+  // Edit Modifier Group Submission
   $(document).on("submit", "#editModifierGroupForm", function (e) {
     e.preventDefault();
     const form = $(this)[0];
@@ -105,9 +105,31 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Delete Modifier Group
+  $(document).on("click", ".delete-modifier-group-btn", function (e) {
+    e.stopPropagation();
+    var modifierGroupId = $(this).data("id");
+
+    $.ajax({
+      type: "GET",
+      url: "/Menu/LoadDeleteModifierGroupModal",
+      success: function (response) {
+        $("#modalContainer").empty();
+        $("#modalContainer").html(response);
+        $("#deleteModifierGroupId").val(modifierGroupId);
+        let modal = document.getElementById("deleteModifierGroupModal");
+        let modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
 });
 
-// Initialize sortable for categories
+// Initialize sortable for modifierGroup
 function initializeModifierGroupSortable() {
   $("#modifierGroupList").sortable({
     update: function (event, ui) {
