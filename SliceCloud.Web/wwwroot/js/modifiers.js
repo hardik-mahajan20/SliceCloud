@@ -124,6 +124,26 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Delete Modifier GET
+  $(document).on("click", ".delete-modifier-btn", function () {
+    var modifierId = $(this).data("id");
+    $.ajax({
+      type: "GET",
+      url: "/Menu/LoadDeleteModifierModal",
+      success: function (response) {
+        $("#modalContainer").empty();
+        $("#modalContainer").html(response);
+        $("#deleteModifierId").val(modifierId);
+        let modal = document.getElementById("deleteModifierModal");
+        let modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
+      },
+      error: function () {
+        toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
 });
 
 function initializeEditModifierCheckboxes() {

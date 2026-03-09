@@ -989,4 +989,15 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region LoadDeleteModifierModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadDeleteModifierModal()
+    {
+        return PartialView("_DeletModifierModal");
+    }
+
+    #endregion
 }
