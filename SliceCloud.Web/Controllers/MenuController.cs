@@ -840,4 +840,21 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region LoadModifiersByModifierGroup
+
+    public async Task<IActionResult> LoadModifiersByModifierGroup(int modifierGroupId, int pageNumber = 1, int pageSize = 5, string searchQuery = "")
+    {
+        PaginatedList<ModifierViewModel>? paginatedModifiers = await _modifierService.GetPaginatedModifiersByModifierGroupId(modifierGroupId, pageNumber, pageSize, searchQuery);
+
+        ViewBag.FromRec = paginatedModifiers.FromRec;
+        ViewBag.ToRec = paginatedModifiers.ToRec;
+        ViewBag.TotalItems = paginatedModifiers.TotalItems;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalPages = paginatedModifiers.TotalPages;
+
+        return PartialView("_ModifiersPartial", paginatedModifiers);
+    }
+
+    #endregion
 }

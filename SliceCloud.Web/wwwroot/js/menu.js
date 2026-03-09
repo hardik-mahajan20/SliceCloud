@@ -35,7 +35,17 @@ $(document).ready(async function () {
 
   $("#pills-profile-tab").click(async function () {
     await loadPartialView("/Menu/LoadModifiers");
-    await loadAllModifierGroups();
+    await loadAllModifierGroups(function (firstModifierGroupId) {
+      if (firstModifierGroupId) {
+        selectedModifierGroupId = firstModifierGroupId;
+        $("#modifierGroupIdHidden").val(selectedModifierGroupId);
+        laodModifierGroupWiseModifies(
+          selectedModifierGroupId,
+          currentPage,
+          pageSize
+        );
+      }
+    });
   });
 });
 
@@ -187,6 +197,29 @@ function loadCategoryWiseItems(
 
       await applyMainCheckboxState();
       await fetchAllItemIds();
+    },
+    error: function () {
+      toastr.error("An unexpected error occurred.");
+    },
+  });
+}
+function laodModifierGroupWiseModifies(
+  modifierGroupId,
+  pageNumber = 1,
+  pageSize = 5,
+  searchQuery = ""
+) {
+  $.ajax({
+    url: "/Menu/LoadModifiersByModifierGroup",
+    type: "GET",
+    data: {
+      modifierGroupId: modifierGroupId,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      searchQuery: searchQuery,
+    },
+    success: async function (data) {
+      $("#modifiers-container").html(data);
     },
     error: function () {
       toastr.error("An unexpected error occurred.");
