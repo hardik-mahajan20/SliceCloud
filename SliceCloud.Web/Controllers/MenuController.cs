@@ -843,6 +843,8 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #region LoadModifiersByModifierGroup
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
     public async Task<IActionResult> LoadModifiersByModifierGroup(int modifierGroupId, int pageNumber = 1, int pageSize = 5, string searchQuery = "")
     {
         PaginatedList<ModifierViewModel>? paginatedModifiers = await _modifierService.GetPaginatedModifiersByModifierGroupId(modifierGroupId, pageNumber, pageSize, searchQuery);
@@ -860,6 +862,8 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #region GetAddModifier
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
     public async Task<IActionResult> GetAddModifier()
     {
 
@@ -874,6 +878,55 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
         };
 
         return PartialView("_AddNewModifierModalPartial", viewModel);
+    }
+
+    #endregion
+
+    #region AddModifier POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<JsonResult> AddModifier(ModifierSectionViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+                );
+
+            return Json(new
+            {
+                success = false,
+                validationErrors = errors,
+                modifierGroupIds = model.ModifierGroupIds
+            });
+        }
+
+        try
+        {
+            int result = await _modifierService.AddModifierAsync(model);
+            if (result > 0)
+            {
+                return Json(new { success = true });
+            }
+
+            return Json(new
+            {
+                success = false,
+                message = "Failed to add modifier."
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "An error occurred: " + ex.Message
+            });
+        }
     }
 
     #endregion

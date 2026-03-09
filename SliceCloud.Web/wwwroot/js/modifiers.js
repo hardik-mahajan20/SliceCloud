@@ -20,6 +20,46 @@ $(document).ready(function () {
       },
     });
   });
+
+  // Add Modifier POST
+  $(document).on("submit", "#addModifierForm", function (event) {
+    event.preventDefault();
+
+    updateModifierDropdownText();
+
+    let formData = $(this).serialize();
+
+    // Clear previous validation messages
+    $("span[data-valmsg-for]").text("");
+
+    $.ajax({
+      type: "POST",
+      url: "/Menu/AddModifier",
+      data: formData,
+      success: function (response) {
+        if (response.success) {
+          toastr.success("Modifier added successfully!");
+          let modal = document.getElementById("addModifierModalContainer");
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
+          modalInstance.hide();
+        } else if (response.validationErrors) {
+          // Loop through validation errors and show them under fields
+          for (let key in response.validationErrors) {
+            const messages = response.validationErrors[key];
+            const span = $(`[data-valmsg-for="${key}"]`);
+            if (span.length) {
+              span.text(messages.join(", "));
+            }
+          }
+        } else {
+          toastr.error("Error: " + response.message, "Error");
+        }
+      },
+      error: function () {
+        toastr.error("An error occurred while saving the modifier.", "Error");
+      },
+    });
+  });
 });
 
 function initializeModifierCheckboxes() {

@@ -15,4 +15,15 @@ public class ModifierRepository(SliceCloudContext sliceCloudContext) : IModifier
     }
 
     #endregion
+
+    #region AddModifier
+
+    public async Task<int> AddModifierAsync(Modifier modifier)
+    {
+        await _sliceCloudContext.Modifiers.AddAsync(modifier);
+        await _sliceCloudContext.SaveChangesAsync();
+        return modifier.ModifierId;
+    }
+
+    #endregion
 }

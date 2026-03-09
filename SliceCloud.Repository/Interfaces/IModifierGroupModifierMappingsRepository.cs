@@ -9,4 +9,10 @@ public interface IModifierGroupModifierMappingsRepository
     /// </summary>
     /// <returns>All modifierGroupModifierMapping as queryable.</returns>
     IQueryable<ModifierGroupModifierMapping> GetAllModifierGroupModifierMappingAsQueryable();
+
+    /// <summary>
+    /// Adds a list of ModifierGroupModifierMapping asynchronously.
+    /// </summary>
+    /// <param name="modifierGroupModifierMappings">The list of ModifierGroupModifierMapping to add.</param>
+    Task AddModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings);
 }

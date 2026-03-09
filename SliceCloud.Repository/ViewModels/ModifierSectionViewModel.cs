@@ -4,6 +4,9 @@ namespace SliceCloud.Repository.ViewModels;
 
 public class ModifierSectionViewModel
 {
+    [Required(ErrorMessage = "ModifierGroup Name is required.")]
+    [RegularExpression(@"^[A-Za-z][A-Za-z0-9 ]{2,19}$", ErrorMessage = "ModifierGroup Name must start with a letter and be 3-20 characters long, using only letters, numbers, and spaces.")]
+    [StringLength(20, MinimumLength = 3, ErrorMessage = "ModifierGroup Name must be between 3 and 20 characters.")]
     public string? ModifierName { get; set; } = null!;
 
     [Required(ErrorMessage = "Rate is required.")]
