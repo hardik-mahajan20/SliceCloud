@@ -930,4 +930,30 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region GetModifierByIdEdit
+
+    [HttpGet]
+    public async Task<ActionResult> GetModifierByIdEdit(int modifierId)
+    {
+        ModifierViewModel modifierViewModel = await _modifierService.GetModifierByIdAsync(modifierId);
+        List<UnitViewModel>? unitViewModels = await _unitService.GetUnitsAsync();
+        List<ModifierGroupViewModel>? modifierGroupViewModels = await _modifierGroupService.GetAllModifierGroupsAsync();
+
+        ModifierSectionViewModel modifierSectionViewModel = new()
+        {
+            ModifierId = modifierViewModel.ModifierId,
+            ModifierName = modifierViewModel.ModifierName,
+            UnitId = modifierViewModel.UnitId,
+            Rate = modifierViewModel.Rate,
+            Quantity = modifierViewModel.Quantity,
+            Description = modifierViewModel.Description,
+            ModifierGroupIds = modifierViewModel.ModifierGroupIds,
+            ModifierGroups = modifierGroupViewModels,
+            Units = unitViewModels,
+        };
+        return PartialView("_EditNewModifierModalPartial", modifierSectionViewModel);
+    }
+
+    #endregion
 }

@@ -116,6 +116,31 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
         return newModifieId;
     }
 
+    public async Task<ModifierViewModel> GetModifierByIdAsync(int modifierId)
+    {
+        Modifier? modifier = await _modifierRepository
+                                        .GetAllModifiersAsQueryable()
+                                            .Include(m => m.ModifierGroupModifierMappings)
+                                                .FirstOrDefaultAsync(m => m.ModifierId == modifierId && m.IsDeleted == false);
+
+        if (modifier == null)
+        {
+            return new ModifierViewModel();
+        }
+
+        return new ModifierViewModel
+        {
+            ModifierId = modifier.ModifierId,
+            ModifierName = modifier.ModifierName,
+            UnitId = modifier.UnitId,
+            Rate = modifier.Rate,
+            Quantity = modifier.Quantity,
+            Description = modifier.Description,
+            ModifierGroupIds = modifier.ModifierGroupModifierMappings.Select(mgm => mgm.ModifierGroupId).ToList()
+        };
+
+    }
+
     #endregion
 
 }
