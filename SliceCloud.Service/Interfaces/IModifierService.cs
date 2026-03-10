@@ -62,4 +62,10 @@ public interface IModifierService
     /// <param name="modifierGroupId">The ID of the modifier-group to retrieve modifier IDs for.</param>
     /// <returns>A task that returns a list of modifier IDs.</returns>
     Task<List<int>> GetAllModifierIdsAsync(int modifierGroupId);
+
+    /// <summary>
+    /// Deletes multiple modifiers by their IDs asynchronously.
+    /// </summary>
+    /// <param name="modifiersIds">The list of item IDs to soft delete.</param>
+    Task<bool> DeleteMultipleModifierAsync(List<int> modifiersIds);
 }

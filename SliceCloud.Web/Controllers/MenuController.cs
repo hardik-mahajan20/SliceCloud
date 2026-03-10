@@ -1057,4 +1057,21 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region DeleteMultipleModifiers POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteMultipleModifier([FromBody] List<int> modifierIds)
+    {
+        if (modifierIds == null || !modifierIds.Any())
+        {
+            return Json(new { success = false, message = "No modifier selected." });
+        }
+
+        bool isAllModifierssDeleted = await _modifierService.DeleteMultipleModifierAsync(modifierIds);
+        return Json(new { success = isAllModifierssDeleted });
+    }
+
+    #endregion
 }

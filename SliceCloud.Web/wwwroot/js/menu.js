@@ -1,4 +1,4 @@
-// Item Mass Delete Start
+// For the Items
 let selectedItems = new Set();
 let mainCheckboxState = { isChecked: false, isIndeterminate: false };
 let allItemIds = new Set();

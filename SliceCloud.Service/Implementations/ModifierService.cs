@@ -226,4 +226,24 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
     }
 
     #endregion
+
+    #region DeleteMultipleMultipleModifier
+
+    public async Task<bool> DeleteMultipleModifierAsync(List<int> modifiersIds)
+    {
+        List<Modifier>? modifiers = await _modifierRepository.GetAllModifiersAsQueryable().Where(m => modifiersIds.Contains(m.ModifierId)).ToListAsync();
+
+        if (modifiers.Any())
+        {
+            foreach (Modifier modifier in modifiers)
+            {
+                modifier.IsDeleted = true;
+                modifier.ModifiedAt = DateTime.UtcNow;
+                modifier.ModifiedBy = _currentUserService.UserId;
+            }
+        }
+        return await _modifierRepository.SaveChangesAsync() > 0;
+    }
+
+    #endregion
 }

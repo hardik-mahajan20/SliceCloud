@@ -45,7 +45,7 @@ $(document).ready(function () {
     }
   });
 
-  // Load Add Item Modal
+  // Load Add Modifier Modal
   $(document).on("click", ".add-modifier-btn", function () {
     $.ajax({
       url: "/Menu/GetAddModifier",
@@ -244,6 +244,8 @@ $(document).ready(function () {
 
     if (isChecked) {
       allModifierIds.forEach((id) => selectedModifiers.add(id));
+      console.log(allModifierIds);
+      
     } else {
       selectedModifiers.clear();
     }
@@ -267,7 +269,7 @@ $(document).ready(function () {
     updateMainCheckboxStateModifier();
   });
 
-  // Delete Menu Item
+  // Delete Multile Modifer
   $(document).on("click", ".delete-multiple-modifier-btn", function () {
     let selectedModifiersArray = Array.from(selectedModifiers);
 
@@ -287,6 +289,46 @@ $(document).ready(function () {
       },
       error: function () {
         toastr.error("An unexpected error occurred.");
+      },
+    });
+  });
+
+  // Confirm delete AJAX
+  $(document).on("click", "#confirmDeleteModifier", function () {
+    $.ajax({
+      url: "/Menu/DeleteMultipleModifier",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(Array.from(selectedModifiers)),
+      success: async function (response) {
+        if (response.success) {
+          toastr.success("Modifiers deleted successfully.");
+          let modal = document.getElementById(
+            "deleteConfirmationModalModifiers"
+          );
+          let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
+          modalInstance.hide();
+          selectedModifiers.clear();
+          mainCheckboxStateModifier = {
+            isChecked: false,
+            isIndeterminate: false,
+          };
+
+          // Uncheck all checkboxes
+          $("#maincheckboxModifier")
+            .prop("checked", false)
+            .prop("indeterminate", false);
+          $(".modifier-checkbox").prop("checked", false);
+
+          await laodModifierGroupWiseModifies(selectedModifiers, 1, 1, "");
+          // Optional: Refetch IDs if needed
+          await fetchAllModifierIds();
+        } else {
+          toastr.error("Error: " + response.message);
+        }
+      },
+      error: function () {
+        toastr.error("Something went wrong. Please try again.");
       },
     });
   });
@@ -460,7 +502,7 @@ async function laodModifierGroupWiseModifies(
       }
 
       await applyMainCheckboxStateModifier();
-      await fetchAllItemIds();
+      await fetchAllModifierIds();
     },
     error: function () {
       toastr.error("An unexpected error occurred.");

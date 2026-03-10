@@ -1,8 +1,8 @@
 $(document).ready(function () {
   // Load modifier-group based on modifier-group click
   $(document).on("click", ".modifier-btn", async function () {
-    $(".modifier-btn").removeClass("active-category");
-    $(this).addClass("active-category");
+    $(".modifier-btn").removeClass("active-modifier-group");
+    $(this).addClass("active-modifier-group");
     $("#modifierSearch").val("");
 
     selectedModifierGroupId = $(this).data("id");
