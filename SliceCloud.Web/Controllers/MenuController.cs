@@ -840,4 +840,238 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
+    #region LoadModifiersByModifierGroup
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> LoadModifiersByModifierGroup(int modifierGroupId, int pageNumber = 1, int pageSize = 5, string searchQuery = "")
+    {
+        PaginatedList<ModifierViewModel>? paginatedModifiers = await _modifierService.GetPaginatedModifiersByModifierGroupId(modifierGroupId, pageNumber, pageSize, searchQuery);
+
+        ViewBag.FromRec = paginatedModifiers.FromRec;
+        ViewBag.ToRec = paginatedModifiers.ToRec;
+        ViewBag.TotalItems = paginatedModifiers.TotalItems;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalPages = paginatedModifiers.TotalPages;
+
+        return PartialView("_ModifiersPartial", paginatedModifiers);
+    }
+
+    #endregion
+
+    #region GetAddModifier
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetAddModifier()
+    {
+
+        List<ModifierGroupViewModel>? modifierGroups = await _modifierGroupService.GetAllModifierGroupsAsync();
+
+        List<UnitViewModel>? units = await _unitService.GetUnitsAsync();
+
+        ModifierSectionViewModel viewModel = new()
+        {
+            ModifierGroups = modifierGroups,
+            Units = units,
+        };
+
+        return PartialView("_AddNewModifierModalPartial", viewModel);
+    }
+
+    #endregion
+
+    #region AddModifier POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<JsonResult> AddModifier(ModifierSectionViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList()
+                );
+
+            return Json(new
+            {
+                success = false,
+                validationErrors = errors,
+                modifierGroupIds = model.ModifierGroupIds
+            });
+        }
+
+        try
+        {
+            int result = await _modifierService.AddModifierAsync(model);
+            if (result > 0)
+            {
+                return Json(new { success = true });
+            }
+
+            return Json(new
+            {
+                success = false,
+                message = "Failed to add modifier."
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "An error occurred: " + ex.Message
+            });
+        }
+    }
+
+    #endregion
+
+    #region GetModifierByIdEdit
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<ActionResult> GetModifierByIdEdit(int modifierId)
+    {
+        ModifierViewModel modifierViewModel = await _modifierService.GetModifierByIdAsync(modifierId);
+        List<UnitViewModel>? unitViewModels = await _unitService.GetUnitsAsync();
+        List<ModifierGroupViewModel>? modifierGroupViewModels = await _modifierGroupService.GetAllModifierGroupsAsync();
+
+        ModifierSectionViewModel modifierSectionViewModel = new()
+        {
+            ModifierId = modifierViewModel.ModifierId,
+            ModifierName = modifierViewModel.ModifierName,
+            UnitId = modifierViewModel.UnitId,
+            Rate = modifierViewModel.Rate,
+            Quantity = modifierViewModel.Quantity,
+            Description = modifierViewModel.Description,
+            ModifierGroupIds = modifierViewModel.ModifierGroupIds,
+            ModifierGroups = modifierGroupViewModels,
+            Units = unitViewModels,
+        };
+        return PartialView("_EditNewModifierModalPartial", modifierSectionViewModel);
+    }
+
+    #endregion
+
+    #region UpdateModifier
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> UpdateModifier(ModifierSectionViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Value?.Errors.Select(e => e.ErrorMessage).FirstOrDefault()
+                );
+
+            return Json(new { success = false, validationErrors = errors });
+        }
+
+        int result = await _modifierService.UpdateModifierAsync(model);
+
+        if (result > 0)
+        {
+            return Json(new { success = true, modifierGroupIds = model.ModifierGroupIds });
+        }
+        else
+        {
+            return Json(new { success = false, message = "Failed to update modifier." });
+        }
+    }
+
+    #endregion
+
+    #region LoadDeleteModifierModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadDeleteModifierModal()
+    {
+        return PartialView("_DeletModifierModal");
+    }
+
+    #endregion
+
+    #region Delete Modifier POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteModifier(int modifierId)
+    {
+        bool isDeleted = await _modifierService.DeleteModifierAsync(modifierId);
+        if (isDeleted)
+        {
+            return Json(new
+            {
+                success = true,
+                message = "Modifier deleted successfully!"
+            });
+        }
+        else
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Error deleting modifier!"
+            });
+        }
+    }
+
+    #endregion
+
+    #region GetAllModifierIds
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public async Task<IActionResult> GetAllModifierIds(int modifierGroupId)
+    {
+        try
+        {
+            List<int>? modifierIds = await _modifierService.GetAllModifierIdsAsync(modifierGroupId);
+            return Json(modifierIds);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    #endregion
+
+    #region LoadMultipleDeleteMenuModifierModal
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
+    public IActionResult LoadDeleteMultipleMenuModifierModal()
+    {
+        return PartialView("_DeleteMultiplModifierModal");
+    }
+
+    #endregion
+
+    #region DeleteMultipleModifiers POST
+
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpPost]
+    public async Task<IActionResult> DeleteMultipleModifier([FromBody] List<int> modifierIds)
+    {
+        if (modifierIds == null || !modifierIds.Any())
+        {
+            return Json(new { success = false, message = "No modifier selected." });
+        }
+
+        bool isAllModifierssDeleted = await _modifierService.DeleteMultipleModifierAsync(modifierIds);
+        return Json(new { success = isAllModifierssDeleted });
+    }
+
+    #endregion
 }

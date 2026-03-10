@@ -29,4 +29,6 @@ public class ModifierViewModel
     public bool? IsDeleted { get; set; }
 
     public ModifierType? ModifierType { get; set; }
+
+    public List<int>? ModifierGroupIds { get; set; }
 }

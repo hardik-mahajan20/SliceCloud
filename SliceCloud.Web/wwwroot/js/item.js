@@ -3,9 +3,9 @@ $(document).ready(function () {
   let selectedModifiersData = {};
 
   // Item Search
-  $(document).on("keyup", "#itemSearch", function () {
+  $(document).on("keyup", "#itemSearch", async function () {
     let searchQuery = $(this).val();
-    loadCategoryWiseItems(
+    await loadCategoryWiseItems(
       selectedCategoryId,
       currentPage,
       pageSize,
@@ -14,25 +14,25 @@ $(document).ready(function () {
   });
 
   // PageSize Dropdown
-  $(document).on("change", "#pageSizeDropdown", function () {
+  $(document).on("change", "#pageSizeDropdown", async function () {
     pageSize = $(this).val();
     currentPage = 1;
-    loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+    await loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
   });
 
   // Previous Page
-  $(document).on("click", "#prevPageBtn", function () {
+  $(document).on("click", "#prevPageBtn", async function () {
     if (currentPage > 1) {
       currentPage--;
-      loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+      await loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
     }
   });
 
   // Next Page
-  $(document).on("click", "#nextPageBtn", function () {
+  $(document).on("click", "#nextPageBtn", async function () {
     if (currentPage < totalPages) {
       currentPage++;
-      loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+      await loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
     }
   });
 
@@ -69,128 +69,6 @@ $(document).ready(function () {
       },
     });
   });
-
-  // bind modifier group change event for Add Item Modal
-  function bindModifierGroupEventAdd() {
-    $(document).on("change", "#ModifierGroupDropdown", function () {
-      var selectedGroupIds = $(this).val() || [];
-      if (selectedGroupIds && selectedGroupIds.length > 0) {
-        $.ajax({
-          url: "/Menu/GetModifiersByGroup",
-          type: "GET",
-          traditional: true,
-          data: {
-            modifierGroupIds: selectedGroupIds,
-          },
-          success: function (response) {
-            updateModifierItems(response);
-          },
-          error: function (xhr, status, error) {
-            toastr.error("AJAX Error: " + error, "Error");
-          },
-        });
-      } else {
-        $("#ModifierItemsContainer").html(
-          "<p class='text-muted'>Select a Modifier Group to load items.</p>"
-        );
-      }
-    });
-  }
-
-  // Function to update modifier items based on selected groups
-  function updateModifierItems(data) {
-    var container = $("#ModifierItemsContainer");
-    container.find(".no-modifier-message").remove();
-
-    if (data.groups && data.groups.length > 0) {
-      $.each(data.groups, function (_index, group) {
-        if ($(`#group-${group.groupId}`).length === 0) {
-          selectedModifiersData[group.groupId] = {
-            groupName: group.groupName,
-            modifiers: [],
-            dropdown1Value: 0,
-            dropdown2Value: 0,
-          };
-          selectedModifierGroupData.push({
-            modifierGroupId: group.groupId,
-            min: 0,
-            max: 0,
-          });
-
-          var groupHtml = `
-                 <div id="group-${group.groupId}" class="px-3 mt-3">
-                     <div class="d-flex justify-content-between align-items-center mb-2">
-                         <strong class="text-muted">${group.groupName}</strong>
-                         <button class="remove-group border-0 bg-transparent" data-group="${
-                           group.groupId
-                         }">
-                             <i class="bi bi-trash" style="color:#808080;"></i>
-                         </button>
-                     </div>
-                     <div>
-                         <div class="row">
-                             <div class="col-6 mb-2">
-                                 <select class="form-select form-select-sm modifier-quantity rounded-pill border dropdown1" data-group="${
-                                   group.groupId
-                                 }">
-                                     ${[...Array(6).keys()]
-                                       .map(
-                                         (i) =>
-                                           `<option value="${i}">${i}</option>`
-                                       )
-                                       .join("")}
-                                 </select>
-                             </div>
-                             <div class="col-6 mb-2">
-                                 <select class="form-select form-select-sm modifier-quantity rounded-pill border dropdown2" data-group="${
-                                   group.groupId
-                                 }">
-                                     ${[...Array(6).keys()]
-                                       .map(
-                                         (i) =>
-                                           `<option value="${i}">${i}</option>`
-                                       )
-                                       .join("")}
-                                 </select>
-                             </div>
-                         </div>
-                         <ul>`;
-
-          var groupModifiers = data.modifierItems.filter((m) =>
-            m.groupId.some((id) => id === group.groupId)
-          );
-          if (groupModifiers.length > 0) {
-            $.each(groupModifiers, function (idx, item) {
-              groupHtml += `
-                         <li>
-                             <div class="d-flex justify-content-between align-items-center">
-                                 <span>${item.modifierName}</span>
-                                 <span>${item.price}</span>
-                             </div>
-                         </li>`;
-
-              selectedModifiersData[group.groupId].modifiers.push({
-                modifierId: item.modifierId,
-                modifierName: item.modifierName,
-                price: item.price,
-              });
-            });
-          } else {
-            groupHtml += `<p class='text-muted'>No modifiers available for this group.</p>`;
-          }
-
-          groupHtml += `</ul></div></div>`;
-          container.prepend(groupHtml);
-        }
-      });
-    }
-
-    if ($("#ModifierItemsContainer").children().length === 0) {
-      container.append(
-        "<p class='text-muted no-modifier-message'>Select a Modifier Group to load items.</p>"
-      );
-    }
-  }
 
   // Handle changes in dropdowns to maintain min/max logic and enable/disable options
   $(document).on("change", ".dropdown1, .dropdown2", function () {
@@ -293,14 +171,14 @@ $(document).ready(function () {
       data: formData,
       processData: false,
       contentType: false,
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Menu item added successfully!");
           let modal = document.getElementById("addItemModalContainer");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
 
-          loadCategoryWiseItems(response.categoryId, 1, 5, "");
+          await loadCategoryWiseItems(response.categoryId, 1, 5, "");
         } else {
           if (response.message.includes("already exists")) {
             toastr.warning(response.message);
@@ -330,7 +208,6 @@ $(document).ready(function () {
   });
 
   // Edit Item Get AJAX
-
   $(document).on("click", ".edit-item-btn", function () {
     // Initialize Select2 for Modifier Groups Dropdown
     $("#EditModifierGroupDropdown").select2({
@@ -368,212 +245,10 @@ $(document).ready(function () {
     });
   });
 
-  // Fetch and prepopulated modifier groups & items
-  function fetchModifierMappings(itemId) {
-    $.ajax({
-      url: "/Menu/GetModifierMappingsByItemId",
-      type: "GET",
-      data: {
-        id: itemId,
-      },
-      success: function (modifierMappings) {
-        if (modifierMappings && modifierMappings.length > 0) {
-          prepopulatedModifierGroups(modifierMappings);
-        } else {
-          toastr.warning(
-            "No modifier mappings found for this item.",
-            "Warning"
-          );
-        }
-      },
-      error: function () {
-        toastr.error("Failed to fetch modifier mappings.", "Error");
-      },
-    });
-  }
-
-  // Prepopulated Modifier Groups
-  function prepopulatedModifierGroups(modifierMappings) {
-    var modifierContainer = $("#modifierGroupContainer");
-    modifierContainer.empty();
-
-    let selectedGroupIds = [];
-
-    modifierMappings.forEach(function (mapping) {
-      selectedGroupIds.push(mapping.modifierGroupId);
-      addModifierGroupToUI(
-        mapping.modifierGroupId,
-        mapping.modifierGroupName,
-        mapping.minValue,
-        mapping.maxValue,
-        mapping.modifierItems
-      );
-    });
-
-    $("#EditModifierGroupDropdown").val(selectedGroupIds);
-  }
-
-  // Function to add modifier group to UI
-  function addModifierGroupToUI(groupId, groupName, min, max, items = []) {
-    var modifierContainer = $("#modifierGroupContainer");
-
-    if ($("#group-" + groupId).length) {
-      return;
-    }
-
-    var groupHtml = `
-       <div id="group-${groupId}" class="modifier-group px-3 mt-1">
-           <div class="d-flex justify-content-between align-items-center mb-2">
-               <strong class="text-muted">${groupName}</strong>
-               <button class="remove-group border-0 bg-transparent" data-group="${groupId}">
-                   <i class="bi bi-trash" style="color:#808080;"></i>
-               </button>
-           </div>
-           <div class="row">
-               <div class="col-6 mb-2">
-                   <label class="small">Min</label>
-                   <select class="form-select form-select-sm dropdown1 rounded-pill" data-group="${groupId}">
-                       ${[...Array(6).keys()]
-                         .map(
-                           (i) =>
-                             `<option value="${i}" ${
-                               i == min ? "selected" : ""
-                             }>${i}</option>`
-                         )
-                         .join("")}
-                   </select>
-               </div>
-               <div class="col-6 mb-2">
-                   <label class="small">Max</label>
-                   <select class="form-select form-select-sm dropdown2 rounded-pill" data-group="${groupId}">
-                       ${[...Array(6).keys()]
-                         .map(
-                           (i) =>
-                             `<option value="${i}" ${
-                               i == max ? "selected" : ""
-                             }>${i}</option>`
-                         )
-                         .join("")}
-                   </select>
-               </div>
-           </div>
-           <ul>`;
-
-    items.forEach(function (item) {
-      groupHtml += `
-        <li>
-            <div class="d-flex justify-content-between align-items-center">
-            <span>${item.modifierItemName}</span>
-                <span>${item.Price || item.price || 0}</span>
-            </div>
-        </li>`;
-    });
-
-    groupHtml += `</ul></div>`;
-
-    modifierContainer.prepend(groupHtml);
-
-    let minDropdown = $(`#group-${groupId} .dropdown1`);
-    let maxDropdown = $(`#group-${groupId} .dropdown2`);
-
-    minDropdown.val(min).trigger("change");
-    maxDropdown.val(max).trigger("change");
-
-    updateDropdownConstraints(groupId);
-  }
-
-  // Bind Modifier Group Dropdown Events
-  function bindModifierGroupEvent() {
-    $(document).on("change", "#EditModifierGroupDropdown", function () {
-      var selectedGroups = $(this).val() || [];
-
-      if (selectedGroups.length === 0) {
-        toastr.warning("No modifier groups selected.", "Warning");
-        return;
-      }
-
-      $.ajax({
-        url: "/Menu/GetModifiersByGroup",
-        type: "GET",
-        data: {
-          modifierGroupIds: selectedGroups,
-        },
-        traditional: true,
-        success: function (response) {
-          if (response && response.groups) {
-            response.groups.forEach(function (group) {
-              if ($("#group-" + group.groupId).length === 0) {
-                addModifierGroupToUI(
-                  group.groupId,
-                  group.groupName,
-                  0,
-                  0,
-                  response.modifierItems.filter((m) =>
-                    m.groupId.some((id) => id === group.groupId)
-                  )
-                );
-              }
-            });
-          }
-        },
-        error: function (_xhr, _status, error) {
-          toastr.error("Error fetching modifiers: " + error, "Error");
-        },
-      });
-    });
-
-    // Handle Removal of Modifier Group
-    $(document).on("click", ".remove-group", function () {
-      var groupId = $(this).data("group");
-      $("#group-" + groupId).remove();
-
-      // Update dropdown after removal
-      var selectedValues = $("#EditModifierGroupDropdown").val() || [];
-      $("#EditModifierGroupDropdown").val(
-        selectedValues.filter((id) => id !== groupId)
-      );
-    });
-  }
-
   $(document).on("change", ".dropdown1, .dropdown2", function () {
     var groupId = $(this).data("group");
     updateDropdownConstraints(groupId);
   });
-
-  function updateDropdownConstraints(groupId) {
-    var minDropdown = $(`#group-${groupId} .dropdown1`);
-    var maxDropdown = $(`#group-${groupId} .dropdown2`);
-
-    var minValue = parseInt(minDropdown.val());
-    var maxValue = parseInt(maxDropdown.val());
-
-    if (minValue > maxValue) {
-      maxDropdown.val(minValue).trigger("change");
-    }
-
-    if (maxValue < minValue) {
-      minDropdown.val(maxValue).trigger("change");
-    }
-
-    // Disable invalid options and fade them
-    minDropdown.find("option").each(function () {
-      var val = parseInt($(this).val());
-      if (val > maxValue) {
-        $(this).prop("disabled", true).css("color", "#ccc"); // Fade out
-      } else {
-        $(this).prop("disabled", false).css("color", "black"); // Restore color
-      }
-    });
-
-    maxDropdown.find("option").each(function () {
-      var val = parseInt($(this).val());
-      if (val < minValue) {
-        $(this).prop("disabled", true).css("color", "#ccc"); // Fade out
-      } else {
-        $(this).prop("disabled", false).css("color", "black"); // Restore color
-      }
-    });
-  }
 
   // Edit Item POST
   $(document).on("submit", "#editItemForm", function (event) {
@@ -625,14 +300,19 @@ $(document).ready(function () {
       data: formData,
       processData: false,
       contentType: false,
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Menu item updated successfully!");
           let modal = document.getElementById("editItemModal");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
 
-          loadCategoryWiseItems(response.categoryId, currentPage, pageSize, "");
+          await loadCategoryWiseItems(
+            response.categoryId,
+            currentPage,
+            pageSize,
+            ""
+          );
         } else {
           if (response.message.includes("already exists")) {
             toastr.warning(response.message);
@@ -692,14 +372,14 @@ $(document).ready(function () {
         itemId: menuItemId,
       },
       dataType: "json",
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Category deleted successfully!");
           let modal = document.getElementById("deleteItemModal");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
 
-          loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
+          await loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
         } else {
           toastr.error("Error deleting category.");
         }
@@ -772,7 +452,7 @@ $(document).ready(function () {
       type: "POST",
       contentType: "application/json",
       data: JSON.stringify(Array.from(selectedItems)),
-      success: function (response) {
+      success: async function (response) {
         if (response.success) {
           toastr.success("Items deleted successfully.");
           let modal = document.getElementById("deleteConfirmationModalItems");
@@ -787,9 +467,9 @@ $(document).ready(function () {
             .prop("indeterminate", false);
           $(".item-checkbox").prop("checked", false);
 
-          loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
+          await loadCategoryWiseItems(selectedCategoryId, 1, 1, "");
           // Optional: Refetch IDs if needed
-          fetchAllItemIds();
+          await fetchAllItemIds();
         } else {
           toastr.error("Error: " + response.message);
         }
@@ -800,6 +480,7 @@ $(document).ready(function () {
     });
   });
 });
+// All Functions
 async function fetchAllItemIds() {
   let categoryId = selectedCategoryId || $("#categoryIdHidden").val();
 
@@ -836,4 +517,365 @@ async function applyMainCheckboxState() {
   $("#maincheckbox")
     .prop("checked", mainCheckboxState.isChecked)
     .prop("indeterminate", mainCheckboxState.isIndeterminate);
+}
+
+// === Update Dropdown Constraints ===
+function updateDropdownConstraints(groupId) {
+  var minDropdown = $(`#group-${groupId} .dropdown1`);
+  var maxDropdown = $(`#group-${groupId} .dropdown2`);
+
+  var minValue = parseInt(minDropdown.val());
+  var maxValue = parseInt(maxDropdown.val());
+
+  if (minValue > maxValue) {
+    maxDropdown.val(minValue).trigger("change");
+  }
+
+  if (maxValue < minValue) {
+    minDropdown.val(maxValue).trigger("change");
+  }
+
+  // Disable invalid options and fade them
+  minDropdown.find("option").each(function () {
+    var val = parseInt($(this).val());
+    if (val > maxValue) {
+      $(this).prop("disabled", true).css("color", "#ccc"); // Fade out
+    } else {
+      $(this).prop("disabled", false).css("color", "black"); // Restore color
+    }
+  });
+
+  maxDropdown.find("option").each(function () {
+    var val = parseInt($(this).val());
+    if (val < minValue) {
+      $(this).prop("disabled", true).css("color", "#ccc"); // Fade out
+    } else {
+      $(this).prop("disabled", false).css("color", "black"); // Restore color
+    }
+  });
+}
+
+// Fetch and prepopulated modifier groups & items
+function fetchModifierMappings(itemId) {
+  $.ajax({
+    url: "/Menu/GetModifierMappingsByItemId",
+    type: "GET",
+    data: {
+      id: itemId,
+    },
+    success: function (modifierMappings) {
+      if (modifierMappings && modifierMappings.length > 0) {
+        prepopulatedModifierGroups(modifierMappings);
+      } else {
+        toastr.warning("No modifier mappings found for this item.", "Warning");
+      }
+    },
+    error: function () {
+      toastr.error("Failed to fetch modifier mappings.", "Error");
+    },
+  });
+}
+
+// Prepopulated Modifier Groups
+function prepopulatedModifierGroups(modifierMappings) {
+  var modifierContainer = $("#modifierGroupContainer");
+  modifierContainer.empty();
+
+  let selectedGroupIds = [];
+
+  modifierMappings.forEach(function (mapping) {
+    selectedGroupIds.push(mapping.modifierGroupId);
+    addModifierGroupToUI(
+      mapping.modifierGroupId,
+      mapping.modifierGroupName,
+      mapping.minValue,
+      mapping.maxValue,
+      mapping.modifierItems
+    );
+  });
+
+  $("#EditModifierGroupDropdown").val(selectedGroupIds);
+}
+
+// Function to add modifier group to UI
+function addModifierGroupToUI(groupId, groupName, min, max, items = []) {
+  var modifierContainer = $("#modifierGroupContainer");
+
+  if ($("#group-" + groupId).length) {
+    return;
+  }
+
+  var groupHtml = `
+       <div id="group-${groupId}" class="modifier-group px-3 mt-1">
+           <div class="d-flex justify-content-between align-items-center mb-2">
+               <strong class="text-muted">${groupName}</strong>
+               <button class="remove-group border-0 bg-transparent" data-group="${groupId}">
+                   <i class="bi bi-trash" style="color:#808080;"></i>
+               </button>
+           </div>
+           <div class="row">
+               <div class="col-6 mb-2">
+                   <label class="small">Min</label>
+                   <select class="form-select form-select-sm dropdown1 rounded-pill" data-group="${groupId}">
+                       ${[...Array(6).keys()]
+                         .map(
+                           (i) =>
+                             `<option value="${i}" ${
+                               i == min ? "selected" : ""
+                             }>${i}</option>`
+                         )
+                         .join("")}
+                   </select>
+               </div>
+               <div class="col-6 mb-2">
+                   <label class="small">Max</label>
+                   <select class="form-select form-select-sm dropdown2 rounded-pill" data-group="${groupId}">
+                       ${[...Array(6).keys()]
+                         .map(
+                           (i) =>
+                             `<option value="${i}" ${
+                               i == max ? "selected" : ""
+                             }>${i}</option>`
+                         )
+                         .join("")}
+                   </select>
+               </div>
+           </div>
+           <ul>`;
+
+  items.forEach(function (item) {
+    groupHtml += `
+        <li>
+            <div class="d-flex justify-content-between align-items-center">
+            <span>${item.modifierItemName}</span>
+                <span>${item.Price || item.price || 0}</span>
+            </div>
+        </li>`;
+  });
+
+  groupHtml += `</ul></div>`;
+
+  modifierContainer.prepend(groupHtml);
+
+  let minDropdown = $(`#group-${groupId} .dropdown1`);
+  let maxDropdown = $(`#group-${groupId} .dropdown2`);
+
+  minDropdown.val(min).trigger("change");
+  maxDropdown.val(max).trigger("change");
+
+  updateDropdownConstraints(groupId);
+}
+
+// Bind Modifier Group Dropdown Events
+function bindModifierGroupEvent() {
+  $(document).on("change", "#EditModifierGroupDropdown", function () {
+    var selectedGroups = $(this).val() || [];
+
+    if (selectedGroups.length === 0) {
+      toastr.warning("No modifier groups selected.", "Warning");
+      return;
+    }
+
+    $.ajax({
+      url: "/Menu/GetModifiersByGroup",
+      type: "GET",
+      data: {
+        modifierGroupIds: selectedGroups,
+      },
+      traditional: true,
+      success: function (response) {
+        if (response && response.groups) {
+          response.groups.forEach(function (group) {
+            if ($("#group-" + group.groupId).length === 0) {
+              addModifierGroupToUI(
+                group.groupId,
+                group.groupName,
+                0,
+                0,
+                response.modifierItems.filter((m) =>
+                  m.groupId.some((id) => id === group.groupId)
+                )
+              );
+            }
+          });
+        }
+      },
+      error: function (_xhr, _status, error) {
+        toastr.error("Error fetching modifiers: " + error, "Error");
+      },
+    });
+  });
+
+  // Handle Removal of Modifier Group
+  $(document).on("click", ".remove-group", function () {
+    var groupId = $(this).data("group");
+    $("#group-" + groupId).remove();
+
+    // Update dropdown after removal
+    var selectedValues = $("#EditModifierGroupDropdown").val() || [];
+    $("#EditModifierGroupDropdown").val(
+      selectedValues.filter((id) => id !== groupId)
+    );
+  });
+}
+
+// bind modifier group change event for Add Item Modal
+function bindModifierGroupEventAdd() {
+  $(document).on("change", "#ModifierGroupDropdown", function () {
+    var selectedGroupIds = $(this).val() || [];
+    if (selectedGroupIds && selectedGroupIds.length > 0) {
+      $.ajax({
+        url: "/Menu/GetModifiersByGroup",
+        type: "GET",
+        traditional: true,
+        data: {
+          modifierGroupIds: selectedGroupIds,
+        },
+        success: function (response) {
+          updateModifierItems(response);
+        },
+        error: function (xhr, status, error) {
+          toastr.error("AJAX Error: " + error, "Error");
+        },
+      });
+    } else {
+      $("#ModifierItemsContainer").html(
+        "<p class='text-muted'>Select a Modifier Group to load items.</p>"
+      );
+    }
+  });
+}
+
+// Function to update modifier items based on selected groups
+function updateModifierItems(data) {
+  var container = $("#ModifierItemsContainer");
+  container.find(".no-modifier-message").remove();
+
+  if (data.groups && data.groups.length > 0) {
+    $.each(data.groups, function (_index, group) {
+      if ($(`#group-${group.groupId}`).length === 0) {
+        selectedModifiersData[group.groupId] = {
+          groupName: group.groupName,
+          modifiers: [],
+          dropdown1Value: 0,
+          dropdown2Value: 0,
+        };
+        selectedModifierGroupData.push({
+          modifierGroupId: group.groupId,
+          min: 0,
+          max: 0,
+        });
+
+        var groupHtml = `
+                 <div id="group-${group.groupId}" class="px-3 mt-3">
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                         <strong class="text-muted">${group.groupName}</strong>
+                         <button class="remove-group border-0 bg-transparent" data-group="${
+                           group.groupId
+                         }">
+                             <i class="bi bi-trash" style="color:#808080;"></i>
+                         </button>
+                     </div>
+                     <div>
+                         <div class="row">
+                             <div class="col-6 mb-2">
+                                 <select class="form-select form-select-sm modifier-quantity rounded-pill border dropdown1" data-group="${
+                                   group.groupId
+                                 }">
+                                     ${[...Array(6).keys()]
+                                       .map(
+                                         (i) =>
+                                           `<option value="${i}">${i}</option>`
+                                       )
+                                       .join("")}
+                                 </select>
+                             </div>
+                             <div class="col-6 mb-2">
+                                 <select class="form-select form-select-sm modifier-quantity rounded-pill border dropdown2" data-group="${
+                                   group.groupId
+                                 }">
+                                     ${[...Array(6).keys()]
+                                       .map(
+                                         (i) =>
+                                           `<option value="${i}">${i}</option>`
+                                       )
+                                       .join("")}
+                                 </select>
+                             </div>
+                         </div>
+                         <ul>`;
+
+        var groupModifiers = data.modifierItems.filter((m) =>
+          m.groupId.some((id) => id === group.groupId)
+        );
+        if (groupModifiers.length > 0) {
+          $.each(groupModifiers, function (idx, item) {
+            groupHtml += `
+                         <li>
+                             <div class="d-flex justify-content-between align-items-center">
+                                 <span>${item.modifierName}</span>
+                                 <span>${item.price}</span>
+                             </div>
+                         </li>`;
+
+            selectedModifiersData[group.groupId].modifiers.push({
+              modifierId: item.modifierId,
+              modifierName: item.modifierName,
+              price: item.price,
+            });
+          });
+        } else {
+          groupHtml += `<p class='text-muted'>No modifiers available for this group.</p>`;
+        }
+
+        groupHtml += `</ul></div></div>`;
+        container.prepend(groupHtml);
+      }
+    });
+  }
+
+  if ($("#ModifierItemsContainer").children().length === 0) {
+    container.append(
+      "<p class='text-muted no-modifier-message'>Select a Modifier Group to load items.</p>"
+    );
+  }
+}
+
+// Function to load items dynamically based on selected category
+async function loadCategoryWiseItems(
+  categoryId,
+  pageNumber = 1,
+  pageSize = 5,
+  searchQuery = ""
+) {
+  $.ajax({
+    url: "/Menu/LoadItemsByCategory",
+    type: "GET",
+    data: {
+      categoryId: categoryId,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      searchQuery: searchQuery,
+    },
+    success: async function (data) {
+      $("#items-container").html(data);
+      await updatePaginationControls();
+
+      $(".item-checkbox").each(function () {
+        const itemId = parseInt(
+          $(this).closest("tr").find("input[name='ItemId']").val()
+        );
+        $(this).prop("checked", selectedItems.has(itemId));
+      });
+      if (searchQuery !== "") {
+        $("#maincheckbox").addClass("d-none");
+      }
+
+      await applyMainCheckboxState();
+      await fetchAllItemIds();
+    },
+    error: function () {
+      toastr.error("An unexpected error occurred.");
+    },
+  });
 }
