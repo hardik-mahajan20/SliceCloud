@@ -1,6 +1,6 @@
 $(document).ready(function () {
   // Load category based on category click
-  $(document).on("click", ".category-btn", function () {
+  $(document).on("click", ".category-btn", async function () {
     $(".category-btn").removeClass("active-category");
     $(this).addClass("active-category");
     $("#itemSearch").val("");
@@ -8,8 +8,9 @@ $(document).ready(function () {
     selectedCategoryId = $(this).data("id");
 
     $("#categoryIdHidden").val(selectedCategoryId);
-    loadCategoryWiseItems(selectedCategoryId, 1, 5, "");
+    await loadCategoryWiseItems(selectedCategoryId, 1, 5, "");
   });
+
   // Add Category
   $(document).on("click", "#openAddCategoryModal", function () {
     $.ajax({
@@ -99,11 +100,15 @@ $(document).ready(function () {
           let modal = document.getElementById("editCategory");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
-          await loadAllCategories(function (firstCategoryId) {
+          await loadAllCategories(async function (firstCategoryId) {
             if (firstCategoryId) {
               selectedCategoryId = firstCategoryId;
               $("#categoryIdHidden").val(selectedCategoryId);
-              loadCategoryWiseItems(selectedCategoryId, currentPage, pageSize);
+              await loadCategoryWiseItems(
+                selectedCategoryId,
+                currentPage,
+                pageSize
+              );
             }
           });
         } else {
@@ -161,6 +166,7 @@ $(document).ready(function () {
           let modal = document.getElementById("deleteCategoryModal");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
+          await loadAllCategories();
         } else {
           toastr.error("Error deleting category.");
         }
@@ -173,7 +179,7 @@ $(document).ready(function () {
 });
 
 // Initialize sortable for categories
-function initializeCategorySortable() {
+async function initializeCategorySortable() {
   $("#categoryList").sortable({
     update: function (event, ui) {
       var sortedIDs = $(this)
@@ -194,6 +200,54 @@ function initializeCategorySortable() {
           toastr.error("An unexpected error occurred.", "Error");
         },
       });
+    },
+  });
+}
+
+// Load all categories and execute callback with the first category ID
+async function loadAllCategories(callback) {
+  $.ajax({
+    url: "/Menu/GetAllCategories",
+    type: "GET",
+    success: function (data) {
+      let categoryList = $(".list-group");
+      categoryList.empty();
+      let firstCategoryId = null;
+
+      if (Array.isArray(data) && data.length > 0) {
+        firstCategoryId = data[0].id || data[0].categoryId;
+
+        if (firstCategoryId) {
+          $.each(data, function (index, category) {
+            let activeClass = index === 0 ? "active-category" : "";
+            categoryList.append(`
+                    <li class="d-flex p-1 align-items-center justify-content-between category-btn btn ${activeClass}" data-id="${category.categoryId}">
+                                       <div class="d-flex align-items-center flex-wrap m-0 gap-2 ms-2">
+                        <div class="sort-handle">
+                            <i class="bi bi-grip-vertical"></i>
+                        </div>
+                        <div class="text-truncate category-name">${category.categoryName}</div>
+                    </div>
+                    <div class="d-flex">
+                        <button class="edit-category-btn btn p-0 m-1" data-id="${category.categoryId}">
+                            <i class="bi bi-pen"></i>
+                        </button>
+                        <button class="delete-category-btn btn p-0 m-1" data-id="${category.categoryId}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    </li>
+                `);
+          });
+
+          if (callback) callback(firstCategoryId);
+        }
+      } else {
+        toastr.warning("No categories found!", "Warning");
+      }
+    },
+    error: function () {
+      toastr.error("An unexpected error occurred.");
     },
   });
 }

@@ -1,0 +1,87 @@
+@using SliceCloud.Repository.Enums
+@using SliceCloud.Repository.ViewModels
+@model SliceCloud.Repository.ViewModels.PaginatedList<ModifierViewModel>
+<div class="modifier-group-modifier-wrapper">
+    <table class="table">
+        <tr class="tableheader">
+            <td class="align-middle">
+                <div class="d-flex ">
+                    <input class="form-check-input me-3" type="checkbox" id="maincheckboxModifier" />
+                    Name
+                </div>
+            </td>
+            <td class="ps-lg-0 ps-3 align-middle">Unit</td>
+            <td class="align-middle">Rate</td>
+            <td class="align-middle">Quantity</td>
+            <td class="align-middle">Action</td>
+        </tr>
+
+        <tbody>
+            @if (Model.Count == 0)
+            {
+                <tr>
+                    <td colspan="6" class="text-center border-bottom-0">
+                        <div class="d-flex flex-column">
+                            <i class="bi bi-emoji-frown fs-4"></i>
+                            <div>No records found</div>
+                        </div>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (ModifierViewModel modifierViewModel in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center ">
+                                <input class="form-check-input me-3 modifier-checkbox" type="checkbox"
+                                    name="modifier-checkbox-@modifierViewModel.ModifierId"
+                                    id="modifier-checkbox-@modifierViewModel.ModifierId" />
+                                <input type="hidden" name="ModifierId" value="@modifierViewModel.ModifierId">
+                                <span class="truncate-text" style="min-width: 190px;"
+                                    title="@modifierViewModel.ModifierName">@modifierViewModel.ModifierName</span>
+                            </div>
+                        </td>
+                        <td>Pcs</td>
+                        <td>@modifierViewModel.Rate</td>
+                        <td>@modifierViewModel.Quantity</td>
+                        <td>
+                            <div class="d-flex justify-content-center align-items-center ">
+                                <button class="btn edit-modifier-btn" data-id="@modifierViewModel.ModifierId">
+                                    <i class="bi bi-pen"></i>
+                                </button>
+                                <button class="btn delete-modifier-btn " data-id="@modifierViewModel.ModifierId">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+@if (Model.Count != 0)
+{
+    <div class="pagination-container d-flex flex-wrap flex-md-nowrap">
+        <span>Showing @ViewBag.FromRec - @ViewBag.ToRec of @ViewBag.TotalItems</span>
+        @{
+            int[] pageSizes = { 5, 10, 20 };
+        }
+        <select id="pageSizeDropdownModifier" class="form-select">
+            @foreach (var size in pageSizes)
+            {
+                <option value="@size" selected="@(ViewBag.PageSize == size ? "selected" : null)">@size</option>
+            }
+        </select>
+        <input type="hidden" id="totalPagesModifier" value="@ViewBag.TotalPages" />
+        <button id="prevPageBtnModifier">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <button id="nextPageBtnModifier">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+}

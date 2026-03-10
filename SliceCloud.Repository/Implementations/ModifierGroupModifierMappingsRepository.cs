@@ -16,4 +16,23 @@ public class ModifierGroupModifierMappingsRepository(SliceCloudContext sliceClou
 
     #endregion
 
+    #region AddModifierGroupMappings
+
+    public async Task AddModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings)
+    {
+        await _sliceCloudContext.ModifierGroupModifierMappings.AddRangeAsync(modifierGroupModifierMappings);
+        await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
+
+    #region RemoveModifierGroupMappings
+
+    public async Task RemoveModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings)
+    {
+        _sliceCloudContext.ModifierGroupModifierMappings.RemoveRange(modifierGroupModifierMappings);
+        await _sliceCloudContext.SaveChangesAsync();
+    }
+
+    #endregion
 }
