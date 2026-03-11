@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="~/css/customers.css" />
     <link rel="stylesheet" href="~/css/customers-table-partial.css" />
 }
+
 <div class="container-fluid p-4">
     <div class="d-flex flex-column flex-xl-row align-item-center justify-content-between mb-3">
         <h1 class="custom-body-text-color d-flex align-items-start mb-2">Customers</h1>
@@ -13,7 +14,7 @@
             <div class="d-flex flex-column flex-sm-row align-item-center justify-content-end gap-1 ">
                 <div class="d-flex align-items-center border rounded px-2 bg-white custom-input-size mb-1">
                     <input class="form-control border-0 shadow-none p-0" type="text" placeholder="Search" id="search"
-                        style="width: 100%; font-size: 14px; height: 100%;">
+                           style="width: 100%; font-size: 14px; height: 100%;">
                     <i class="bi bi-search"></i>
                 </div>
                 <div class="form-floating custom-input-size mb-1">
@@ -41,14 +42,14 @@
                     </div>
                     <button class="btn btn-primary" style="width: 100px;">Search</button>
                     <a class="btn btn-outline-primary d-flex align-items-center justify-content-center p-0"
-                        style="width: 100px;" id="clear">Clear</a>
+                       style="width: 100px;" id="clear">Clear</a>
                 </div>
                 <div class="mb-1">
                     <button
                         class="btn btn-primary text-white d-flex align-items-center justify-content-center custom-input-size "
                         style="width: 100px;" id="exportBtn">
                         <div class="d-flex align-items-center justify-content-center p-1 gap-1 "><i
-                                class="bi bi-file-earmark-arrow-up"></i>
+                            class="bi bi-file-earmark-arrow-up"></i>
                             Export
                         </div>
                     </button>
@@ -62,7 +63,7 @@
 </div>
 
 <div class="modal fade customer-history-modal" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel"
-    aria-hidden="true">
+     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg " id="customDateModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -90,7 +91,7 @@
 </div>
 
 <div class="modal fade" id="customerHistoryModal" tabindex="-1" aria-labelledby="customerHistoryModalLabel"
-    aria-hidden="true">
+     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -131,7 +132,7 @@
                     </div>
 
                     <div class="customer-history-table">
-                        <table class="order-table">
+                        <table class="customer-history-order-table">
                             <thead>
                                 <tr>
                                     <th>Order Date</th>
@@ -150,6 +151,7 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     <script src="~/js/customers.js"></script>
 }

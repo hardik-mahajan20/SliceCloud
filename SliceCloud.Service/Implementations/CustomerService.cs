@@ -16,8 +16,37 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     #region GetPaginatedCustomers
 
-    public async Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, DateTime? startDate, DateTime? endDate, int page, int pageSize, string sortColumn, string sortDirection)
+    public async Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, string timeRange, DateTime? startDate, DateTime? endDate, string sortOrder = "asc", string sortColumn = "CustomerName", int page = 1, int pageSize = 5)
     {
+
+        if (!startDate.HasValue || !endDate.HasValue)
+        {
+            DateTime today = DateTime.Today;
+
+            switch (timeRange)
+            {
+                case "7":
+                    startDate = today.AddDays(-7);
+                    endDate = today;
+                    break;
+                case "30":
+                    startDate = today.AddDays(-30);
+                    endDate = today;
+                    break;
+                case "month":
+                    startDate = new DateTime(today.Year, today.Month, 1);
+                    endDate = today;
+                    break;
+                case "year":
+                    startDate = new DateTime(today.Year, 1, 1);
+                    endDate = today;
+                    break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(sortColumn)) sortColumn = "CustomerName";
+        if (string.IsNullOrEmpty(sortOrder)) sortOrder = "asc";
+
         IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQueryable();
 
         DateTime? startUtc = startDate?.ToUniversalTime();
@@ -49,17 +78,17 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
         query = sortColumn switch
         {
             CustomerConstants.CREATE_DATE
-              => sortDirection == GeneralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.CreatedAt)
                   : query.OrderByDescending(o => o.CreatedAt),
             CustomerConstants.TOTAL_ORDER
-               => sortDirection == GeneralConstants.ASCENDING
+               => sortOrder == GeneralConstants.ASCENDING
                    ? query.OrderBy(o => o.TotalOrder).ThenBy(o => o.CustomerId)
                    : query
                      .OrderByDescending(o => o.TotalOrder)
                      .ThenByDescending(o => o.CustomerId),
             CustomerConstants.CUSTOMER_NAME
-              => sortDirection == GeneralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.CustomerName)
                   : query.OrderByDescending(o => o.CustomerName),
             _ => query.OrderByDescending(o => o.CreatedAt)
@@ -84,27 +113,31 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     #region GetCustomerHistory
 
-    public async Task<CustomerHistoryViewModel> GetCustomerHistoryAsync(int customerId)
+    public async Task<object> GetCustomerHistoryAsync(int customerId)
     {
         Customer? customer = await _customerRepository.GetCustomerWithOrdersAsync(customerId);
         if (customer == null) return new CustomerHistoryViewModel();
 
-        return new CustomerHistoryViewModel
+        return new
         {
-            Name = customer.CustomerName,
-            PhoneNumber = customer.PhoneNo,
-            MaxOrder = customer.Orders.Count != 0 ? customer.Orders.Max(o => o.TotalAmount) : 0,
-            AvgBill = customer.Orders.Any() ? Math.Round(customer.Orders.Average(o => o.TotalAmount), 2) : 0,
-            ComingSince = customer.CreatedAt ?? DateTime.Now,
-            Visits = customer.Orders.Count,
-            Orders = customer.Orders.Select(o => new OrderViewModel
+            success = true,
+            data = new
             {
-                OrderDate = o.OrderDate ?? DateTime.Now,
-                OrderType = o.OrderType ?? GeneralConstants.NA,
-                PaymentMode = o.PaymentMode ?? GeneralConstants.NA,
-                ItemsCount = o.OrderedItems.Count,
-                TotalAmount = o.TotalAmount
-            }).ToList()
+                name = customer.CustomerName,
+                phoneNumber = customer.PhoneNo,
+                maxOrder = customer.Orders.Count != 0 ? customer.Orders.Max(o => o.TotalAmount) : 0,
+                avgBill = customer.Orders.Count != 0 ? Math.Round(customer.Orders.Average(o => o.TotalAmount), 2) : 0,
+                comingSince = customer.CreatedAt ?? DateTime.Now,
+                visits = customer.Orders.Count,
+                orders = customer.Orders.Select(o => new OrderViewModel
+                {
+                    OrderDate = o.OrderDate ?? DateTime.Now,
+                    OrderType = o.OrderType ?? GeneralConstants.NA,
+                    PaymentMode = o.PaymentMode ?? GeneralConstants.NA,
+                    ItemsCount = o.OrderedItems.Count,
+                    TotalAmount = o.TotalAmount
+                }).ToList()
+            }
         };
     }
 

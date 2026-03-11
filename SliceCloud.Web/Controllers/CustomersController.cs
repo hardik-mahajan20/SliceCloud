@@ -41,46 +41,16 @@ public class CustomersController(ICustomerService customerService, IWebHostEnvir
     {
         try
         {
-            if (!startDate.HasValue || !endDate.HasValue)
-            {
-                DateTime today = DateTime.Today;
-
-                switch (timeRange)
-                {
-                    case "7":
-                        startDate = today.AddDays(-7);
-                        endDate = today;
-                        break;
-                    case "30":
-                        startDate = today.AddDays(-30);
-                        endDate = today;
-                        break;
-                    case "month":
-                        startDate = new DateTime(today.Year, today.Month, 1);
-                        endDate = today;
-                        break;
-                    case "year":
-                        startDate = new DateTime(today.Year, 1, 1);
-                        endDate = today;
-                        break;
-                }
-            }
-
-            if (string.IsNullOrEmpty(sortColumn)) sortColumn = "CustomerName";
-            if (string.IsNullOrEmpty(sortOrder)) sortOrder = "asc";
-
             ViewData["SortColumn"] = sortColumn;
             ViewData["SortDirection"] = sortOrder;
 
-            var customers = await _customerService.GetPaginatedCustomersAsync(search, status, startDate, endDate, page, pageSize, sortColumn, sortOrder);
+            PaginatedList<CustomerViewModel>? customerViewModels = await _customerService.GetPaginatedCustomersAsync(search, status, timeRange, startDate, endDate, sortOrder, sortColumn, page, pageSize);
 
             ViewBag.PageSize = pageSize;
-            ViewBag.TotalItems = customers.TotalItems;
+            ViewBag.TotalItems = customerViewModels.TotalItems;
             ViewBag.Page = page;
-            ViewBag.TotalPages = customers.TotalPages;
-            // ViewBag.FromRec = ((page - 1) * pageSize) + 1;
-            // ViewBag.ToRec = Math.Min(page * pageSize, orders.TotalItems);
-            if (customers.TotalItems == 0)
+            ViewBag.TotalPages = customerViewModels.TotalPages;
+            if (customerViewModels.TotalItems == 0)
             {
                 ViewBag.FromRec = 0;
                 ViewBag.ToRec = 0;
@@ -88,9 +58,9 @@ public class CustomersController(ICustomerService customerService, IWebHostEnvir
             else
             {
                 ViewBag.FromRec = ((page - 1) * pageSize) + 1;
-                ViewBag.ToRec = Math.Min(page * pageSize, customers.TotalItems);
+                ViewBag.ToRec = Math.Min(page * pageSize, customerViewModels.TotalItems);
             }
-            return PartialView("_CustomersTablePartialView", customers);
+            return PartialView("_CustomersTablePartialView", customerViewModels);
         }
         catch (Exception)
         {
@@ -103,40 +73,20 @@ public class CustomersController(ICustomerService customerService, IWebHostEnvir
 
     #region  GetCustomerHistory
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public async Task<IActionResult> GetCustomerHistory(int id)
     {
         try
         {
-            CustomerHistoryViewModel customerHistoryViewModel = await _customerService.GetCustomerHistoryAsync(id);
+            object? customer = await _customerService.GetCustomerHistoryAsync(id);
 
-            if (customerHistoryViewModel == null)
+            if (customer == null)
             {
                 return Json(new { success = false });
             }
 
-            var result = new
-            {
-                success = true,
-                data = new
-                {
-                    name = customerHistoryViewModel.Name,
-                    phoneNumber = customerHistoryViewModel.PhoneNumber,
-                    maxOrder = customerHistoryViewModel.MaxOrder,
-                    avgBill = customerHistoryViewModel.AvgBill,
-                    comingSince = customerHistoryViewModel.ComingSince.ToString("yyyy-MM-dd HH:mm:ss"),
-                    visits = customerHistoryViewModel.Visits,
-                    orders = customerHistoryViewModel.Orders.Select(o => new
-                    {
-                        orderDate = o.OrderDate.ToString("yyyy-MM-dd"),
-                        PaymentMode = o.PaymentMode,
-                        items = o.ItemsCount,
-                        amount = o.TotalAmount,
-                        orderType = o.OrderType
-                    }).ToList()
-                }
-            };
-            return Json(result);
+            return Json(customer);
         }
         catch (Exception)
         {
