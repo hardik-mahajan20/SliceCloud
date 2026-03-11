@@ -19,9 +19,9 @@ public interface IModifierService
     Task<List<ModifierGroup>> GetAllModifierGroupsAsync();
 
     /// <summary>
-    /// Retrieves a paginated list of modifiers by modifiergroup ID with an optional search query.
+    /// Retrieves a paginated list of modifiers by modifierGroup ID with an optional search query.
     /// </summary>
-    /// <param name="modifierGroupId">The ID of the modifierGruop to retrieve modifiers for.</param>
+    /// <param name="modifierGroupId">The ID of the modifierGroup to retrieve modifiers for.</param>
     /// <param name="pageNumber">The page number for pagination.</param>
     /// <param name="pageSize">The number of modifiers per page.</param>
     /// <param name="searchQuery">An optional search query to filter modifiers.</param>

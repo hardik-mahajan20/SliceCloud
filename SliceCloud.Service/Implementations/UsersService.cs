@@ -26,7 +26,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
     public async Task<PaginatedList<User>> GetAllUsersAsync(int pageNumber, int pageSize, string query, string sortOrder, string sortColumn, string search)
     {
-        IQueryable<User>? usersQuery = _usersRepository.GetAllUsersAsQuearyable().Where(u => u.IsDeleted == false);
+        IQueryable<User>? usersQuery = _usersRepository.GetAllUsersAsQueryable().Where(u => u.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(search))
         {
@@ -78,19 +78,19 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
     {
         Dictionary<string, string> errors = [];
 
-        bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == createUserViewModel.Email);
+        bool isEmailExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.Email == createUserViewModel.Email);
         if (isEmailExists)
         {
             errors.Add(nameof(createUserViewModel.Email), ErrorConstants.EMAIL_ALREADY_EXISTS);
         }
 
-        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == createUserViewModel.UserName);
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.UserName == createUserViewModel.UserName);
         if (isUsernameExists)
         {
             errors.Add(nameof(createUserViewModel.UserName), ErrorConstants.USERNAME_ALREADY_EXISTS);
         }
 
-        bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == createUserViewModel.Phone);
+        bool isPhoneExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.PhoneNumber == createUserViewModel.Phone);
 
         if (isPhoneExists)
         {
@@ -108,19 +108,19 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
     {
         Dictionary<string, string> errors = [];
 
-        bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == updateUserViewModel.Email && u.UserId == updateUserViewModel.Id);
+        bool isEmailExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.Email == updateUserViewModel.Email && u.UserId == updateUserViewModel.Id);
         if (isEmailExists)
         {
             errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.EMAIL_ALREADY_EXISTS);
         }
 
-        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == updateUserViewModel.UserName && u.UserId == updateUserViewModel.Id);
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.UserName == updateUserViewModel.UserName && u.UserId == updateUserViewModel.Id);
         if (isUsernameExists)
         {
             errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.USERNAME_ALREADY_EXISTS);
         }
 
-        bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == updateUserViewModel.PhoneNumber && u.UserId == updateUserViewModel.Id);
+        bool isPhoneExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.PhoneNumber == updateUserViewModel.PhoneNumber && u.UserId == updateUserViewModel.Id);
         if (isPhoneExists)
         {
             errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.PHONE_NUMBER_ALREADY_EXISTS);

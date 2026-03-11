@@ -2,10 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.ViewModels;
-using SliceCloud.Service.Implementations;
 using SliceCloud.Service.Interfaces;
 
-namespace SliceCloud.Service.Attributes;
+namespace SliceCloud.Service.Implementations;
 
 public class TableService(ITableRepository tableRepository, ICurrentUserService currentUserService) : ITableService
 {

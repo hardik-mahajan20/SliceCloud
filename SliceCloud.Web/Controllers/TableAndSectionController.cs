@@ -480,11 +480,11 @@ public class TableAndSectionController(ISectionService sectionService, ITableSer
                 });
             }
 
-            bool isTableUpdaed = await _tableService.UpdateTableAsync(tableViewModel);
+            bool isTableUpdated = await _tableService.UpdateTableAsync(tableViewModel);
 
             return Json(new
             {
-                success = isTableUpdaed
+                success = isTableUpdated
             });
         }
         catch (Exception ex)

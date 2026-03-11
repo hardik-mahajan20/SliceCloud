@@ -90,15 +90,15 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task<bool> IsDuplicateTaxNameAsync(string taxName, int? taxId = null)
     {
-        IQueryable<Taxis>? quary = _taxesFeesRepository.GetAllTaxisAsQueryable();
+        IQueryable<Taxis>? query = _taxesFeesRepository.GetAllTaxisAsQueryable();
 
         if (taxId is not null)
         {
-            return await quary.AnyAsync(t => t.TaxName == taxName && t.TaxId != taxId);
+            return await query.AnyAsync(t => t.TaxName == taxName && t.TaxId != taxId);
         }
         else
         {
-            return await quary.AnyAsync(t => t.TaxName == taxName);
+            return await query.AnyAsync(t => t.TaxName == taxName);
         }
     }
 
@@ -209,9 +209,9 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task<List<TaxViewModel>> GetEnabledTaxesAsync()
     {
-        List<Taxis>? quary = await _taxesFeesRepository.GetAllTaxisAsQueryable().Where(t => !t.IsDeleted ?? false).ToListAsync();
+        List<Taxis>? query = await _taxesFeesRepository.GetAllTaxisAsQueryable().Where(t => !t.IsDeleted ?? false).ToListAsync();
 
-        return quary
+        return query
             .Where(t => t.IsEnabled == true)
             .Select(t => new TaxViewModel
             {
