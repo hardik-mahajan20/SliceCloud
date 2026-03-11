@@ -1,13 +1,9 @@
-using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Mvc;
 using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Interfaces;
 using SliceCloud.Service.Utils;
-
-using System.Text;
-using iTextSharp.text;
 using SliceCloud.Repository.Models;
 
 namespace SliceCloud.Web.Controllers;

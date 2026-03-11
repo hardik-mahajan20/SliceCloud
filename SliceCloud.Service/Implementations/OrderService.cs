@@ -201,6 +201,8 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
 
     #endregion
 
+    #region ExportOrdersToExcel
+
     public async Task<FileResult> ExportOrdersToExcel(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath)
     {
         List<Order>? orders = await GetFilteredCustomersAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
@@ -402,6 +404,8 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         };
     }
 
+    #endregion
+
     #region GetOrderInvoice
 
     public async Task<OrderInvoiceViewModel?> GetOrderInvoiceAsync(int orderId)
@@ -501,27 +505,17 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
 
     #endregion
 
-    #region Helpers
-
-    private string CalculateOrderDuration(DateTime? orderDate, DateTime? modifiedOn)
-    {
-        if (orderDate.HasValue && modifiedOn.HasValue)
-        {
-            TimeSpan duration = modifiedOn.Value - orderDate.Value;
-            int hours = (int)duration.TotalHours;
-            int minutes = duration.Minutes;
-            return $"{hours} Hours {minutes} Minutes";
-        }
-        return OrderConstants.ZERO_TIME;
-    }
-    #endregion
-
     #region ExportOrderPdf
 
     public async Task<byte[]> ExportOrderPdf(string webRootPath, int orderId)
     {
 
         OrderInvoiceViewModel? invoiceModel = await GetOrderInvoiceAsync(orderId);
+
+        if (invoiceModel is null)
+        {
+            return Array.Empty<byte>();
+        }
 
         using MemoryStream memoryStream = new();
         Document document = new Document(PageSize.A4, 30, 30, 40, 40);
@@ -718,6 +712,18 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
 
     #region  Helpers
 
+    private string CalculateOrderDuration(DateTime? orderDate, DateTime? modifiedOn)
+    {
+        if (orderDate.HasValue && modifiedOn.HasValue)
+        {
+            TimeSpan duration = modifiedOn.Value - orderDate.Value;
+            int hours = (int)duration.TotalHours;
+            int minutes = duration.Minutes;
+            return $"{hours} Hours {minutes} Minutes";
+        }
+        return OrderConstants.ZERO_TIME;
+    }
+
     private static PdfPCell GetCell(string text, Font font, int alignment, bool bold = false)
     {
         PdfPCell? cell = new PdfPCell(new Phrase(text, font))
@@ -742,6 +748,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         };
         return cell;
     }
+
     private static PdfPCell GetSummaryLabelCell(string text, Font font, bool bold = false)
     {
         PdfPCell? cell = new PdfPCell(new Phrase(text, font))
@@ -754,6 +761,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         if (bold) cell.Phrase.Font.Color = new BaseColor(14, 103, 167);
         return cell;
     }
+
     private static PdfPCell GetSummaryValueCell(string text, Font font, bool bold = false)
     {
         PdfPCell? cell = new PdfPCell(new Phrase(text, font))
@@ -766,6 +774,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         if (bold) cell.Phrase.Font.Color = new BaseColor(14, 103, 167);
         return cell;
     }
+
     private static PdfPCell GetBorderedCell(string text, Font font, int alignment)
     {
         PdfPCell? cell = new PdfPCell(new Phrase(text, font))
@@ -778,5 +787,6 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         };
         return cell;
     }
+
     #endregion
 }
