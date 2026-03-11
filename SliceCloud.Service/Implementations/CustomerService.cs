@@ -18,7 +18,7 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     public async Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, DateTime? startDate, DateTime? endDate, int page, int pageSize, string sortColumn, string sortDirection)
     {
-        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQuearyable();
+        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQueryable();
 
         DateTime? startUtc = startDate?.ToUniversalTime();
         DateTime? endUtc = endDate?.ToUniversalTime();
@@ -114,7 +114,7 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     public async Task<IEnumerable<Customer>> GetFilteredOrders(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
     {
-        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQuearyable();
+        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQueryable();
 
         DateTime? startUtc = startDate?.ToUniversalTime();
 

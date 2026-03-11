@@ -5,8 +5,8 @@ namespace SliceCloud.Repository.Interfaces;
 public interface ICityRepository
 {
     /// <summary>
-    /// Retrieves all cities as quearyable.
+    /// Retrieves all cities as queryable.
     /// </summary>
-    /// <returns>All cities as quearyable.</returns>
-    IQueryable<City> GetAllCitiesAsQuearyable();
+    /// <returns>All cities as queryable.</returns>
+    IQueryable<City> GetAllCitiesAsQueryable();
 }

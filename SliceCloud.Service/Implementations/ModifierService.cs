@@ -96,7 +96,7 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
             CreatedBy = _currentUserService.UserId
         };
 
-        int newModifieId = await _modifierRepository.AddModifierAsync(menuItem);
+        int newModifiedId = await _modifierRepository.AddModifierAsync(menuItem);
 
         if (modifierSectionViewModel.ModifierGroupIds != null && modifierSectionViewModel.ModifierGroupIds.Any())
         {
@@ -113,7 +113,7 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
 
             await _modifierGroupModifierMappingsRepository.AddModifierGroupMappingsAsync(modifierGroupMappings);
         }
-        return newModifieId;
+        return newModifiedId;
     }
 
     public async Task<ModifierViewModel> GetModifierByIdAsync(int modifierId)
@@ -159,7 +159,7 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
             ModifiedBy = _currentUserService.UserId
         };
 
-        int modifieId = await _modifierRepository.UpdateModifierAsync(modifier);
+        int modifiedId = await _modifierRepository.UpdateModifierAsync(modifier);
 
         if (modifierSectionViewModel.ModifierGroupIds != null && modifierSectionViewModel.ModifierGroupIds.Any())
         {
@@ -192,7 +192,7 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
             if (mappingsToAdd.Any())
                 await _modifierGroupModifierMappingsRepository.AddModifierGroupMappingsAsync(mappingsToAdd);
         }
-        return modifieId;
+        return modifiedId;
     }
 
     public async Task<bool> DeleteModifierAsync(int modifierId)

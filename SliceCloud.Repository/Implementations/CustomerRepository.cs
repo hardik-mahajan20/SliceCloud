@@ -8,9 +8,9 @@ public class CustomerRepository(SliceCloudContext sliceCloudContext) : ICustomer
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllCustomersAsQuearyable
+    #region GetAllCustomersAsQueryable
 
-    public IQueryable<Customer> GetAllCustomersAsQuearyable()
+    public IQueryable<Customer> GetAllCustomersAsQueryable()
     {
         return _sliceCloudContext.Customers.AsQueryable();
     }

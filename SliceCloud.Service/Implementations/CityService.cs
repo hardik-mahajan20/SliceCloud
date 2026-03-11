@@ -13,7 +13,7 @@ public class CityService(ICityRepository cityRepository) : ICityService
 
     public async Task<List<City>> GetCitiesByStateIdAsync(int stateId)
     {
-        IQueryable<City>? cities = _cityRepository.GetAllCitiesAsQuearyable();
+        IQueryable<City>? cities = _cityRepository.GetAllCitiesAsQueryable();
 
         List<City>? filteredCities = await cities.Where(c => c.StateId == stateId)
                                                     .AsNoTracking()

@@ -5,9 +5,9 @@ namespace SliceCloud.Repository.Interfaces;
 public interface ICategoryRepository
 {
     /// <summary>
-    /// Retrieves all categories as quearyable.
+    /// Retrieves all categories as queryable.
     /// </summary>
-    /// <returns>All categories as quearyable.</returns>
+    /// <returns>All categories as queryable.</returns>
     IQueryable<Category> GetAllCategoriesAsQueryable();
 
     /// <summary>

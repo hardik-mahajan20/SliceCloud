@@ -19,9 +19,9 @@ public interface IItemModifierGroupMapRepository
     Task<List<ItemModifierGroupMap>> GetMappingByItemIdAsync(int itemId);
 
     /// <summary>
-    /// Retrieves all itemModifierGroupMaps as quearyable.
+    /// Retrieves all itemModifierGroupMaps as queryable.
     /// </summary>
-    /// <returns>All itemModifierGroupMaps as quearyable.</returns>
+    /// <returns>All itemModifierGroupMaps as queryable.</returns>
     IQueryable<ItemModifierGroupMap> GetAllItemModifierGroupMapsAsQueryable();
 
     /// <summary>

@@ -8,9 +8,9 @@ public class UsersRepository(SliceCloudContext sliceCloudContext) : IUsersReposi
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllUsersAsQuearyable
+    #region GetAllUsersAsQueryable
 
-    public IQueryable<User> GetAllUsersAsQuearyable()
+    public IQueryable<User> GetAllUsersAsQueryable()
     {
         return _sliceCloudContext.Users.AsQueryable();
     }

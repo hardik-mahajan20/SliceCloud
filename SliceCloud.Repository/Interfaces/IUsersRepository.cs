@@ -8,7 +8,7 @@ public interface IUsersRepository
     /// Retrieves all users as queryable.
     /// </summary>
     /// <returns>All users as queryable.</returns>
-    IQueryable<User> GetAllUsersAsQuearyable();
+    IQueryable<User> GetAllUsersAsQueryable();
 
     /// <summary>
     /// Retrieves a user by their ID asynchronously.
