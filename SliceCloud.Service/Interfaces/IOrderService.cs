@@ -51,4 +51,12 @@ public interface IOrderService
     /// <param name="webRootPath">The root path of the web application for file storage.</param>
     /// <returns>A task that returns a file result containing the exported Excel file.</returns>
     Task<FileResult> ExportOrdersToExcel(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath);
+
+    /// <summary>
+    /// Exports order pdf as array of byte.
+    /// </summary>
+    /// <param name="orderId">The id of the order to download the order for.</param>
+    /// <param name="webRootPath">The root path of the web application for file storage.</param>
+    /// <returns>A task that returns a array of byte.</returns>
+    Task<byte[]> ExportOrderPdf(string webRootPath, int orderId);
 }
