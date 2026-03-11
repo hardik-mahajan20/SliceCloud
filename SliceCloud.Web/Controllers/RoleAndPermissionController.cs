@@ -11,10 +11,11 @@ namespace SliceCloud.Web.Controllers;
 /// <summary>
 /// This controller is referenced for the role and permissions module related end points.
 /// </summary>
-public class RoleAndPermissionController(IRolesService rolesService, IPermissionService permissionService) : Controller
+public class RoleAndPermissionController(IRolesService rolesService, IPermissionService permissionService, ICurrentUserService currentUserService) : Controller
 {
     private readonly IRolesService _rolesService = rolesService;
     private readonly IPermissionService _permissionService = permissionService;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
 
     #region RoleAndPermission GET
 
@@ -49,7 +50,7 @@ public class RoleAndPermissionController(IRolesService rolesService, IPermission
     {
         try
         {
-            string? userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            string? userRole = _currentUserService.UserRole;
 
             bool HasRolesPermissionAddEdit = false;
             bool HasRolesPermissionDelete = false;
@@ -62,7 +63,6 @@ public class RoleAndPermissionController(IRolesService rolesService, IPermission
                 HasRolesPermissionDelete =
                     await _permissionService.RoleHasPermissionAsync(userRole, "CanDelete", 2);
             }
-
 
             ViewBag.UserRole = userRole;
             ViewBag.CanAddEdit = HasRolesPermissionAddEdit;

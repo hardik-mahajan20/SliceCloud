@@ -3,9 +3,11 @@
 @{
     ViewData[index: "Title"] = "Permissions";
 }
+
 @section Styles {
     <link rel="stylesheet" href="~/css/permissions.css" />
 }
+
 <div class="d-flex flex-column w-100 p-4 permissions-table-wrapper">
     <div class="d-flex justify-content-between w-100 mb-3 d-sm-row d-column flex-wrap flex-sm-nowrap ">
         <h1 class="custom-body-text-color">Permissions</h1>
@@ -89,6 +91,7 @@
     <input type="hidden" id="currentUserRole" value="@Model.UserRole" />
     <input type="hidden" id="targetRole" value="@Model.RoleName" />
 </div>
+
 @section Scripts {
     <script src="~/js/permissions.js"></script>
 }

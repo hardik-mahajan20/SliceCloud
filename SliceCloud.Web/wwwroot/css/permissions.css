@@ -33,16 +33,6 @@
   width: 20%;
 }
 
-.truncate-text {
-  text-align: start;
-  display: inline-block;
-  max-width: 190px !important;
-  min-width: 190px !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .switch-box {
   cursor: pointer;
   width: 60px !important;
