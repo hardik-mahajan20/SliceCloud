@@ -146,11 +146,12 @@ namespace SliceCloud.Service.Attributes
                 { SideBarOptionConstants.ORDERS, 6 },
                 { SideBarOptionConstants.CUSTOMERS, 7 },
                 { SideBarOptionConstants.DASHBOARD, 8 },
-                { SideBarOptionConstants.ORDER_APP, 9 },
-                { SideBarOptionConstants.ORDER_APP_KOT, 10 },
-                { SideBarOptionConstants.ORDER_APP_MENU, 11 },
-                { SideBarOptionConstants.ORDER_APP_WAITING_LIST, 12 },
-                { SideBarOptionConstants.ORDER_APP_TABLE_VIEW, 13 },
+                { SideBarOptionConstants.MY_PROFILE, 9 },
+                { SideBarOptionConstants.ORDER_APP, 10 },
+                { SideBarOptionConstants.ORDER_APP_KOT, 11 },
+                { SideBarOptionConstants.ORDER_APP_MENU, 12 },
+                { SideBarOptionConstants.ORDER_APP_WAITING_LIST, 13 },
+                { SideBarOptionConstants.ORDER_APP_TABLE_VIEW, 14 },
             };
 
             return moduleMapping.TryGetValue(controllerName, out int moduleId) ? moduleId : 0;

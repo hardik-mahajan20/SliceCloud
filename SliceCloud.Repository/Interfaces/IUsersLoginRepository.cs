@@ -11,11 +11,10 @@ public interface IUsersLoginRepository
     IQueryable<UsersLogin> GetUsersLoginAsQueryable();
 
     /// <summary>
-    /// Retrieves user's login details from its id asynchronously.
+    /// Retrieves a user's login details with user as queryable.
     /// </summary>
-    /// <param name="userId">The user login id.</param>
-    /// <returns>>A task that returns the users's login details asynchronously.</returns>
-    Task<UsersLogin?> GetUsersLoginByIdAsync(int userId);
+    /// <returns>A task that returns the users's login details with user as queryable if found .</returns>
+    IQueryable<UsersLogin> GetUsersLoginWithUserAsQueryable();
 
     /// <summary>
     /// Creates a new user login asynchronously.
@@ -30,10 +29,4 @@ public interface IUsersLoginRepository
     /// <param name="usersLogin">The user login details to update.</param>
     /// <returns>A task that returns true if user updated.</returns>
     Task<bool> UpdateUsersLoginAsync(UsersLogin usersLogin);
-
-    /// <summary>
-    /// Retrieves a user's login details with user as queryable.
-    /// </summary>
-    /// <returns>A task that returns the users's login details with user as queryable if found .</returns>
-    IQueryable<UsersLogin> GetUsersLoginWithUserAsQueryable();
 }

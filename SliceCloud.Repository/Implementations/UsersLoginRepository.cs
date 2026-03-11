@@ -17,11 +17,11 @@ public class UsersLoginRepository(SliceCloudContext sliceCloudContext) : IUsersL
 
     #endregion
 
-    #region GetUsersLoginByIdAsync
+    #region GetUsersLoginWithUserAsQueryable
 
-    public async Task<UsersLogin?> GetUsersLoginByIdAsync(int userId)
+    public IQueryable<UsersLogin> GetUsersLoginWithUserAsQueryable()
     {
-        return await _sliceCloudContext.UsersLogins.FindAsync(userId);
+        return _sliceCloudContext.UsersLogins.Include(u => u.User).AsQueryable();
     }
 
     #endregion
@@ -45,14 +45,4 @@ public class UsersLoginRepository(SliceCloudContext sliceCloudContext) : IUsersL
     }
 
     #endregion
-
-    #region GetUsersLoginWithUserAsQueryable
-
-    public IQueryable<UsersLogin> GetUsersLoginWithUserAsQueryable()
-    {
-        return _sliceCloudContext.UsersLogins.Include(u => u.User).AsQueryable();
-    }
-
-    #endregion
-
 }

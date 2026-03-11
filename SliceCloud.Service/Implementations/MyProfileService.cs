@@ -44,7 +44,7 @@ public class MyProfileService(IUsersRepository usersRepository, IUsersLoginRepos
 
     public async Task<bool> IsUsernameTakenAsync(string username, int currentUserId)
     {
-        bool isUsernameExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.UserName == username && u.UserId == currentUserId);
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.UserName == username && u.UserId != currentUserId);
         return isUsernameExists;
     }
 
@@ -66,14 +66,10 @@ public class MyProfileService(IUsersRepository usersRepository, IUsersLoginRepos
         user.CityId = updateProfileViewModel.CityId;
         user.Address = updateProfileViewModel.Address;
         user.ZipCode = updateProfileViewModel.ZipCode;
+        user.ModifiedBy = userId;
+        user.ModifiedAt = DateTime.UtcNow;
         await _usersRepository.UpdateUserAsync(user);
 
-        UsersLogin usersLogin = await _usersLoginRepository.GetUsersLoginAsQueryable().FirstAsync(u => u.Email == user.Email!);
-        if (usersLogin is not null)
-        {
-            usersLogin.RoleId = user.RoleId;
-            await _usersLoginRepository.UpdateUsersLoginAsync(usersLogin);
-        }
         return await GetProfileByIdAsync(userId);
     }
 

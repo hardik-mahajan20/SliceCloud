@@ -30,7 +30,7 @@ public class UsersRepository(SliceCloudContext sliceCloudContext) : IUsersReposi
 
     public async Task<bool> CreateUserAsync(User user)
     {
-        _sliceCloudContext.Users.Add(user);
+        await _sliceCloudContext.Users.AddAsync(user);
         return await _sliceCloudContext.SaveChangesAsync() > 0;
     }
 
