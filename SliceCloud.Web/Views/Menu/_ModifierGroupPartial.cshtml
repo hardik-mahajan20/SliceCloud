@@ -13,22 +13,22 @@
             @{
                 bool isFirstModifierGroup = true;
             }
-            @foreach (dynamic modifiergroup in Model)
+            @foreach (dynamic modifierGroup in Model)
             {
                 string activeClass = isFirstModifierGroup ? "active-modifier-group" : "";
                 isFirstModifierGroup = false;
                 <li class="d-flex p-1 align-items-center justify-content-between modifier-btn btn @activeClass"
-                    data-id="@modifiergroup.ModifierGroupId" id="modifierGroup-@modifiergroup.ModifierGroupId">
+                    data-id="@modifierGroup.ModifierGroupId" id="modifierGroup-@modifierGroup.ModifierGroupId">
                     <div class="d-flex align-items-center flex-wrap gap-2 ms-3">
                         <div class="sort-handle"> <i class="bi bi-grip-vertical"></i>
                         </div>
-                        <span class="text-truncate modifier-group-name">@modifiergroup.ModifierGroupName</span>
+                        <span class="text-truncate modifier-group-name">@modifierGroup.ModifierGroupName</span>
                     </div>
                     <div class="d-flex">
-                        <button class="edit-modifier-group-btn btn p-0 m-1" data-id="@modifiergroup.ModifierGroupId">
+                        <button class="edit-modifier-group-btn btn p-0 m-1" data-id="@modifierGroup.ModifierGroupId">
                             <i class="bi bi-pen"></i>
                         </button>
-                        <button class="delete-modifier-group-btn btn p-0 m-1" data-id="@modifiergroup.ModifierGroupId">
+                        <button class="delete-modifier-group-btn btn p-0 m-1" data-id="@modifierGroup.ModifierGroupId">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>

@@ -8,7 +8,7 @@ $(document).ready(function () {
     selectedModifierGroupId = $(this).data("id");
 
     $("#modifierGroupIdHidden").val(selectedModifierGroupId);
-    await laodModifierGroupWiseModifies(selectedModifierGroupId, 1, 5, "");
+    await loadModifierGroupWiseModifies(selectedModifierGroupId, 1, 5, "");
   });
 
   // Add Modifier Group
@@ -104,7 +104,7 @@ $(document).ready(function () {
             if (firstModifierGroupId) {
               selectedModifierGroupId = firstModifierGroupId;
               $("#modifierGroupIdHidden").val(selectedModifierGroupId);
-              await laodModifierGroupWiseModifies(
+              await loadModifierGroupWiseModifies(
                 selectedModifierGroupId,
                 currentPage,
                 pageSize

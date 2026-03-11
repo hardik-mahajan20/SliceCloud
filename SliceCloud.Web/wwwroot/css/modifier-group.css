@@ -29,8 +29,8 @@
   display: inline-block;
 }
 
-.modifier-btn.addedit-modifier-group .edit-modifier-group-btn,
-.modifier-btn.addedit-modifier-group .delete-modifier-group-btn {
+.modifier-btn.add-edit-modifier-group .edit-modifier-group-btn,
+.modifier-btn.add-edit-modifier-group .delete-modifier-group-btn {
   display: inline-block;
 }
 

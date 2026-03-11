@@ -2,11 +2,11 @@ $(document).ready(function () {
   // Modifier Search
   $(document).on("keyup", "#modifierSearch", async function () {
     let searchQuery = $(this).val();
-    await laodModifierGroupWiseModifies(
+    await loadModifierGroupWiseModifies(
       selectedModifierGroupId,
       currentPageModifier,
       pageSizeModifier,
-      searchQuery
+      searchQuery,
     );
   });
 
@@ -14,10 +14,10 @@ $(document).ready(function () {
   $(document).on("change", "#pageSizeDropdownModifier", async function () {
     pageSizeModifier = $(this).val();
     currentPageModifier = 1;
-    await laodModifierGroupWiseModifies(
+    await loadModifierGroupWiseModifies(
       selectedModifierGroupId,
       currentPageModifier,
-      pageSizeModifier
+      pageSizeModifier,
     );
   });
 
@@ -25,10 +25,10 @@ $(document).ready(function () {
   $(document).on("click", "#prevPageBtnModifier", async function () {
     if (currentPageModifier > 1) {
       currentPageModifier--;
-      await laodModifierGroupWiseModifies(
+      await loadModifierGroupWiseModifies(
         selectedModifierGroupId,
         currentPageModifier,
-        pageSizeModifier
+        pageSizeModifier,
       );
     }
   });
@@ -37,10 +37,10 @@ $(document).ready(function () {
   $(document).on("click", "#nextPageBtnModifier", async function () {
     if (currentPageModifier < totalPagesModifier) {
       currentPageModifier++;
-      await laodModifierGroupWiseModifies(
+      await loadModifierGroupWiseModifies(
         selectedModifierGroupId,
         currentPageModifier,
-        pageSizeModifier
+        pageSizeModifier,
       );
     }
   });
@@ -76,7 +76,7 @@ $(document).ready(function () {
     let formData = $(this).serialize();
 
     // Clear previous validation messages
-    $("span[data-valmsg-for]").text("");
+    $("span[data-val-msg-for]").text("");
 
     $.ajax({
       type: "POST",
@@ -88,17 +88,17 @@ $(document).ready(function () {
           let modal = document.getElementById("addModifierModalContainer");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
-          await laodModifierGroupWiseModifies(
+          await loadModifierGroupWiseModifies(
             response.modifierGroupId,
             1,
             5,
-            ""
+            "",
           );
         } else if (response.validationErrors) {
           // Loop through validation errors and show them under fields
           for (let key in response.validationErrors) {
             const messages = response.validationErrors[key];
-            const span = $(`[data-valmsg-for="${key}"]`);
+            const span = $(`[data-val-msg-for="${key}"]`);
             if (span.length) {
               span.text(messages.join(", "));
             }
@@ -158,17 +158,17 @@ $(document).ready(function () {
           let modal = document.getElementById("editModifierModalContainer");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
-          await laodModifierGroupWiseModifies(
+          await loadModifierGroupWiseModifies(
             response.modifierGroupId,
             currentPageModifier,
             pageSizeModifier,
-            ""
+            "",
           );
         } else if (response.validationErrors) {
           // Loop through validation errors and show them under fields
           for (let key in response.validationErrors) {
             const messages = response.validationErrors[key];
-            const span = $(`[data-valmsg-for="${key}"]`);
+            const span = $(`[data-val-msg-for="${key}"]`);
             if (span.length) {
               span.text(messages.join(", "));
             }
@@ -220,11 +220,11 @@ $(document).ready(function () {
           let modal = document.getElementById("deleteModifierModal");
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
-          await laodModifierGroupWiseModifies(
+          await loadModifierGroupWiseModifies(
             selectedModifierGroupId,
             1,
             1,
-            ""
+            "",
           );
         } else {
           toastr.error("Error deleting category.");
@@ -237,7 +237,7 @@ $(document).ready(function () {
   });
 
   // === Main Checkbox Change Event ===
-  $(document).on("change", "#maincheckboxModifier", function () {
+  $(document).on("change", "#main-checkboxModifier", function () {
     const isChecked = this.checked;
     mainCheckboxStateModifier.isChecked = isChecked;
     mainCheckboxStateModifier.isIndeterminate = false;
@@ -245,7 +245,6 @@ $(document).ready(function () {
     if (isChecked) {
       allModifierIds.forEach((id) => selectedModifiers.add(id));
       console.log(allModifierIds);
-      
     } else {
       selectedModifiers.clear();
     }
@@ -257,7 +256,7 @@ $(document).ready(function () {
   // === Individual Item Checkbox Change Event ===
   $(document).on("change", ".modifier-checkbox", function () {
     const modifierId = parseInt(
-      $(this).closest("tr").find("input[name='ModifierId']").val()
+      $(this).closest("tr").find("input[name='ModifierId']").val(),
     );
 
     if (this.checked) {
@@ -269,7 +268,7 @@ $(document).ready(function () {
     updateMainCheckboxStateModifier();
   });
 
-  // Delete Multile Modifer
+  // Delete Multiple Modifier
   $(document).on("click", ".delete-multiple-modifier-btn", function () {
     let selectedModifiersArray = Array.from(selectedModifiers);
 
@@ -304,7 +303,7 @@ $(document).ready(function () {
         if (response.success) {
           toastr.success("Modifiers deleted successfully.");
           let modal = document.getElementById(
-            "deleteConfirmationModalModifiers"
+            "deleteConfirmationModalModifiers",
           );
           let modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
           modalInstance.hide();
@@ -315,12 +314,12 @@ $(document).ready(function () {
           };
 
           // Uncheck all checkboxes
-          $("#maincheckboxModifier")
+          $("#main-checkboxModifier")
             .prop("checked", false)
             .prop("indeterminate", false);
           $(".modifier-checkbox").prop("checked", false);
 
-          await laodModifierGroupWiseModifies(selectedModifiers, 1, 1, "");
+          await loadModifierGroupWiseModifies(selectedModifiers, 1, 1, "");
           // Optional: Refetch IDs if needed
           await fetchAllModifierIds();
         } else {
@@ -369,7 +368,7 @@ function updateMainCheckboxStateModifier() {
 
 // === Apply Main Checkbox State ===
 async function applyMainCheckboxStateModifier() {
-  $("#maincheckboxModifier")
+  $("#main-checkboxModifier")
     .prop("checked", mainCheckboxStateModifier.isChecked)
     .prop("indeterminate", mainCheckboxStateModifier.isIndeterminate);
 }
@@ -402,7 +401,7 @@ function updateEditModifierDropdownText() {
   let form = $("#editModifierForm");
   selectedValues.forEach((value) => {
     form.append(
-      `<input type="hidden" name="ModifierGroupIds[]" value="${value}">`
+      `<input type="hidden" name="ModifierGroupIds[]" value="${value}">`,
     );
   });
 
@@ -450,7 +449,7 @@ function updateModifierDropdownText() {
   let form = $("#addModifierForm");
   selectedValues.forEach((value) => {
     form.append(
-      `<input type="hidden" name="ModifierGroupIds[]" value="${value}">`
+      `<input type="hidden" name="ModifierGroupIds[]" value="${value}">`,
     );
   });
 
@@ -472,11 +471,11 @@ function updateModifierDropdownText() {
 }
 
 // Function to load modifiers dynamically based on selected modifier group
-async function laodModifierGroupWiseModifies(
+async function loadModifierGroupWiseModifies(
   modifierGroupId,
   pageNumber = 1,
   pageSize = 5,
-  searchQuery = ""
+  searchQuery = "",
 ) {
   $.ajax({
     url: "/Menu/LoadModifiersByModifierGroup",
@@ -493,12 +492,12 @@ async function laodModifierGroupWiseModifies(
 
       $(".modifier-checkbox").each(function () {
         const modifierId = parseInt(
-          $(this).closest("tr").find("input[name='ModifierId']").val()
+          $(this).closest("tr").find("input[name='ModifierId']").val(),
         );
         $(this).prop("checked", selectedModifiers.has(modifierId));
       });
       if (searchQuery !== "") {
-        $("#maincheckboxModifier").addClass("d-none");
+        $("#main-checkboxModifier").addClass("d-none");
       }
 
       await applyMainCheckboxStateModifier();

@@ -490,8 +490,8 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     [HttpPost]
     public async Task<IActionResult> UpdateMenuItem(EditMenuItemViewModel model, IFormFile? itemImage, string ModifierGroupsJson)
     {
-        model.IsAvailable = Request.Form["Isavailable"].ToString().ToLower() == "true";
-        model.IsDefaultTax = Request.Form["Isdefaulttax"].ToString().ToLower() == "true";
+        model.IsAvailable = Request.Form["IsAvailable"].ToString().ToLower() == "true";
+        model.IsDefaultTax = Request.Form["IsDefaultTax"].ToString().ToLower() == "true";
 
         if (!ModelState.IsValid)
         {
@@ -633,7 +633,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     {
         MenuViewModel menuViewModel = new()
         {
-            Modifiergroups = await _modifierGroupService.GetAllModifierGroupsAsync(),
+            ModifierGroups = await _modifierGroupService.GetAllModifierGroupsAsync(),
         };
         return PartialView("_ModifierSectionPartial", menuViewModel);
     }
@@ -781,8 +781,8 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
         try
         {
-            bool ismodifierGroupNameUpdated = await _modifierGroupService.UpdateModifierGroupAsync(model);
-            if (!ismodifierGroupNameUpdated)
+            bool isModifierGroupNameUpdated = await _modifierGroupService.UpdateModifierGroupAsync(model);
+            if (!isModifierGroupNameUpdated)
             {
                 return Json(new { success = false, message = "Failed to update Modifier Group." });
             }
@@ -996,7 +996,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     [HttpGet]
     public IActionResult LoadDeleteModifierModal()
     {
-        return PartialView("_DeletModifierModal");
+        return PartialView("_DeleteModifierModal");
     }
 
     #endregion
@@ -1053,7 +1053,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     [HttpGet]
     public IActionResult LoadDeleteMultipleMenuModifierModal()
     {
-        return PartialView("_DeleteMultiplModifierModal");
+        return PartialView("_DeleteMultipleModifierModal");
     }
 
     #endregion
@@ -1069,8 +1069,8 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
             return Json(new { success = false, message = "No modifier selected." });
         }
 
-        bool isAllModifierssDeleted = await _modifierService.DeleteMultipleModifierAsync(modifierIds);
-        return Json(new { success = isAllModifierssDeleted });
+        bool isAllModifiersDeleted = await _modifierService.DeleteMultipleModifierAsync(modifierIds);
+        return Json(new { success = isAllModifiersDeleted });
     }
 
     #endregion
