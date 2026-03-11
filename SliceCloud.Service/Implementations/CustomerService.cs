@@ -48,18 +48,18 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
         query = sortColumn switch
         {
-            CustomerConstants.CREATEDATE
-              => sortDirection == GenralConstants.ASCENDING
+            CustomerConstants.CREATE_DATE
+              => sortDirection == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.CreatedAt)
                   : query.OrderByDescending(o => o.CreatedAt),
             CustomerConstants.TOTAL_ORDER
-               => sortDirection == GenralConstants.ASCENDING
+               => sortDirection == GeneralConstants.ASCENDING
                    ? query.OrderBy(o => o.TotalOrder).ThenBy(o => o.CustomerId)
                    : query
                      .OrderByDescending(o => o.TotalOrder)
                      .ThenByDescending(o => o.CustomerId),
             CustomerConstants.CUSTOMER_NAME
-              => sortDirection == GenralConstants.ASCENDING
+              => sortDirection == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.CustomerName)
                   : query.OrderByDescending(o => o.CustomerName),
             _ => query.OrderByDescending(o => o.CreatedAt)
@@ -100,8 +100,8 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
             Orders = customer.Orders.Select(o => new OrderViewModel
             {
                 OrderDate = o.OrderDate ?? DateTime.Now,
-                OrderType = o.OrderType ?? GenralConstants.NA,
-                PaymentMode = o.PaymentMode ?? GenralConstants.NA,
+                OrderType = o.OrderType ?? GeneralConstants.NA,
+                PaymentMode = o.PaymentMode ?? GeneralConstants.NA,
                 ItemsCount = o.OrderedItems.Count,
                 TotalAmount = o.TotalAmount
             }).ToList()
@@ -145,16 +145,16 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
         switch (sortColumn)
         {
             case CustomerConstants.CUSTOMER_NAME:
-                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CustomerName) : query.OrderByDescending(o => o.CustomerName);
+                query = sortOrder == GeneralConstants.ASCENDING ? query.OrderBy(o => o.CustomerName) : query.OrderByDescending(o => o.CustomerName);
                 break;
             case CustomerConstants.ORDER_DATE:
-                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
+                query = sortOrder == GeneralConstants.ASCENDING ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
                 break;
             case CustomerConstants.TOTAL_AMOUNT:
-                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.TotalOrder) : query.OrderByDescending(o => o.TotalOrder);
+                query = sortOrder == GeneralConstants.ASCENDING ? query.OrderBy(o => o.TotalOrder) : query.OrderByDescending(o => o.TotalOrder);
                 break;
             default:
-                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CustomerId) : query.OrderByDescending(o => o.CustomerId);
+                query = sortOrder == GeneralConstants.ASCENDING ? query.OrderBy(o => o.CustomerId) : query.OrderByDescending(o => o.CustomerId);
                 break;
         }
 

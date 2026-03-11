@@ -4,7 +4,7 @@ namespace SliceCloud.Repository.Constants;
 /// Contains string constants for general purpose.
 /// Used to avoid magic strings and ensure consistency across the project.
 /// </summary>
-public static class GenralConstants
+public static class GeneralConstants
 {
     public const string ACCESS_DENIED = "Access Denied.";
     public const string ERROR = "error";
@@ -27,7 +27,7 @@ public static class GenralConstants
     public const string WWWROOT = "wwwroot";
     public const string IMAGES = "images";
     public const string UPLOADS = "uploads";
-    public const string REMEMBERME = "RememberMe";
+    public const string REMEMBER_ME = "RememberMe";
     public const string TRUE = "True";
     public const string SLICECLOUD_REPOSITORY = "SliceCloud.Repository";
     public const string SLICECLOUD_SERVICE = "SliceCloud.Service";

@@ -22,7 +22,7 @@ public static class ToastExtensions
         string type,
         string message)
     {
-        tempData[GenralConstants.TOAST] = JsonSerializer.Serialize(
+        tempData[GeneralConstants.TOAST] = JsonSerializer.Serialize(
             new
             {
                 type,

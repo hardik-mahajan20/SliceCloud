@@ -12,7 +12,7 @@ public class ImageService : IImageService
         {
             string fileGuid = Guid.NewGuid().ToString();
 
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), GenralConstants.WWWROOT, GenralConstants.IMAGES, GenralConstants.UPLOADS);
+            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), GeneralConstants.WWWROOT, GeneralConstants.IMAGES, GeneralConstants.UPLOADS);
 
             if (!Directory.Exists(uploadsFolder))
             {

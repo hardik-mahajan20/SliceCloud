@@ -11,8 +11,8 @@ public static class DependencyInjection
     {
         services.AddDbContext<SliceCloudContext>(options => options.UseNpgsql(connectionString));
         services.AddHttpContextAccessor();
-        RegisterImplementations(services, GenralConstants.SLICECLOUD_REPOSITORY);
-        RegisterImplementations(services, GenralConstants.SLICECLOUD_SERVICE);
+        RegisterImplementations(services, GeneralConstants.SLICECLOUD_REPOSITORY);
+        RegisterImplementations(services, GeneralConstants.SLICECLOUD_SERVICE);
 
     }
     public static void RegisterImplementations(IServiceCollection services, string assemblyName)

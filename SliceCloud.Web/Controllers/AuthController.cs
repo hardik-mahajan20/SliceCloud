@@ -31,7 +31,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
 
 
             ClaimsPrincipal? principal = null;
-            string? token = Request.Cookies[GenralConstants.AUTH_TOKEN];
+            string? token = Request.Cookies[GeneralConstants.AUTH_TOKEN];
             if (token != null)
             {
                 principal = _jwtService.ValidateToken(token);
@@ -39,7 +39,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
 
             if (principal == null)
             {
-                Response.Cookies.Delete(GenralConstants.AUTH_TOKEN);
+                Response.Cookies.Delete(GeneralConstants.AUTH_TOKEN);
                 CookieUtils.ClearCookies(HttpContext);
                 SessionUtils.ClearSession(HttpContext);
                 return View();
@@ -48,7 +48,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch (Exception)
         {
-            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
+            TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return View();
         }
     }
@@ -120,7 +120,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch
         {
-            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
+            TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return View("Error");
         }
     }
@@ -138,7 +138,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch (Exception)
         {
-            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
+            TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return View("Error");
         }
     }
@@ -174,12 +174,12 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
 
             await _emailSenderService.SendResetPasswordEmailAsync(model.Email, resetLink);
 
-            TempData.SetToast(GenralConstants.SUCCESS, SuccessConstants.PASSWORD_RESET_LINK_SENT);
+            TempData.SetToast(GeneralConstants.SUCCESS, SuccessConstants.PASSWORD_RESET_LINK_SENT);
             return RedirectToAction("Login", "Auth");
         }
         catch (Exception)
         {
-            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.FAILED_TO_SEND_RESET_EMAIL);
+            TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.FAILED_TO_SEND_RESET_EMAIL);
             return View(model);
         }
     }
@@ -195,14 +195,14 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         {
             if (string.IsNullOrEmpty(token))
             {
-                TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
+                TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
                 return RedirectToAction("Login");
             }
 
             bool isValid = await _authService.ValidatePasswordResetTokenAsync(token);
             if (!isValid)
             {
-                TempData.SetToast(GenralConstants.ERROR, ErrorConstants.INVALID_EXPIRED_LINK);
+                TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.INVALID_EXPIRED_LINK);
                 return RedirectToAction("Login");
             }
 
@@ -213,7 +213,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch (Exception)
         {
-            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
+            TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return RedirectToAction("Login");
         }
     }
@@ -246,12 +246,12 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
                 return View(model);
             }
 
-            TempData.SetToast(GenralConstants.SUCCESS, SuccessConstants.PASSWORD_RESET_LINK_SENT_LOGIN_AGAIN);
+            TempData.SetToast(GeneralConstants.SUCCESS, SuccessConstants.PASSWORD_RESET_LINK_SENT_LOGIN_AGAIN);
             return RedirectToAction("Login", "Auth");
         }
         catch (Exception)
         {
-            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
+            TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return View(model);
         }
     }
@@ -270,7 +270,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch (Exception)
         {
-            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
+            TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return RedirectToAction("Login", "Auth");
         }
     }
@@ -284,7 +284,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
     {
         try
         {
-            string? oldToken = Request.Cookies[GenralConstants.AUTH_TOKEN];
+            string? oldToken = Request.Cookies[GeneralConstants.AUTH_TOKEN];
             if (string.IsNullOrEmpty(oldToken))
             {
                 return RedirectToAction("Login", "Auth");
@@ -306,7 +306,7 @@ public class AuthController(IAuthService authService, IJwtService jwtService, IE
         }
         catch (Exception)
         {
-            TempData.SetToast(GenralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
+            TempData.SetToast(GeneralConstants.ERROR, ErrorConstants.ERROR_ON_REQUEST_PROCESSING);
             return RedirectToAction("Login", "Auth");
         }
     }

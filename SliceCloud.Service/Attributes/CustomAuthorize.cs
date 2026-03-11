@@ -28,7 +28,7 @@ namespace SliceCloud.Service.Attributes
                 is not IPermissionService permissionService
             )
             {
-                context.Result = new RedirectToActionResult(GenralConstants.ERROR, GenralConstants.HOME, null);
+                context.Result = new RedirectToActionResult(GeneralConstants.ERROR, GeneralConstants.HOME, null);
                 return;
             }
 
@@ -37,7 +37,7 @@ namespace SliceCloud.Service.Attributes
             ClaimsPrincipal? principal = jwtService?.ValidateToken(token ?? String.Empty);
             if (principal == null)
             {
-                context.Result = new RedirectToActionResult(GenralConstants.LOGIN, GenralConstants.AUTH, null);
+                context.Result = new RedirectToActionResult(GeneralConstants.LOGIN, GeneralConstants.AUTH, null);
                 return;
             }
 
@@ -51,7 +51,7 @@ namespace SliceCloud.Service.Attributes
                 if (!_roles.Contains(userRole))
                 {
                     bool isAjax =
-                        context.HttpContext.Request.Headers[GenralConstants.X_REQUESTED_WITH] == GenralConstants.XML_HTTP_REQUEST;
+                        context.HttpContext.Request.Headers[GeneralConstants.X_REQUESTED_WITH] == GeneralConstants.XML_HTTP_REQUEST;
                     HandleAccessDenied(context, isAjax);
                     return;
                 }
@@ -59,18 +59,18 @@ namespace SliceCloud.Service.Attributes
 
             if (!string.IsNullOrEmpty(_requiredPermission))
             {
-                string? controllerName = context.RouteData.Values[GenralConstants.CONTROLLER]?.ToString();
+                string? controllerName = context.RouteData.Values[GeneralConstants.CONTROLLER]?.ToString();
                 int moduleId = GetModuleIdByControllerName(controllerName ?? string.Empty);
                 if (moduleId == 0)
                 {
-                    context.Result = new RedirectToActionResult(GenralConstants.ACCESS_DENIED, GenralConstants.ERROR, null);
+                    context.Result = new RedirectToActionResult(GeneralConstants.ACCESS_DENIED, GeneralConstants.ERROR, null);
                     return;
                 }
                 // Bypass auth for QR-related controllers
                 if (
-                    controllerName == GenralConstants.QR_REDIRECT
-                    || controllerName == GenralConstants.QR_CODE
-                    || controllerName == GenralConstants.QR_MENU
+                    controllerName == GeneralConstants.QR_REDIRECT
+                    || controllerName == GeneralConstants.QR_CODE
+                    || controllerName == GeneralConstants.QR_MENU
                 )
                 {
                     return;
@@ -84,7 +84,7 @@ namespace SliceCloud.Service.Attributes
                 if (!hasPermission)
                 {
                     bool isAjax =
-                        context.HttpContext.Request.Headers[GenralConstants.X_REQUESTED_WITH] == GenralConstants.XML_HTTP_REQUEST;
+                        context.HttpContext.Request.Headers[GeneralConstants.X_REQUESTED_WITH] == GeneralConstants.XML_HTTP_REQUEST;
                     HandleAccessDenied(context, isAjax);
                     return;
                 }
@@ -101,11 +101,11 @@ namespace SliceCloud.Service.Attributes
             if (isAjax)
             {
                 context.HttpContext.Response.StatusCode = 401;
-                context.Result = new JsonResult(new { success = false, message = GenralConstants.UNAUTHORIZED });
+                context.Result = new JsonResult(new { success = false, message = GeneralConstants.UNAUTHORIZED });
             }
             else
             {
-                context.Result = new RedirectToActionResult(GenralConstants.LOGIN, GenralConstants.AUTH, null);
+                context.Result = new RedirectToActionResult(GeneralConstants.LOGIN, GeneralConstants.AUTH, null);
             }
         }
 
@@ -120,12 +120,12 @@ namespace SliceCloud.Service.Attributes
             {
                 context.HttpContext.Response.StatusCode = 403;
                 context.Result = new JsonResult(
-                    new { success = false, message = GenralConstants.ACCESS_DENIED }
+                    new { success = false, message = GeneralConstants.ACCESS_DENIED }
                 );
             }
             else
             {
-                context.Result = new RedirectToActionResult(GenralConstants.ACCESS_DENIED, GenralConstants.ERROR, null);
+                context.Result = new RedirectToActionResult(GeneralConstants.ACCESS_DENIED, GeneralConstants.ERROR, null);
             }
         }
 

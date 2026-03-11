@@ -65,7 +65,7 @@ public class JwtService : IJwtService
 
         if (rememberMe)
         {
-            claims.Add(new Claim(GenralConstants.REMEMBERME, GenralConstants.TRUE));
+            claims.Add(new Claim(GeneralConstants.REMEMBER_ME, GeneralConstants.TRUE));
         }
 
         SecurityTokenDescriptor? tokenDescriptor = new SecurityTokenDescriptor

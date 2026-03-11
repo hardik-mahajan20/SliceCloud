@@ -17,7 +17,7 @@ public static class SessionUtils
         if (user != null)
         {
             string userData = JsonSerializer.Serialize(user);
-            httpContext.Session.SetString(GenralConstants.USER_DATA, userData);
+            httpContext.Session.SetString(GeneralConstants.USER_DATA, userData);
         }
     }
 
@@ -28,11 +28,11 @@ public static class SessionUtils
     /// <returns>A tuple containing the user's email and username, or null if not found.</returns>
     public static (string? Email, string? Username)? GetUser(HttpContext httpContext)
     {
-        string? userData = httpContext.Session.GetString(GenralConstants.USER_DATA);
+        string? userData = httpContext.Session.GetString(GeneralConstants.USER_DATA);
 
         if (string.IsNullOrEmpty(userData))
         {
-            httpContext.Request.Cookies.TryGetValue(GenralConstants.USER_DATA, out userData);
+            httpContext.Request.Cookies.TryGetValue(GeneralConstants.USER_DATA, out userData);
         }
 
         if (string.IsNullOrEmpty(userData))

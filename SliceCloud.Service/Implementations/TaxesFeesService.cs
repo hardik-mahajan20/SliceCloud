@@ -55,15 +55,15 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
         query = sortColumn switch
         {
             TaxConstants.TAX_NAME
-              => sortDirection == GenralConstants.ASCENDING
+              => sortDirection == GeneralConstants.ASCENDING
                   ? query.OrderBy(t => t.TaxName)
                   : query.OrderByDescending(t => t.TaxName),
             TaxConstants.TAX_VALUE
-              => sortDirection == GenralConstants.ASCENDING
+              => sortDirection == GeneralConstants.ASCENDING
                   ? query.OrderBy(t => t.TaxValue)
                   : query.OrderByDescending(t => t.TaxValue),
             _
-              => sortDirection == GenralConstants.ASCENDING
+              => sortDirection == GeneralConstants.ASCENDING
                   ? query.OrderBy(t => t.TaxId)
                   : query.OrderByDescending(t => t.TaxId),
         };

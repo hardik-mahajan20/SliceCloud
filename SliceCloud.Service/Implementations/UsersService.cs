@@ -40,18 +40,18 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
         usersQuery = sortColumn switch
         {
-            UserConstants.CREATEDATE
-              => sortOrder == GenralConstants.ASCENDING
+            UserConstants.CREATE_DATE
+              => sortOrder == GeneralConstants.ASCENDING
                   ? usersQuery.OrderBy(o => o.CreatedAt)
                   : usersQuery.OrderByDescending(o => o.CreatedAt),
             UserConstants.EMAIL
-              => sortOrder == GenralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? usersQuery.OrderBy(o => o.Email).ThenBy(o => o.UserId)
                   : usersQuery
                     .OrderByDescending(o => o.Email)
                     .ThenByDescending(o => o.UserId),
             UserConstants.PHONE
-              => sortOrder == GenralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? usersQuery.OrderBy(o => o.PhoneNumber)
                   : usersQuery.OrderByDescending(o => o.PhoneNumber),
             _ => usersQuery.OrderByDescending(o => o.CreatedAt)
