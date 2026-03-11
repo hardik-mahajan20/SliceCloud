@@ -13,7 +13,6 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 {
     private readonly ICustomerRepository _customerRepository = customerRepository;
 
-
     #region GetPaginatedCustomers
 
     public async Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, string timeRange, DateTime? startDate, DateTime? endDate, string sortOrder = "asc", string sortColumn = "CustomerName", int page = 1, int pageSize = 5)
@@ -25,27 +24,27 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
             switch (timeRange)
             {
-                case "7":
+                case CustomerConstants.DATE_RANGE_7:
                     startDate = today.AddDays(-7);
                     endDate = today;
                     break;
-                case "30":
+                case CustomerConstants.DATE_RANGE_30:
                     startDate = today.AddDays(-30);
                     endDate = today;
                     break;
-                case "month":
+                case CustomerConstants.DATE_RANGE_MONTH:
                     startDate = new DateTime(today.Year, today.Month, 1);
                     endDate = today;
                     break;
-                case "year":
+                case CustomerConstants.DATE_RANGE_YEAR:
                     startDate = new DateTime(today.Year, 1, 1);
                     endDate = today;
                     break;
             }
         }
 
-        if (string.IsNullOrEmpty(sortColumn)) sortColumn = "CustomerName";
-        if (string.IsNullOrEmpty(sortOrder)) sortOrder = "asc";
+        if (string.IsNullOrEmpty(sortColumn)) sortColumn = CustomerConstants.CUSTOMER_NAME;
+        if (string.IsNullOrEmpty(sortOrder)) sortOrder = GeneralConstants.ASCENDING;
 
         IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQueryable();
 
@@ -234,9 +233,9 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
         string statusTextOrder = orderStatus switch
         {
-            0 => "Account Manager",
-            1 => "Chef",
-            _ => "Admin"
+            0 => RolesConstants.MANAGER,
+            1 => RolesConstants.CHEF,
+            _ => RolesConstants.ADMIN
         };
 
         IXLRange allStatusRange = worksheet.Range("C2:F3");
