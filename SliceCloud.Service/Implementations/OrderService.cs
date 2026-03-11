@@ -16,16 +16,39 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
     #region  GetOrders
 
     public async Task<PaginatedList<OrderViewModel>> GetOrdersAsync(
-        string search,
-        string status,
-        DateTime? startDate,
-        DateTime? endDate,
-        int page,
-        int pageSize,
-        string sortColumn,
-        string sortDirection
+        string search, string status, string timeRange, DateTime? startDate, DateTime? endDate, string sortOrder = "asc", string sortColumn = "OrderDate", int page = 1, int pageSize = 10
     )
     {
+
+        if (!startDate.HasValue || !endDate.HasValue)
+        {
+            DateTime today = DateTime.Today;
+
+            switch (timeRange)
+            {
+                case "7":
+                    startDate = today.AddDays(-7);
+                    endDate = today;
+                    break;
+                case "30":
+                    startDate = today.AddDays(-30);
+                    endDate = today;
+                    break;
+                case "month":
+                    startDate = new DateTime(today.Year, today.Month, 1);
+                    endDate = today;
+                    break;
+                case "year":
+                    startDate = new DateTime(today.Year, 1, 1);
+                    endDate = today;
+                    break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(sortColumn)) sortColumn = "OrderDate";
+        if (string.IsNullOrEmpty(sortOrder)) sortOrder = "asc";
+
+
         IQueryable<Order>? query = _orderRepository.GetAllOrderAsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -65,21 +88,21 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         query = sortColumn switch
         {
             OrderConstants.CUSTOMER_NAME
-              => sortDirection == GeneralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.Customer.CustomerName ?? string.Empty)
                   : query.OrderByDescending(o => o.Customer.CustomerName ?? string.Empty),
             OrderConstants.ORDER_DATE
-              => sortDirection == GeneralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.OrderDate).ThenBy(o => o.OrderId)
                   : query.OrderByDescending(o => o.OrderDate).ThenByDescending(o => o.OrderId),
             OrderConstants.TOTAL_AMOUNT
-              => sortDirection == GeneralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.TotalAmount).ThenBy(o => o.OrderId)
                   : query
                     .OrderByDescending(o => o.TotalAmount)
                     .ThenByDescending(o => o.OrderId),
             _
-              => sortDirection == GeneralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.OrderId)
                   : query.OrderByDescending(o => o.OrderId),
         };
@@ -265,7 +288,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
             Items = orderDetails,
             SubTotal = subTotal,
             TotalAmountDue = totalAmountDue,
-            TaxBreakdown = taxBreakdown, 
+            TaxBreakdown = taxBreakdown,
             PaymentMethod = order.PaymentMode ?? OrderConstants.PENDING
         };
     }

@@ -21,12 +21,13 @@ namespace SliceCloud.Web.Controllers;
 public class OrdersController(IOrderService orderService, IWebHostEnvironment hostingEnvironment) : Controller
 {
 
-    IOrderService _orderService = orderService;
-    IWebHostEnvironment _hostingEnvironment = hostingEnvironment;
+    private readonly IOrderService _orderService = orderService;
+    private readonly IWebHostEnvironment _hostingEnvironment = hostingEnvironment;
 
     #region Orders GET
 
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
     public IActionResult Orders()
     {
         try
@@ -44,43 +45,16 @@ public class OrdersController(IOrderService orderService, IWebHostEnvironment ho
 
     #region LoadOrders Partial View
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
+    [HttpGet]
     public async Task<IActionResult> LoadOrders(string search, string status, string timeRange, DateTime? startDate, DateTime? endDate, string sortOrder = "asc", string sortColumn = "OrderDate", int page = 1, int pageSize = 10)
     {
         try
         {
-            if (!startDate.HasValue || !endDate.HasValue)
-            {
-                DateTime today = DateTime.Today;
-
-                switch (timeRange)
-                {
-                    case "7":
-                        startDate = today.AddDays(-7);
-                        endDate = today;
-                        break;
-                    case "30":
-                        startDate = today.AddDays(-30);
-                        endDate = today;
-                        break;
-                    case "month":
-                        startDate = new DateTime(today.Year, today.Month, 1);
-                        endDate = today;
-                        break;
-                    case "year":
-                        startDate = new DateTime(today.Year, 1, 1);
-                        endDate = today;
-                        break;
-                }
-            }
-
-            if (string.IsNullOrEmpty(sortColumn)) sortColumn = "OrderDate";
-            if (string.IsNullOrEmpty(sortOrder)) sortOrder = "asc";
-
             ViewData["SortColumn"] = sortColumn;
             ViewData["SortDirection"] = sortOrder;
 
-            PaginatedList<OrderViewModel> orders = await _orderService.GetOrdersAsync(
-              search, status, startDate, endDate, page, pageSize, sortColumn, sortOrder);
+            PaginatedList<OrderViewModel> orders = await _orderService.GetOrdersAsync(search, status, timeRange, startDate, endDate, sortOrder = "asc", sortColumn = "OrderDate", page, pageSize);
 
             ViewBag.PageSize = pageSize;
             ViewBag.TotalItems = orders.TotalItems;
@@ -99,17 +73,19 @@ public class OrdersController(IOrderService orderService, IWebHostEnvironment ho
 
             return PartialView("_OrdersTablePartialView", orders);
         }
-        catch (Exception ex)
+        catch (Exception f)
         {
-            return Json(new { success = false, message = ex.Message });
+            TempData.SetToast("error", "An error occurred while processing your request. Please try again.");
+            return PartialView("_OrdersTablePartialView", null);
+
         }
     }
 
     #endregion
 
-
     #region ExportOrders
 
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     public Task<IActionResult> ExportOrders(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
     {
         List<Order>? orders = _orderService.GetFilteredCustomersAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
@@ -311,6 +287,7 @@ public class OrdersController(IOrderService orderService, IWebHostEnvironment ho
                             $"Orders_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.xlsx"));
             }
         }
+   
     }
 
     #endregion

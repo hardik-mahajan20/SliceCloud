@@ -2,10 +2,7 @@
 @using SliceCloud.Repository.ViewModels
 @model SliceCloud.Repository.ViewModels.OrderInvoiceViewModel
 @{
-    ViewData["Title"] = "Order Details";
-}
-@section Styles {
-    <link rel="stylesheet" href="~/css/order-details.css" />
+    ViewData[index: "Title"] = "Order Details";
 }
 <div class="d-flex flex-column w-100 p-4">
     <div class="d-flex justify-content-between w-100 mb-3">
@@ -124,7 +121,7 @@
                             <td class="text-end">Subtotal:</td>
                             <td class="text-end">₹@Model.SubTotal.ToString("0.00")</td>
                         </tr>
-                        @foreach (var tax in Model.TaxBreakdown)
+                        @foreach (TaxBreakdownViewModel tax in Model.TaxBreakdown)
                         {
                             <tr>
                                 <td colspan="3"></td>

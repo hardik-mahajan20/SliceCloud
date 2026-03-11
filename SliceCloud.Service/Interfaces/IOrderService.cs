@@ -17,7 +17,7 @@ public interface IOrderService
     /// <param name="sortColumn">The column to sort the results by.</param>
     /// <param name="sortDirection">The direction of sorting (e.g., ascending or descending).</param>
     /// <returns>A task that returns a paginated list of order view models.</returns>
-    Task<PaginatedList<OrderViewModel>> GetOrdersAsync(string search, string status, DateTime? startDate, DateTime? endDate, int page, int pageSize, string sortColumn, string sortDirection);
+    Task<PaginatedList<OrderViewModel>> GetOrdersAsync(string search, string status, string timeRange, DateTime? startDate, DateTime? endDate, string sortOrder = "asc", string sortColumn = "OrderDate", int page = 1, int pageSize = 10);
 
     /// <summary>
     /// Retrieves a filtered list of customers based on search text, date range, order status, and sorting options.
