@@ -15,4 +15,5 @@ public class CountryRepository(SliceCloudContext sliceCloudContext) : ICountryRe
     }
 
     #endregion
+    
 }

@@ -15,4 +15,5 @@ public class CityRepository(SliceCloudContext sliceCloudContext) : ICityReposito
     }
 
     #endregion
+    
 }

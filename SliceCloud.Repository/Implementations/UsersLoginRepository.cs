@@ -36,7 +36,7 @@ public class UsersLoginRepository(SliceCloudContext sliceCloudContext) : IUsersL
 
     #endregion
 
-    #region UpdateUsersLoginAsync
+    #region UpdateUsersLogin
 
     public async Task<bool> UpdateUsersLoginAsync(UsersLogin usersLogin)
     {
@@ -45,4 +45,5 @@ public class UsersLoginRepository(SliceCloudContext sliceCloudContext) : IUsersL
     }
 
     #endregion
+
 }

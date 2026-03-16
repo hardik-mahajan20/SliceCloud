@@ -25,4 +25,5 @@ public class RolesRepository(SliceCloudContext sliceCloudContext) : IRolesReposi
     }
 
     #endregion
+
 }

@@ -54,4 +54,5 @@ public class TableRepository(SliceCloudContext sliceCloudContext) : ITableReposi
     }
 
     #endregion
+
 }

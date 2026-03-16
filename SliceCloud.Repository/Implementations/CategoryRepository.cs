@@ -8,11 +8,21 @@ public class CategoryRepository(SliceCloudContext sliceCloudContext) : ICategory
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllCategoriesAsync
+    #region GetAllCategoriesAsQueryable
 
     public IQueryable<Category> GetAllCategoriesAsQueryable()
     {
         return _sliceCloudContext.Categories.AsQueryable();
+    }
+
+    #endregion
+
+    #region GetCategoryById
+
+    public async Task<Category?> GetCategoryByIdAsync(int categoryId)
+    {
+        return await _sliceCloudContext.Categories
+            .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
     }
 
     #endregion
@@ -28,23 +38,13 @@ public class CategoryRepository(SliceCloudContext sliceCloudContext) : ICategory
 
     #endregion
 
-    #region GetCategoryById
-
-    public async Task<Category?> GetCategoryByIdAsync(int categoryId)
-    {
-        return await _sliceCloudContext.Categories
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
-    }
-
-    #endregion
-
     #region UpdateCategory
 
-    public async Task<bool> UpdateCategoryAsync(Category category)
+    public async Task<int> UpdateCategoryAsync(Category category)
     {
         _sliceCloudContext.Categories.Update(category);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.SaveChangesAsync();
+        return category.CategoryId;
     }
 
     #endregion

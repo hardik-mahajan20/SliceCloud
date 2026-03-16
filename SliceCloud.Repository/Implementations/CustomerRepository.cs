@@ -29,4 +29,5 @@ public class CustomerRepository(SliceCloudContext sliceCloudContext) : ICustomer
     }
 
     #endregion
+    
 }

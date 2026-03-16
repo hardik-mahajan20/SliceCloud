@@ -7,7 +7,7 @@ public class ModifierRepository(SliceCloudContext sliceCloudContext) : IModifier
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllModifiersAsync
+    #region GetAllModifiersAsQueryable
 
     public IQueryable<Modifier> GetAllModifiersAsQueryable()
     {
@@ -46,4 +46,5 @@ public class ModifierRepository(SliceCloudContext sliceCloudContext) : IModifier
     }
 
     #endregion
+
 }
