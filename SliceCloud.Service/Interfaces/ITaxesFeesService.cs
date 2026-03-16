@@ -5,12 +5,6 @@ namespace SliceCloud.Service.Interfaces;
 public interface ITaxesFeesService
 {
     /// <summary>
-    /// Retrieves a list of all taxes and fees.
-    /// </summary>
-    /// <returns>A list of taxes and fees view models.</returns>
-    Task<List<TaxesFeesViewModel>> GetAllTaxesAsync();
-
-    /// <summary>
     /// Retrieves a paginated list of taxes and fees based on search criteria and sorting options.
     /// </summary>
     /// <param name="search">The search term to filter taxes and fees.</param>

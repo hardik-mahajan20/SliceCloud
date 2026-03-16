@@ -105,7 +105,7 @@ public class CustomersController(ICustomerService customerService, IWebHostEnvir
 
         try
         {
-            IEnumerable<Customer> customers = await _customerService.GetFilteredOrders(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
+            IEnumerable<Customer> customers = await _customerService.GetFilteredOrdersAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
 
             if (customers == null || !customers.Any())
             {
@@ -114,7 +114,7 @@ public class CustomersController(ICustomerService customerService, IWebHostEnvir
                 return Json(new { success = false, message = "No records found to download" });
             }
 
-            FileResult fileResult = await _customerService.ExportCustomersToExcel(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder, _webHostEnvironment.WebRootPath);
+            FileResult fileResult = await _customerService.ExportCustomersToExcelAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder, _webHostEnvironment.WebRootPath);
 
             if (fileResult == null)
             {

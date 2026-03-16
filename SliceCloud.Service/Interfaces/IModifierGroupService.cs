@@ -32,7 +32,6 @@ public interface IModifierGroupService
     /// <returns>A task representing the asynchronous operation.</returns>
     Task UpdateModifierGroupOrderAsync(List<int> orderedModifierGroupIds);
 
-
     /// <summary>
     /// Creates a new modifier group asynchronously.
     /// </summary>

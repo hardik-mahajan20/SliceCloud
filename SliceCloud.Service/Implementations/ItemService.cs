@@ -194,7 +194,7 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
 
     #endregion
 
-    #region DeleteMultipleMultipleItem
+    #region DeleteMultipleMenuItem
 
     public async Task<bool> DeleteMultipleMenuItemAsync(List<int> itemIds)
     {

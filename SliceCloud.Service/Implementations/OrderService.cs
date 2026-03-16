@@ -24,7 +24,6 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
         string search, string status, string timeRange, DateTime? startDate, DateTime? endDate, string sortOrder = "asc", string sortColumn = "OrderDate", int page = 1, int pageSize = 10
     )
     {
-
         if (!startDate.HasValue || !endDate.HasValue)
         {
             DateTime today = DateTime.Today;
@@ -203,7 +202,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
 
     #region ExportOrdersToExcel
 
-    public async Task<FileResult> ExportOrdersToExcel(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath)
+    public async Task<FileResult> ExportOrdersToExcelAsync(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath)
     {
         List<Order>? orders = await GetFilteredCustomersAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
 
@@ -507,7 +506,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
 
     #region ExportOrderPdf
 
-    public async Task<byte[]> ExportOrderPdf(string webRootPath, int orderId)
+    public async Task<byte[]> ExportOrderPdfAsync(string webRootPath, int orderId)
     {
 
         OrderInvoiceViewModel? invoiceModel = await GetOrderInvoiceAsync(orderId);
@@ -712,7 +711,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
 
     #region  Helpers
 
-    private string CalculateOrderDuration(DateTime? orderDate, DateTime? modifiedOn)
+    private static string CalculateOrderDuration(DateTime? orderDate, DateTime? modifiedOn)
     {
         if (orderDate.HasValue && modifiedOn.HasValue)
         {
@@ -789,4 +788,5 @@ public class OrderService(IOrderRepository orderRepository, IOrderTaxRepository 
     }
 
     #endregion
+
 }

@@ -169,7 +169,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
         try
         {
-            bool isCategoryUpdated = await _categoryService.UpdateAsync(model);
+            bool isCategoryUpdated = await _categoryService.UpdateCategoryAsync(model);
             if (!isCategoryUpdated)
             {
                 return Json(new { success = false, message = "Failed to update category." });
@@ -847,7 +847,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     [HttpGet]
     public async Task<IActionResult> LoadModifiersByModifierGroup(int modifierGroupId, int pageNumber = 1, int pageSize = 5, string searchQuery = "")
     {
-        PaginatedList<ModifierViewModel>? paginatedModifiers = await _modifierService.GetPaginatedModifiersByModifierGroupId(modifierGroupId, pageNumber, pageSize, searchQuery);
+        PaginatedList<ModifierViewModel>? paginatedModifiers = await _modifierService.GetPaginatedModifiersByModifierGroupIdAsync(modifierGroupId, pageNumber, pageSize, searchQuery);
 
         ViewBag.FromRec = paginatedModifiers.FromRec;
         ViewBag.ToRec = paginatedModifiers.ToRec;

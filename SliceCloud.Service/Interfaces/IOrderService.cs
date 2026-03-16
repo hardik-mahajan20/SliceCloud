@@ -50,7 +50,7 @@ public interface IOrderService
     /// <param name="sortOrder">The direction of sorting (e.g., ascending or descending).</param>
     /// <param name="webRootPath">The root path of the web application for file storage.</param>
     /// <returns>A task that returns a file result containing the exported Excel file.</returns>
-    Task<FileResult> ExportOrdersToExcel(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath);
+    Task<FileResult> ExportOrdersToExcelAsync(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath);
 
     /// <summary>
     /// Exports order pdf as array of byte.
@@ -58,5 +58,5 @@ public interface IOrderService
     /// <param name="orderId">The id of the order to download the order for.</param>
     /// <param name="webRootPath">The root path of the web application for file storage.</param>
     /// <returns>A task that returns a array of byte.</returns>
-    Task<byte[]> ExportOrderPdf(string webRootPath, int orderId);
+    Task<byte[]> ExportOrderPdfAsync(string webRootPath, int orderId);
 }

@@ -11,29 +11,16 @@ using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Service.Implementations;
 
-public class JwtService : IJwtService
+public class JwtService(IConfiguration configuration, IUsersLoginRepository userLoginRepository, IRolesService rolesService) : IJwtService
 {
-    private readonly string _key;
-    private readonly string _issuer;
-    private readonly string _audience;
-    private readonly IUsersLoginRepository _userLoginRepository;
-    private readonly IRolesService _rolesService;
-
-    public JwtService(IConfiguration configuration, IUsersLoginRepository userLoginRepository, IRolesService rolesService)
-    {
-        _key = configuration["Jwt:Key"]
+    private readonly string _key = configuration["Jwt:Key"]
                 ?? throw new ArgumentNullException(nameof(configuration), ErrorConstants.JWT_KEY_MISSING);
-
-        _issuer = configuration["Jwt:Issuer"]
+    private readonly string _issuer = configuration["Jwt:Issuer"]
             ?? throw new ArgumentNullException(nameof(configuration), ErrorConstants.JWT_ISSUER_MISSING);
-
-        _audience = configuration["Jwt:Audience"]
+    private readonly string _audience = configuration["Jwt:Audience"]
             ?? throw new ArgumentNullException(nameof(configuration), ErrorConstants.JWT_AUDIENCE_MISSING);
-
-        _userLoginRepository = userLoginRepository;
-        _rolesService = rolesService;
-
-    }
+    private readonly IUsersLoginRepository _userLoginRepository = userLoginRepository;
+    private readonly IRolesService _rolesService = rolesService;
 
     #region GenerateJwtToken
 

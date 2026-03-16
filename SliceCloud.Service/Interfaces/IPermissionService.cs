@@ -20,7 +20,6 @@ public interface IPermissionService
     /// <returns>A task that returns the role and its permissions.</returns>
     Task<RoleAndPermissionsViewModel> GetAllPermissionsAsync(int roleId);
 
-
     /// <summary>
     /// Updates all permissions for a specific role asynchronously.
     /// </summary>

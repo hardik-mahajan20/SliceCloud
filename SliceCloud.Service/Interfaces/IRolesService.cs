@@ -11,7 +11,6 @@ public interface IRolesService
     /// <returns>A task that returns the role if found, otherwise null.</returns>
     Task<Role?> GetRoleByIdAsync(int roleId);
 
-
     /// <summary>
     /// Retrieves all the roles asynchronously.
     /// </summary>

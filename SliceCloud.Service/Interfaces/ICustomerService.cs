@@ -37,7 +37,7 @@ public interface ICustomerService
     /// <param name="sortColumn">The column to sort the results by.</param>
     /// <param name="sortOrder">The direction of sorting (e.g., ascending or descending).</param>
     /// <returns>A collection of filtered customers.</returns>
-    Task<IEnumerable<Customer>> GetFilteredOrders(
+    Task<IEnumerable<Customer>> GetFilteredOrdersAsync(
         string searchText,
         DateTime? startDate,
         DateTime? endDate,
@@ -56,5 +56,5 @@ public interface ICustomerService
     /// <param name="sortOrder">The direction of sorting (e.g., ascending or descending).</param>
     /// <param name="webRootPath">The root path of the web application for file storage.</param>
     /// <returns>A task that returns a file result containing the exported Excel file.</returns>
-    Task<FileResult> ExportCustomersToExcel(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath);
+    Task<FileResult> ExportCustomersToExcelAsync(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath);
 }

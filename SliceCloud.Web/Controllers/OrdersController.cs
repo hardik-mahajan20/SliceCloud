@@ -92,7 +92,7 @@ public class OrdersController(IOrderService orderService, IWebHostEnvironment we
                 return Json(new { success = false, message = "No records found to download" });
             }
 
-            FileResult fileResult = await _orderService.ExportOrdersToExcel(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder, _webHostEnvironment.WebRootPath);
+            FileResult fileResult = await _orderService.ExportOrdersToExcelAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder, _webHostEnvironment.WebRootPath);
 
             if (fileResult == null)
             {
@@ -120,7 +120,7 @@ public class OrdersController(IOrderService orderService, IWebHostEnvironment we
     {
         string webRootPath = _webHostEnvironment.WebRootPath;
 
-        byte[] pdfBytes = await _orderService.ExportOrderPdf(
+        byte[] pdfBytes = await _orderService.ExportOrderPdfAsync(
             webRootPath,
             orderId
         );

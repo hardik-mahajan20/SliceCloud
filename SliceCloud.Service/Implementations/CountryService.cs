@@ -13,7 +13,8 @@ public class CountryService(ICountryRepository countryRepository) : ICountryServ
 
     public async Task<List<Country>> GetAllCountriesAsync()
     {
-        return await _countryRepository.GetAllCountriesAsQueryable().ToListAsync();
+        return await _countryRepository.GetAllCountriesAsQueryable()
+                                        .ToListAsync();
     }
 
     #endregion

@@ -15,27 +15,6 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     private readonly IItemRepository _itemRepository = itemRepository;
 
-    #region GetAllTaxes
-
-    public async Task<List<TaxesFeesViewModel>> GetAllTaxesAsync()
-    {
-        // List<Taxis>? taxes = await _taxesFeesRepository.GetAllTaxesAsync();
-        List<Taxis>? taxes = await _taxesFeesRepository.GetAllTaxisAsQueryable().Where(t => !t.IsDeleted ?? false).ToListAsync();
-
-        return taxes.Select(t => new TaxesFeesViewModel
-        {
-            TaxId = t.TaxId,
-            TaxName = t.TaxName,
-            TaxType = t.TaxType,
-            IsEnabled = t.IsEnabled ?? false,
-            IsDefault = t.IsDefault ?? false,
-            IsInclusive = t.IsInclusive ?? false,
-            TaxValue = (decimal?)t.TaxValue
-        }).ToList();
-    }
-
-    #endregion
-
     #region GetTaxesAndFees
 
     public async Task<PaginatedList<TaxesFeesViewModel>> GetTaxesAndFeesAsync(string search, int page, int pageSize, string sortColumn, string sortDirection)
@@ -104,7 +83,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     #endregion
 
-    #region AddTaxAsync
+    #region AddTax
 
     public async Task<bool> AddTaxAsync(TaxesFeesViewModel model)
     {
@@ -251,4 +230,5 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
     }
 
     #endregion
+
 }

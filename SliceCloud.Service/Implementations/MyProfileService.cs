@@ -7,10 +7,9 @@ using SliceCloud.Service.Interfaces;
 
 namespace SliceCloud.Service.Implementations;
 
-public class MyProfileService(IUsersRepository usersRepository, IUsersLoginRepository usersLoginRepository) : IMyProfileService
+public class MyProfileService(IUsersRepository usersRepository) : IMyProfileService
 {
     private readonly IUsersRepository _usersRepository = usersRepository;
-    private readonly IUsersLoginRepository _usersLoginRepository = usersLoginRepository;
 
     #region GetProfileById
 
@@ -74,4 +73,5 @@ public class MyProfileService(IUsersRepository usersRepository, IUsersLoginRepos
     }
 
     #endregion
+
 }

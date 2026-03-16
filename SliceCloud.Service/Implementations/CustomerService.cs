@@ -144,14 +144,13 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     #region  GetFilteredOrders
 
-    public async Task<IEnumerable<Customer>> GetFilteredOrders(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
+    public async Task<IEnumerable<Customer>> GetFilteredOrdersAsync(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
     {
         IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQueryable();
 
         DateTime? startUtc = startDate?.ToUniversalTime();
 
         DateTime? endUtc = endDate?.ToUniversalTime();
-
 
         if (!string.IsNullOrWhiteSpace(searchText))
         {
@@ -199,9 +198,9 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     #region ExportCustomersToExcel
 
-    public async Task<FileResult> ExportCustomersToExcel(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath)
+    public async Task<FileResult> ExportCustomersToExcelAsync(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath)
     {
-        IEnumerable<Customer>? customers = await GetFilteredOrders(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
+        IEnumerable<Customer>? customers = await GetFilteredOrdersAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
 
         using var workbook = new XLWorkbook();
         IXLWorksheet? worksheet = workbook.Worksheets.Add(CustomerConstants.CUSTOMERS);
@@ -354,7 +353,9 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
         }
     }
+
     #endregion
+
 }
 
 

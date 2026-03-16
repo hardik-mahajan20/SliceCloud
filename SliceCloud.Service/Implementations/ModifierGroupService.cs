@@ -73,6 +73,8 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
 
     #endregion
 
+    #region UpdateModifierGroupOrder
+
     public async Task UpdateModifierGroupOrderAsync(List<int> orderedModifierGroupIds)
     {
         List<ModifierGroup>? modifierGroups = await _modifierGroupRepository.GetAllModifierGroupsAsQueryable()
@@ -91,6 +93,10 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
 
         await _modifierGroupRepository.SaveChangesAsync();
     }
+
+    #endregion
+
+    #region AddModifierGroup
 
     public async Task<int> AddModifierGroupAsync(ModifierGroupViewModel modifierGroupViewModel)
     {
@@ -117,6 +123,10 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
         return await _modifierGroupRepository.AddModifierGroupAsync(modifierGroup);
     }
 
+    #endregion
+
+    #region UpdateModifierGroup
+
     public async Task<bool> UpdateModifierGroupAsync(ModifierGroupViewModel modifierGroupViewModel)
     {
         ModifierGroup? modifierGroup = await _modifierGroupRepository.GetModifierGroupByIdAsync(modifierGroupViewModel.ModifierGroupId);
@@ -142,6 +152,10 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
         return await _modifierGroupRepository.UpdateModifierGroupAsync(modifierGroup) > 0;
     }
 
+    #endregion
+
+    #region DeleteModifierGroup
+
     public async Task<bool> DeleteModifierGroupAsync(int modifierGroupId)
     {
 
@@ -158,4 +172,7 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
 
         return await _modifierGroupRepository.UpdateModifierGroupAsync(modifierGroup) > 0;
     }
+
+    #endregion
+
 }

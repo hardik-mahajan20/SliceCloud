@@ -12,6 +12,8 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
 
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
+    #region GetAllCategories
+
     public async Task<List<CategoryViewModel>> GetAllCategoriesAsync()
     {
         List<Category> categories = await _categoryRepository.GetAllCategoriesAsQueryable().Where(c => c.IsDeleted == false)
@@ -25,6 +27,10 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
             Description = item.Description
         }).ToList();
     }
+
+    #endregion
+
+    #region UpdateCategoryOrder
 
     public async Task UpdateCategoryOrderAsync(List<int> sortedCategoryIds)
     {
@@ -44,6 +50,10 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
 
         await _categoryRepository.SaveChangesAsync();
     }
+
+    #endregion
+
+    #region AddCategory
 
     public async Task<int> AddCategoryAsync(CategoryViewModel categoryViewModel)
     {
@@ -70,6 +80,10 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
         return await _categoryRepository.AddCategoryAsync(category);
     }
 
+    #endregion
+
+    #region GetCategoryById
+
     public async Task<CategoryViewModel> GetCategoryByIdAsync(int categoryId)
     {
         Category? category = await _categoryRepository.GetCategoryByIdAsync(categoryId);
@@ -87,7 +101,11 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
         };
     }
 
-    public async Task<bool> UpdateAsync(CategoryViewModel categoryViewModel)
+    #endregion
+
+    #region UpdateCategory
+
+    public async Task<bool> UpdateCategoryAsync(CategoryViewModel categoryViewModel)
     {
         Category? category = await _categoryRepository.GetCategoryByIdAsync(categoryViewModel.CategoryId);
 
@@ -112,6 +130,10 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
         return await _categoryRepository.UpdateCategoryAsync(category) > 0;
     }
 
+    #endregion
+
+    #region DeleteCategory
+
     public async Task<bool> DeleteCategoryAsync(int categoryId)
     {
 
@@ -128,4 +150,6 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
 
         return await _categoryRepository.UpdateCategoryAsync(category) > 0;
     }
+
+    #endregion
 }

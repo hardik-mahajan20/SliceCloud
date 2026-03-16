@@ -57,7 +57,6 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
             _ => usersQuery.OrderByDescending(o => o.CreatedAt)
         };
 
-
         PaginatedList<User> paginatedUsers = await PaginatedList<User>.CreateAsync(usersQuery, pageNumber, pageSize);
 
         foreach (var user in paginatedUsers)
@@ -176,7 +175,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
                 Status = (UserStatus)1,
             };
 
-            await _usersLoginService.CreateUserLoginAsync(login);
+            await _usersLoginService.AddUserLoginAsync(login);
             return true;
         }
         return false;
@@ -224,7 +223,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
     #endregion UpdateExitingUser
 
-    #region 
+    #region UpdateExitingUser
 
     public async Task<bool> UpdateExitingUserAsync(UpdateUserViewModel updateUserViewModel, int id, IFormFile itemImage)
     {
@@ -238,7 +237,6 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         {
             user!.ProfileImage = updateUserViewModel.ProfileImage;
         }
-
 
         if (user != null)
         {
@@ -306,8 +304,6 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
             .ToList();
     }
 
-
-
     #region DeleteProfileImage
 
     public bool DeleteProfileImage(string imagePath)
@@ -336,4 +332,5 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
 
     #endregion
+
 }

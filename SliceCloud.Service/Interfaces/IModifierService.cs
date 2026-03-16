@@ -26,7 +26,7 @@ public interface IModifierService
     /// <param name="pageSize">The number of modifiers per page.</param>
     /// <param name="searchQuery">An optional search query to filter modifiers.</param>
     /// <returns>A task that returns a paginated list of modifier view models.</returns>
-    Task<PaginatedList<ModifierViewModel>> GetPaginatedModifiersByModifierGroupId(int modifierGroupId, int pageNumber, int pageSize, string searchQuery = "");
+    Task<PaginatedList<ModifierViewModel>> GetPaginatedModifiersByModifierGroupIdAsync(int modifierGroupId, int pageNumber, int pageSize, string searchQuery = "");
 
     /// <summary>
     /// Adds a new modifier asynchronously.

@@ -6,6 +6,8 @@ namespace SliceCloud.Service.Implementations;
 
 public class ImageService : IImageService
 {
+    #region ImgPath
+
     public async Task<string?> ImgPath(IFormFile? Img)
     {
         if (Img != null)
@@ -18,7 +20,6 @@ public class ImageService : IImageService
             {
                 Directory.CreateDirectory(uploadsFolder);
             }
-
 
             string fileExtension = Path.GetExtension(Img.FileName);
             string filePath = Path.Combine(uploadsFolder, fileGuid + fileExtension);
@@ -34,4 +35,5 @@ public class ImageService : IImageService
         return null;
     }
 
+    #endregion
 }
