@@ -112,7 +112,6 @@ public class TaxesAndFeesController(ITaxesFeesService taxesFeesService) : Contro
 
     #endregion
 
-
     #region GetTaxById
 
     public async Task<JsonResult> GetTaxById(int id)

@@ -320,7 +320,6 @@ public class UsersController(IUsersService usersService, ICountryService country
 
     #endregion
 
-
     #region DeleteProfileImage
 
     [HttpPost]
@@ -335,4 +334,5 @@ public class UsersController(IUsersService usersService, ICountryService country
     }
 
     #endregion
+
 }

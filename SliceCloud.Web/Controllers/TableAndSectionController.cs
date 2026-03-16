@@ -133,7 +133,6 @@ public class TableAndSectionController(ISectionService sectionService, ITableSer
 
     #endregion
 
-
     #region AddSection
 
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
@@ -588,4 +587,5 @@ public class TableAndSectionController(ISectionService sectionService, ITableSer
     }
 
     #endregion
+
 }

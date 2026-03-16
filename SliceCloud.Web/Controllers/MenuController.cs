@@ -256,7 +256,8 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #endregion
 
-    #region 
+    #region GetMenuData
+
     public async Task<IActionResult> GetMenuData()
     {
         List<CategoryViewModel>? categories = await _categoryService.GetAllCategoriesAsync();
@@ -284,7 +285,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #endregion
 
-    #region GetModifierGroupsByIds
+    #region GetModifiersByGroup
 
     [HttpGet]
     public async Task<JsonResult> GetModifiersByGroup([FromQuery] List<int> modifierGroupIds)
@@ -484,7 +485,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #endregion
 
-    #region 
+    #region UpdateMenuItem
 
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
@@ -597,7 +598,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #endregion
 
-    #region LoadMultipleDeleteMenuItemModal
+    #region LoadDeleteMultipleMenuItemModal
 
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
@@ -608,7 +609,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #endregion
 
-    #region DeleteMultipleItems POST
+    #region DeleteMultipleMenuItem POST
 
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
@@ -1047,7 +1048,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #endregion
 
-    #region LoadMultipleDeleteMenuModifierModal
+    #region LoadDeleteMultipleMenuModifierModal
 
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
@@ -1058,7 +1059,7 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
 
     #endregion
 
-    #region DeleteMultipleModifiers POST
+    #region DeleteMultipleModifier POST
 
     [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
@@ -1074,4 +1075,5 @@ public class MenuController(ICategoryService categoryService, IItemService itemS
     }
 
     #endregion
+
 }

@@ -115,7 +115,7 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
     public async Task<object> GetCustomerHistoryAsync(int customerId)
     {
         Customer? customer = await _customerRepository.GetCustomerWithOrdersAsync(customerId);
-        if (customer == null) return new CustomerHistoryViewModel();
+        if (customer == null) return new { success = false, message = "Customer not found" };
 
         return new
         {
