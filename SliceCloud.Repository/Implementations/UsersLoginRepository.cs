@@ -26,22 +26,24 @@ public class UsersLoginRepository(SliceCloudContext sliceCloudContext) : IUsersL
 
     #endregion
 
-    #region CreateUserLogin
+    #region AddUserLogin
 
-    public async Task<bool> CreateUserLoginAsync(UsersLogin usersLogin)
+    public async Task<int> AddUserLoginAsync(UsersLogin usersLogin)
     {
         await _sliceCloudContext.UsersLogins.AddAsync(usersLogin);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.SaveChangesAsync();
+        return usersLogin.UserLoginId;
     }
 
     #endregion
 
     #region UpdateUsersLogin
 
-    public async Task<bool> UpdateUsersLoginAsync(UsersLogin usersLogin)
+    public async Task<int> UpdateUsersLoginAsync(UsersLogin usersLogin)
     {
         _sliceCloudContext.UsersLogins.Update(usersLogin);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.SaveChangesAsync();
+        return usersLogin.UserLoginId;
     }
 
     #endregion

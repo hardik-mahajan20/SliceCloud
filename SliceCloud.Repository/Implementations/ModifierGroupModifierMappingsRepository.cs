@@ -18,20 +18,21 @@ public class ModifierGroupModifierMappingsRepository(SliceCloudContext sliceClou
 
     #region AddModifierGroupMappings
 
-    public async Task AddModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings)
+    public async Task<int> AddModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings)
     {
         await _sliceCloudContext.ModifierGroupModifierMappings.AddRangeAsync(modifierGroupModifierMappings);
         await _sliceCloudContext.SaveChangesAsync();
+        return modifierGroupModifierMappings.FirstOrDefault()?.ModifierGroupModifierMappingId ?? 0;
     }
 
     #endregion
 
     #region RemoveModifierGroupMappings
 
-    public async Task RemoveModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings)
+    public async Task<bool> RemoveModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings)
     {
         _sliceCloudContext.ModifierGroupModifierMappings.RemoveRange(modifierGroupModifierMappings);
-        await _sliceCloudContext.SaveChangesAsync();
+        return await _sliceCloudContext.SaveChangesAsync() > 0;
     }
 
     #endregion

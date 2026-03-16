@@ -100,7 +100,7 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
             CreatedBy = _currentUserService.UserId
         };
 
-        return await _tableRepository.AddTableAsync(table);
+        return await _tableRepository.AddTableAsync(table) > 0;
     }
 
     #endregion
@@ -129,7 +129,7 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
         table.ModifiedAt = DateTime.UtcNow;
         table.ModifiedBy = _currentUserService.UserId;
 
-        return await _tableRepository.UpdateTableAsync(table);
+        return await _tableRepository.UpdateTableAsync(table) > 0;
     }
 
     #endregion
@@ -145,7 +145,7 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
         table.ModifiedAt = DateTime.UtcNow;
         table.ModifiedBy = _currentUserService.UserId;
 
-        return await _tableRepository.UpdateTableAsync(table);
+        return await _tableRepository.UpdateTableAsync(table) > 0;
     }
 
     #endregion

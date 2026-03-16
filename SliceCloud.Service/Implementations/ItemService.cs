@@ -159,7 +159,7 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
         menuItem.ModifiedAt = DateTime.UtcNow;
         menuItem.ModifiedBy = _currentUserService.UserId;
 
-        return await _itemRepository.UpdateMenuItemAsync(menuItem);
+        return await _itemRepository.UpdateMenuItemAsync(menuItem) > 0;
     }
 
     #endregion
@@ -177,7 +177,7 @@ public class ItemService(IItemRepository itemRepository, IImageService imageServ
         item.ModifiedAt = DateTime.UtcNow;
         item.ModifiedBy = _currentUserService.UserId;
 
-        return await _itemRepository.UpdateMenuItemAsync(item);
+        return await _itemRepository.UpdateMenuItemAsync(item) > 0;
     }
 
     #endregion

@@ -8,11 +8,11 @@ public class PermissionRepository(SliceCloudContext sliceCloudContext) : IPermis
 {
     SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllPermissionWithRolesAndModulesAsQueryable
+    #region GetAllPermissionAsQueryable
 
-    public IQueryable<Permission> GetAllPermissionWithRolesAndModulesAsQueryable()
+    public IQueryable<Permission> GetAllPermissionAsQueryable()
     {
-        return _sliceCloudContext.Permissions.Include(p => p.Role).Include(p => p.Module).AsQueryable();
+        return _sliceCloudContext.Permissions.AsQueryable();
     }
 
     #endregion
@@ -26,20 +26,20 @@ public class PermissionRepository(SliceCloudContext sliceCloudContext) : IPermis
 
     #endregion
 
-    #region GetAllPermissionAsQueryable
+    #region GetAllPermissionWithRolesAndModulesAsQueryable
 
-    public IQueryable<Permission> GetAllPermissionAsQueryable()
+    public IQueryable<Permission> GetAllPermissionWithRolesAndModulesAsQueryable()
     {
-        return _sliceCloudContext.Permissions.AsQueryable();
+        return _sliceCloudContext.Permissions.Include(p => p.Role).Include(p => p.Module).AsQueryable();
     }
 
     #endregion
 
     #region SaveChanges
 
-    public async Task SaveChangesAsync()
+    public async Task<int> SaveChangesAsync()
     {
-        await _sliceCloudContext.SaveChangesAsync();
+        return await _sliceCloudContext.SaveChangesAsync();
     }
 
     #endregion

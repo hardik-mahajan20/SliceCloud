@@ -11,17 +11,17 @@ public interface IModifierRepository
     IQueryable<Modifier> GetAllModifiersAsQueryable();
 
     /// <summary>
-    /// Adds a new modifier asynchronously to the database.
+    /// Adds a new modifier asynchronously in the database.
     /// </summary>
     /// <param name="modifier">The modifier entity to add.</param>
-    /// <returns>A task the modifierId of the new created modifier the asynchronous operation.</returns>
+    /// <returns>A task that returns the ID of the created modifier.</returns>
     Task<int> AddModifierAsync(Modifier modifier);
 
     /// <summary>
-    /// Updates an existing modifier asynchronously to the database.
+    /// Updates an existing modifier asynchronously in the database.
     /// </summary>
-    /// <param name="modifier">The modifier entity to add.</param>
-    /// <returns>A task the modifierId of the existing updated modifier the asynchronous operation.</returns>
+    /// <param name="modifier">The modifier to update.</param>
+    /// <returns>A task that returns the ID of the updated modifier.</returns>
     Task<int> UpdateModifierAsync(Modifier modifier);
 
     /// <summary>

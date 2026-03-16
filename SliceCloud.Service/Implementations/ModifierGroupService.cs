@@ -139,7 +139,7 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
         modifierGroup.ModifiedBy = _currentUserService.UserId;
         modifierGroup.ModifiedAt = DateTime.UtcNow;
 
-        return await _modifierGroupRepository.UpdateModifierGroupAsync(modifierGroup);
+        return await _modifierGroupRepository.UpdateModifierGroupAsync(modifierGroup) > 0;
     }
 
     public async Task<bool> DeleteModifierGroupAsync(int modifierGroupId)
@@ -156,6 +156,6 @@ public class ModifierGroupService(IModifierGroupRepository modifierGroupReposito
         modifierGroup.ModifiedAt = DateTime.UtcNow;
         modifierGroup.ModifiedBy = _currentUserService.UserId;
 
-        return await _modifierGroupRepository.UpdateModifierGroupAsync(modifierGroup);
+        return await _modifierGroupRepository.UpdateModifierGroupAsync(modifierGroup) > 0;
     }
 }

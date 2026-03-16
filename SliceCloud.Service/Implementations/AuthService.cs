@@ -118,7 +118,7 @@ public class AuthService(IUsersLoginRepository usersLoginRepository, IConfigurat
             await _usersRepository.UpdateUserAsync(user);
         }
 
-        return await _usersLoginRepository.UpdateUsersLoginAsync(usersLogin);
+        return await _usersLoginRepository.UpdateUsersLoginAsync(usersLogin) > 0;
     }
 
     public UserCredentialViewModel DecodeJwtToken(string token)

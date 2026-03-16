@@ -118,7 +118,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
             CreatedBy = _currentUserService.UserId
         };
 
-        return await _taxesFeesRepository.AddTaxAsync(tax);
+        return await _taxesFeesRepository.AddTaxAsync(tax) > 0;
     }
 
     #endregion
@@ -158,7 +158,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
         tax.ModifiedBy = _currentUserService.UserId;
         tax.ModifiedAt = DateTime.UtcNow;
 
-        return await _taxesFeesRepository.UpdateTaxAsync(tax);
+        return await _taxesFeesRepository.UpdateTaxAsync(tax) > 0;
     }
 
     #endregion
@@ -173,7 +173,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
         taxis.ModifiedBy = _currentUserService.UserId;
         taxis.ModifiedAt = DateTime.UtcNow;
 
-        return await _taxesFeesRepository.UpdateTaxAsync(taxis);
+        return await _taxesFeesRepository.UpdateTaxAsync(taxis) > 0;
     }
 
     #endregion

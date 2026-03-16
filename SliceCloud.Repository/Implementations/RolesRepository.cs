@@ -8,7 +8,7 @@ public class RolesRepository(SliceCloudContext sliceCloudContext) : IRolesReposi
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllRoles
+    #region GetAllRolesAsQueryable
 
     public IQueryable<Role> GetAllRolesAsQueryable()
     {

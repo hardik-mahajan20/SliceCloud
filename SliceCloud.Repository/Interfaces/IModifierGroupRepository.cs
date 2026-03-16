@@ -5,23 +5,10 @@ namespace SliceCloud.Repository.Interfaces;
 public interface IModifierGroupRepository
 {
     /// <summary>
-    /// Retrieves all modifier-group as queryable.
+    /// Retrieves all modifierGroup as queryable.
     /// </summary>
-    /// <returns>All modifier-group as queryable.</returns>
+    /// <returns>All modifierGroup as queryable.</returns>
     IQueryable<ModifierGroup> GetAllModifierGroupsAsQueryable();
-
-    /// <summary>
-    /// Saves changes to the data source asynchronously.
-    /// </summary>
-    /// <returns>A task representing the asynchronous save operation.</returns>
-    Task<int> SaveChangesAsync();
-
-    /// <summary>
-    /// Adds a new modifier group asynchronously.
-    /// </summary>
-    /// <param name="modifierGroup">The modifier group to add.</param>
-    /// <returns>A task that returns true if the addition was successful, otherwise false.</returns>
-    Task<int> AddModifierGroupAsync(ModifierGroup modifierGroup);
 
     /// <summary>
     /// Retrieves a modifierGroup by its ID asynchronously.
@@ -31,9 +18,22 @@ public interface IModifierGroupRepository
     Task<ModifierGroup?> GetModifierGroupByIdAsync(int modifierGroupId);
 
     /// <summary>
+    /// Adds a new modifierGroup asynchronously in the database.
+    /// </summary>
+    /// <param name="modifierGroup">The modifierGroup entity to add.</param>
+    /// <returns>A task that returns the ID of the created modifierGroup.</returns>
+    Task<int> AddModifierGroupAsync(ModifierGroup modifierGroup);
+
+    /// <summary>
     /// Updates an existing modifierGroup asynchronously in the database.
     /// </summary>
     /// <param name="modifierGroup">The modifierGroup to update.</param>
-    /// <returns>A task that returns true if the update was successful, otherwise false.</returns>
-    Task<bool> UpdateModifierGroupAsync(ModifierGroup modifierGroup);
+    /// <returns>A task that returns the ID of the updated modifierGroup.</returns>
+    Task<int> UpdateModifierGroupAsync(ModifierGroup modifierGroup);
+
+    /// <summary>
+    /// Saves changes to the data source asynchronously.
+    /// </summary>
+    /// <returns>A task representing the asynchronous save operation.</returns>
+    Task<int> SaveChangesAsync();
 }

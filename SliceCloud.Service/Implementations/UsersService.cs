@@ -162,7 +162,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
             ProfileImage = itemImgPath
         };
 
-        bool isUserCreated = await _usersRepository.CreateUserAsync(user);
+        bool isUserCreated = await _usersRepository.AddUserAsync(user) > 0;
         if (isUserCreated)
         {
             int userId = user.UserId;
@@ -275,7 +275,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         if (user is not null)
         {
             user.IsDeleted = true;
-            return await _usersRepository.UpdateUserAsync(user);
+            return await _usersRepository.UpdateUserAsync(user) > 0;
         }
         return false;
     }

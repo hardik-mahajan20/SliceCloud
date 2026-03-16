@@ -109,7 +109,7 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
         category.ModifiedBy = _currentUserService.UserId;
         category.ModifiedAt = DateTime.UtcNow;
 
-        return await _categoryRepository.UpdateCategoryAsync(category);
+        return await _categoryRepository.UpdateCategoryAsync(category) > 0;
     }
 
     public async Task<bool> DeleteCategoryAsync(int categoryId)
@@ -126,6 +126,6 @@ public class CategoryService(ICategoryRepository categoryRepository, ICurrentUse
         category.ModifiedAt = DateTime.UtcNow;
         category.ModifiedBy = _currentUserService.UserId;
 
-        return await _categoryRepository.UpdateCategoryAsync(category);
+        return await _categoryRepository.UpdateCategoryAsync(category) > 0;
     }
 }

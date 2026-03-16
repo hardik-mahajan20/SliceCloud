@@ -7,7 +7,7 @@ public class UnitRepository(SliceCloudContext sliceCloudContext) : IUnitReposito
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllUnits
+    #region GetAllUnitsAsQueryable
 
     public IQueryable<Unit> GetAllUnitsAsQueryable()
     {

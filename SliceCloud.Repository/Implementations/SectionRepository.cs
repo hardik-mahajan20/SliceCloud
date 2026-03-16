@@ -28,20 +28,22 @@ public class SectionRepository(SliceCloudContext sliceCloudContext) : ISectionRe
 
     #region AddSection
 
-    public async Task<bool> AddSectionAsync(Section section)
+    public async Task<int> AddSectionAsync(Section section)
     {
         await _sliceCloudContext.Sections.AddAsync(section);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.SaveChangesAsync();
+        return section.SectionId;
     }
 
     #endregion
 
     #region UpdateSection
 
-    public async Task<bool> UpdateSectionAsync(Section section)
+    public async Task<int> UpdateSectionAsync(Section section)
     {
         _sliceCloudContext.Sections.Update(section);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.SaveChangesAsync();
+        return section.SectionId;
     }
 
     #endregion

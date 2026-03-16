@@ -4,12 +4,12 @@ namespace SliceCloud.Repository.Interfaces;
 
 public interface IItemModifierGroupMapRepository
 {
+
     /// <summary>
-    /// Adds a new item-modifier group mapping to the database.
+    /// Retrieves all itemModifierGroupMap as queryable.
     /// </summary>
-    /// <param name="itemModifierGroupMap">The item-modifier group mapping to add.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task AddItemModifierGroupMapAsync(ItemModifierGroupMap itemModifierGroupMap);
+    /// <returns>All itemModifierGroupMap as queryable.</returns>
+    IQueryable<ItemModifierGroupMap> GetAllItemModifierGroupMapsAsQueryable();
 
     /// <summary>
     /// Retrieves a list of item-modifier group mappings for a specific item.
@@ -19,19 +19,20 @@ public interface IItemModifierGroupMapRepository
     Task<List<ItemModifierGroupMap>> GetMappingByItemIdAsync(int itemId);
 
     /// <summary>
-    /// Retrieves all itemModifierGroupMaps as queryable.
+    /// Adds a new itemModifierGroupMap asynchronously in the database.
     /// </summary>
-    /// <returns>All itemModifierGroupMaps as queryable.</returns>
-    IQueryable<ItemModifierGroupMap> GetAllItemModifierGroupMapsAsQueryable();
+    /// <param name="itemModifierGroupMap">The itemModifierGroupMap entity to add.</param>
+    /// <returns>A task that returns the ID of the created itemModifierGroupMap.</returns>
+    Task<int> AddItemModifierGroupMapAsync(ItemModifierGroupMap itemModifierGroupMap);
+
+    /// <summary>
+    /// Removes itemModifierGroupMaps from the current context.
+    /// </summary>
+    void RemoveItemModifierGroupMaps(IEnumerable<ItemModifierGroupMap> itemModifierGroupMaps);
 
     /// <summary>
     /// Saves changes to the data source asynchronously.
     /// </summary>
     /// <returns>A task representing the asynchronous save operation.</returns>
     Task<int> SaveChangesAsync();
-
-    /// <summary>
-    /// Removes itemModifierGroupMaps from the current context.
-    /// </summary>
-    void RemoveItemModifierGroupMaps(IEnumerable<ItemModifierGroupMap> itemModifierGroupMaps);
 }

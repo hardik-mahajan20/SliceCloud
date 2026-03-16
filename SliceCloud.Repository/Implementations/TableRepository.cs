@@ -17,16 +17,6 @@ public class TableRepository(SliceCloudContext sliceCloudContext) : ITableReposi
 
     #endregion
 
-    #region AddTable
-
-    public async Task<bool> AddTableAsync(Table table)
-    {
-        await _sliceCloudContext.Tables.AddAsync(table);
-        return _sliceCloudContext.SaveChanges() > 0;
-    }
-
-    #endregion
-
     #region GetTableById
 
     public async Task<Table?> GetTableByIdAsync(int tableId)
@@ -36,12 +26,25 @@ public class TableRepository(SliceCloudContext sliceCloudContext) : ITableReposi
 
     #endregion
 
+    #region AddTable
+
+    public async Task<int> AddTableAsync(Table table)
+    {
+        await _sliceCloudContext.Tables.AddAsync(table);
+        await _sliceCloudContext.SaveChangesAsync();
+        return table.TableId;
+    }
+
+    #endregion
+
     #region UpdateTable
 
-    public async Task<bool> UpdateTableAsync(Table table)
+    public async Task<int> UpdateTableAsync(Table table)
     {
         _sliceCloudContext.Tables.Update(table);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.SaveChangesAsync();
+        return table.TableId;
+
     }
 
     #endregion

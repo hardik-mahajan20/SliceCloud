@@ -11,25 +11,25 @@ public interface IItemRepository
     IQueryable<Item> GetAllItemsAsQueryable();
 
     /// <summary>
-    /// Adds a new menu item asynchronously.
-    /// </summary>
-    /// <param name="item">The item to add.</param>
-    /// <returns>A task that returns the ID of the newly added item.</returns>
-    Task<int> AddMenuItemAsync(Item item);
-
-    /// <summary>
-    /// Retrieves an item by its ID asynchronously.
+    /// Retrieves a item by its ID asynchronously.
     /// </summary>
     /// <param name="itemId">The ID of the item to retrieve.</param>
-    /// <returns>The item if found, otherwise null.</returns>
+    /// <returns>A task that returns the item if found in the database, otherwise null.</returns>
     Task<Item?> GetItemByIdAsync(int itemId);
 
     /// <summary>
-    /// Updates an existing menu item asynchronously.
+    /// Adds a new item asynchronously in the database.
     /// </summary>
-    /// <param name="item">The menu item to update.</param>
-    /// <returns>True if the update was successful, otherwise false.</returns>
-    Task<bool> UpdateMenuItemAsync(Item item);
+    /// <param name="item">The item entity to add.</param>
+    /// <returns>A task that returns the ID of the created item.</returns>
+    Task<int> AddMenuItemAsync(Item item);
+
+    /// <summary>
+    /// Updates an existing item asynchronously in the database.
+    /// </summary>
+    /// <param name="item">The item to update.</param>
+    /// <returns>A task that returns the ID of the updated item.</returns>
+    Task<int> UpdateMenuItemAsync(Item item);
 
     /// <summary>
     /// Saves changes to the data source asynchronously.

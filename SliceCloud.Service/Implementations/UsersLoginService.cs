@@ -24,7 +24,7 @@ public class UsersLoginService(IUsersLoginRepository usersLoginRepository) : IUs
                 RoleId = usersLoginViewModel.RoleId,
                 IsFirstLogin = true
             };
-            await _usersLoginRepository.CreateUserLoginAsync(usersLogin);
+            await _usersLoginRepository.AddUserLoginAsync(usersLogin); ;
         }
         catch (Exception ex)
         {
