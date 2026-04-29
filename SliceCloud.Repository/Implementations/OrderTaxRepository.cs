@@ -16,4 +16,5 @@ public class OrderTaxRepository(SliceCloudContext sliceCloudContext) : IOrderTax
     }
 
     #endregion
+    
 }

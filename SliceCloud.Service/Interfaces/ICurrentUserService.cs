@@ -13,4 +13,10 @@ public interface ICurrentUserService
     /// </summary>
     /// <returns>A logged users UserName.</returns>
     string? UserName { get; }
+
+    /// <summary>
+    /// Retrieves logged users UserRole.
+    /// </summary>
+    /// <returns>A logged users UserRole.</returns>
+    string? UserRole { get; }
 }

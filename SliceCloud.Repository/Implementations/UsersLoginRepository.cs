@@ -17,40 +17,33 @@ public class UsersLoginRepository(SliceCloudContext sliceCloudContext) : IUsersL
 
     #endregion
 
-    #region GetUsersLoginByIdAsync
-
-    public async Task<UsersLogin?> GetUsersLoginByIdAsync(int userId)
-    {
-        return await _sliceCloudContext.UsersLogins.FindAsync(userId);
-    }
-
-    #endregion
-
-    #region CreateUserLogin
-
-    public async Task<bool> CreateUserLoginAsync(UsersLogin usersLogin)
-    {
-        await _sliceCloudContext.UsersLogins.AddAsync(usersLogin);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
-    }
-
-    #endregion
-
-    #region UpdateUsersLoginAsync
-
-    public async Task<bool> UpdateUsersLoginAsync(UsersLogin usersLogin)
-    {
-        _sliceCloudContext.UsersLogins.Update(usersLogin);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
-    }
-
-    #endregion
-
     #region GetUsersLoginWithUserAsQueryable
 
     public IQueryable<UsersLogin> GetUsersLoginWithUserAsQueryable()
     {
         return _sliceCloudContext.UsersLogins.Include(u => u.User).AsQueryable();
+    }
+
+    #endregion
+
+    #region AddUserLogin
+
+    public async Task<int> AddUserLoginAsync(UsersLogin usersLogin)
+    {
+        await _sliceCloudContext.UsersLogins.AddAsync(usersLogin);
+        await _sliceCloudContext.SaveChangesAsync();
+        return usersLogin.UserLoginId;
+    }
+
+    #endregion
+
+    #region UpdateUsersLogin
+
+    public async Task<int> UpdateUsersLoginAsync(UsersLogin usersLogin)
+    {
+        _sliceCloudContext.UsersLogins.Update(usersLogin);
+        await _sliceCloudContext.SaveChangesAsync();
+        return usersLogin.UserLoginId;
     }
 
     #endregion

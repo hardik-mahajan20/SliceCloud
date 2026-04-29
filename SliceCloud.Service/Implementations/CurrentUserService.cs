@@ -37,4 +37,16 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
 
     #endregion
 
+    #region Get UserRole
+
+    public string? UserRole
+    {
+        get
+        {
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
+        }
+    }
+
+    #endregion
+
 }

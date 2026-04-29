@@ -11,14 +11,15 @@ public interface IModifierGroupModifierMappingsRepository
     IQueryable<ModifierGroupModifierMapping> GetAllModifierGroupModifierMappingAsQueryable();
 
     /// <summary>
-    /// Adds a list of ModifierGroupModifierMapping asynchronously.
+    /// Adds a new list of modifierGroupModifierMapping asynchronously in the database.
     /// </summary>
-    /// <param name="modifierGroupModifierMappings">The list of ModifierGroupModifierMapping to add.</param>
-    Task AddModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings);
+    /// <param name="modifierGroupModifierMappings">The list of modifierGroupModifierMapping entity to add.</param>
+    /// <returns>A task that returns the ID of the created modifierGroupModifierMapping.</returns>
+    Task<int> AddModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings);
 
     /// <summary>
-    /// Removes a list of ModifierGroupModifierMapping asynchronously.
+    /// Removes a list of modifierGroupModifierMapping asynchronously.
     /// </summary>
-    /// <param name="modifierGroupModifierMappings">The list of ModifierGroupModifierMapping to add.</param>
-    Task RemoveModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings);
+    /// <param name="modifierGroupModifierMappings">The list of modifierGroupModifierMapping to remove.</param>
+    Task<bool> RemoveModifierGroupMappingsAsync(List<ModifierGroupModifierMapping> modifierGroupModifierMappings);
 }

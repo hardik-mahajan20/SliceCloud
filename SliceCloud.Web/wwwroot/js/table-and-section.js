@@ -74,8 +74,8 @@ function loadTableSection(newSectionAdded = false) {
 }
 
 $(document).on("click", ".section-btn", function () {
-  $(".section-btn").removeClass("addedit-section");
-  $(this).addClass("addedit-section");
+  $(".section-btn").removeClass("add-edit-section");
+  $(this).addClass("add-edit-section");
   $(".section-btn").removeClass("active-section");
   $(this).addClass("active-section");
   $("#tableSearch").val("");
@@ -188,7 +188,7 @@ $(document).on("keyup", "#tableSearch", function () {
   );
 });
 
-$(document).on("click", "#addsection", function () {
+$(document).on("click", "#addSection", function () {
   $.ajax({
     url: "/TableAndSection/GetAddSectionModal/",
     type: "GET",
@@ -407,7 +407,7 @@ $(document).on("click", ".add-table-btn", function () {
 });
 
 $(document).on("click", "#saveTableBtn", function () {
-  $(".text-danger[data-valmsg-for]").text("");
+  $(".text-danger[data-val-msg-for]").text("");
 
   var formData = new FormData();
   formData.append("TableName", $("#tableName").val());
@@ -429,7 +429,7 @@ $(document).on("click", "#saveTableBtn", function () {
       } else {
         if (response.validationErrors) {
           $.each(response.validationErrors, function (key, messages) {
-            $(`[data-valmsg-for="${key}"]`).text(messages[0]);
+            $(`[data-val-msg-for="${key}"]`).text(messages[0]);
           });
         } else {
           toastr.error(response.message || "Error adding table.", "Error");
@@ -466,11 +466,11 @@ $(document).on("click", ".edit-table-btn", function () {
 $(document).on("click", "#updateTableBtn", function (e) {
   e.preventDefault();
 
-  $(".text-danger[data-valmsg-for]").text("");
+  $(".text-danger[data-val-msg-for]").text("");
 
   var capacity = $("#editTableCapacity").val();
   if (!capacity || isNaN(capacity) || capacity <= 0) {
-    $("[data-valmsg-for='Capacity']").text(
+    $("[data-val-msg-for='Capacity']").text(
       "Capacity must be a valid number greater than 0."
     );
     return;
@@ -496,7 +496,7 @@ $(document).on("click", "#updateTableBtn", function (e) {
       } else {
         if (response.validationErrors) {
           $.each(response.validationErrors, function (field, messages) {
-            $(`[data-valmsg-for="${field}"]`).text(messages[0]);
+            $(`[data-val-msg-for="${field}"]`).text(messages[0]);
           });
         } else {
           toastr.error(response.message || "Error updating table.", "Error");
@@ -572,7 +572,7 @@ function fetchAllTableIds() {
 function updateCheckboxesFromSelection() {
   $(".child-checkbox").each(function () {
     const tableId = parseInt(
-      $(this).closest("tr").find("input[name='Tableid']").val()
+      $(this).closest("tr").find("input[name='TableId']").val()
     );
     $(this).prop("checked", selectedTables.has(tableId));
   });
@@ -594,7 +594,7 @@ $(document).on("change", "#mainCheckBoxTable", function () {
 
 $(document).on("change", ".child-checkbox", function () {
   const tableId = parseInt(
-    $(this).closest("tr").find("input[name='Tableid']").val()
+    $(this).closest("tr").find("input[name='TableId']").val()
   );
 
   if (this.checked) {

@@ -5,10 +5,10 @@ namespace SliceCloud.Repository.Interfaces;
 public interface IPermissionRepository
 {
     /// <summary>
-    /// Retrieves all permissions with roles and modules as queryable.
+    /// Retrieves all permissions as queryable.
     /// </summary>
-    /// <returns>All permissions with roles and modules as queryable.</returns>
-    IQueryable<Permission> GetAllPermissionWithRolesAndModulesAsQueryable();
+    /// <returns>All permissions as queryable.</returns>
+    IQueryable<Permission> GetAllPermissionAsQueryable();
 
     /// <summary>
     /// Retrieves all permissions with modules as queryable.
@@ -17,14 +17,14 @@ public interface IPermissionRepository
     IQueryable<Permission> GetAllPermissionWithModulesAsQueryable();
 
     /// <summary>
-    /// Retrieves all permissions as queryable.
+    /// Retrieves all permissions with roles and modules as queryable.
     /// </summary>
-    /// <returns>All permissions as queryable.</returns>
-    IQueryable<Permission> GetAllPermissionAsQueryable();
+    /// <returns>All permissions with roles and modules as queryable.</returns>
+    IQueryable<Permission> GetAllPermissionWithRolesAndModulesAsQueryable();
 
     /// <summary>
-    /// Saves changes of open context asynchronously.
+    /// Saves changes to the data source asynchronously.
     /// </summary>
-    /// <returns>A task that return void as result.</returns>
-    Task SaveChangesAsync();
+    /// <returns>A task representing the asynchronous save operation.</returns>
+    Task<int> SaveChangesAsync();
 }

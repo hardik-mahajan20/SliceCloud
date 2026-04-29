@@ -17,6 +17,15 @@ public class ItemRepository(SliceCloudContext sliceCloudContext) : IItemReposito
 
     #endregion
 
+    #region GetItemById
+
+    public async Task<Item?> GetItemByIdAsync(int itemId)
+    {
+        return await _sliceCloudContext.Items.FirstOrDefaultAsync(m => m.ItemId == itemId && m.IsDeleted == false);
+    }
+
+    #endregion
+
     #region AddMenuItem
 
     public async Task<int> AddMenuItemAsync(Item item)
@@ -28,21 +37,13 @@ public class ItemRepository(SliceCloudContext sliceCloudContext) : IItemReposito
 
     #endregion
 
-    #region GetItemById
-
-    public async Task<Item?> GetItemByIdAsync(int itemId)
-    {
-        return await _sliceCloudContext.Items.FirstOrDefaultAsync(m => m.ItemId == itemId && m.IsDeleted == false);
-    }
-
-    #endregion
-
     #region UpdateMenuItem
 
-    public async Task<bool> UpdateMenuItemAsync(Item item)
+    public async Task<int> UpdateMenuItemAsync(Item item)
     {
         _sliceCloudContext.Items.Update(item);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.SaveChangesAsync();
+        return item.ItemId;
     }
 
     #endregion
@@ -55,4 +56,5 @@ public class ItemRepository(SliceCloudContext sliceCloudContext) : IItemReposito
     }
 
     #endregion
+
 }

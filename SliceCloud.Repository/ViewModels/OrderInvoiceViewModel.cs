@@ -2,7 +2,7 @@ namespace SliceCloud.Repository.ViewModels;
 
 public class OrderInvoiceViewModel
 {
-     public int OrderId { get; set; }
+        public int OrderId { get; set; }
 
         public int CustomerId { get; set; }
 

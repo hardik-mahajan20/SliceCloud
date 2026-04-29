@@ -7,12 +7,13 @@ public class CityRepository(SliceCloudContext sliceCloudContext) : ICityReposito
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllCitiesAsQuearyable
+    #region GetAllCitiesAsQueryable
 
-    public IQueryable<City> GetAllCitiesAsQuearyable()
+    public IQueryable<City> GetAllCitiesAsQueryable()
     {
         return _sliceCloudContext.Cities.AsQueryable();
     }
 
     #endregion
+    
 }

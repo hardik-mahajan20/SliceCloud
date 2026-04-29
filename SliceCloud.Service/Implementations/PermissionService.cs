@@ -9,9 +9,11 @@ namespace SliceCloud.Service.Implementations;
 
 public class PermissionService(IPermissionRepository permissionRepository, IRolesRepository rolesRepository) : IPermissionService
 {
-    IPermissionRepository _permissionRepository = permissionRepository;
+    private readonly IPermissionRepository _permissionRepository = permissionRepository;
 
-    IRolesRepository _rolesRepository = rolesRepository;
+    private readonly IRolesRepository _rolesRepository = rolesRepository;
+
+    #region GetAllPermissions
 
     public async Task<RoleAndPermissionsViewModel> GetAllPermissionsAsync(int roleId)
     {
@@ -34,6 +36,8 @@ public class PermissionService(IPermissionRepository permissionRepository, IRole
         };
         return roleAndPermissionsViewModel;
     }
+
+    #endregion
 
     #region RoleHasPermission
 

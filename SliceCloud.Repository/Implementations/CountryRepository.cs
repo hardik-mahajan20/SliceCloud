@@ -9,10 +9,11 @@ public class CountryRepository(SliceCloudContext sliceCloudContext) : ICountryRe
 
     #region GetAllCountries
 
-    public IQueryable<Country> GetAllCountruiesAsQuearyable()
+    public IQueryable<Country> GetAllCountriesAsQueryable()
     {
         return _sliceCloudContext.Countries.AsQueryable();
     }
 
     #endregion
+    
 }

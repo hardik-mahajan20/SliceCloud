@@ -3,10 +3,10 @@
 @model SliceCloud.Repository.ViewModels.PaginatedList<ModifierViewModel>
 <div class="modifier-group-modifier-wrapper">
     <table class="table">
-        <tr class="tableheader">
+        <tr class="table-header">
             <td class="align-middle">
                 <div class="d-flex ">
-                    <input class="form-check-input me-3" type="checkbox" id="maincheckboxModifier" />
+                    <input class="form-check-input me-3" type="checkbox" id="main-checkboxModifier" />
                     Name
                 </div>
             </td>
@@ -36,11 +36,11 @@
                         <td>
                             <div class="d-flex align-items-center ">
                                 <input class="form-check-input me-3 modifier-checkbox" type="checkbox"
-                                    name="modifier-checkbox-@modifierViewModel.ModifierId"
-                                    id="modifier-checkbox-@modifierViewModel.ModifierId" />
+                                       name="modifier-checkbox-@modifierViewModel.ModifierId"
+                                       id="modifier-checkbox-@modifierViewModel.ModifierId" />
                                 <input type="hidden" name="ModifierId" value="@modifierViewModel.ModifierId">
                                 <span class="truncate-text" style="min-width: 190px;"
-                                    title="@modifierViewModel.ModifierName">@modifierViewModel.ModifierName</span>
+                                      title="@modifierViewModel.ModifierName">@modifierViewModel.ModifierName</span>
                             </div>
                         </td>
                         <td>Pcs</td>

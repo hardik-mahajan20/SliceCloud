@@ -46,14 +46,14 @@
                 }
                 else
                 {
-                    @foreach (CustomerViewModel customer in Model)
+                    @foreach (CustomerViewModel customerViewModel in Model)
                     {
-                        <tr class="customer-row" data-id="@customer.CustomerId" style="cursor: pointer;">
-                            <td>@customer.CustomerName</td>
-                            <td>@customer.Email</td>
-                            <td>@customer.PhoneNumber</td>
-                            <td>@customer.CreatedDate.ToString("yyyy-MM-dd")</td>
-                            <td>@customer.TotalOrder</td>
+                        <tr class="customer-row" data-id="@customerViewModel.CustomerId" style="cursor: pointer;">
+                            <td>@customerViewModel.CustomerName</td>
+                            <td>@customerViewModel.Email</td>
+                            <td>@customerViewModel.PhoneNumber</td>
+                            <td>@customerViewModel.CreatedDate.ToString("yyyy-MM-dd")</td>
+                            <td>@customerViewModel.TotalOrder</td>
                         </tr>
                     }
                 }

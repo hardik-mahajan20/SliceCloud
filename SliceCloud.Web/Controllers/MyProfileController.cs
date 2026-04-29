@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SliceCloud.Repository.Constants;
 using SliceCloud.Repository.ViewModels;
 using SliceCloud.Service.Attributes;
 using SliceCloud.Service.Interfaces;
@@ -9,7 +10,7 @@ namespace SliceCloud.Web.Controllers;
 /// <summary>
 /// This controller is referenced for the my-profile module related end points.
 /// </summary>
-public class MyProfileController(ICountryService countryService, IStateService stateService, ICityService cityService, IMyProfileService profileService, IAuthService authenticateUserService) : Controller
+public class MyProfileController(ICountryService countryService, IStateService stateService, ICityService cityService, IMyProfileService profileService, IAuthService authenticateUserService, ICurrentUserService currentUserService) : Controller
 {
 
     private readonly IMyProfileService _profileService = profileService;
@@ -17,20 +18,22 @@ public class MyProfileController(ICountryService countryService, IStateService s
     private readonly IStateService _stateService = stateService;
     private readonly ICityService _cityService = cityService;
     private readonly IAuthService _authenticateUserService = authenticateUserService;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
 
     #region MyProfile GET
 
-    [CustomAuthorize]
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpGet]
     public async Task<IActionResult> MyProfile()
     {
-        UserCredentialViewModel userCredentialViewModel = _authenticateUserService.DecodeJwtToken(Request.Cookies["AuthToken"] ?? "");
-        if (string.IsNullOrEmpty(userCredentialViewModel.Email))
+        int userId = _currentUserService.UserId;
+
+        if (userId <= 0)
         {
             return RedirectToAction("Login", "Auth");
         }
 
-        MyProfileViewModel? myProfileViewModel = await _profileService.GetProfileByIdAsync(userCredentialViewModel.Id);
+        MyProfileViewModel? myProfileViewModel = await _profileService.GetProfileByIdAsync(userId);
 
         if (myProfileViewModel == null)
         {
@@ -47,7 +50,7 @@ public class MyProfileController(ICountryService countryService, IStateService s
 
     #region MyProfile - POST
 
-    [CustomAuthorize]
+    [CustomAuthorize(PermissionConstants.CAN_VIEW, RolesConstants.ADMIN, RolesConstants.MANAGER, RolesConstants.CHEF)]
     [HttpPost]
     public async Task<IActionResult> MyProfile(MyProfileViewModel myProfileViewModel)
     {
@@ -63,20 +66,20 @@ public class MyProfileController(ICountryService countryService, IStateService s
                     }
                 }
 
-
                 return View(myProfileViewModel);
             }
 
+            int userId = _currentUserService.UserId;
 
-            UserCredentialViewModel userCredentialViewModel = _authenticateUserService.DecodeJwtToken(Request.Cookies["AuthToken"] ?? "");
-            if (string.IsNullOrEmpty(userCredentialViewModel.Email))
+            if (userId <= 0)
             {
-                return RedirectToAction("Dashboard", "Dashboard");
+                return RedirectToAction("Login", "Auth");
             }
 
-            MyProfileViewModel? user = await _profileService.GetProfileByIdAsync(userCredentialViewModel.Id);
+            MyProfileViewModel? user = await _profileService.GetProfileByIdAsync(userId);
 
-            bool isDuplicateUsername = await _profileService.IsUsernameTakenAsync(myProfileViewModel.UserName, myProfileViewModel.Id);
+            bool isDuplicateUsername = await _profileService.IsUsernameTakenAsync(myProfileViewModel.UserName, userId);
+            
             if (isDuplicateUsername)
             {
                 ModelState.AddModelError("Username", "Username already exists. Please choose a different one.");
@@ -88,9 +91,7 @@ public class MyProfileController(ICountryService countryService, IStateService s
                 return View(myProfileViewModel);
             }
 
-            UserCredentialViewModel? loggedInUser = _authenticateUserService.DecodeJwtToken(Request.Cookies["AuthToken"] ?? ""); ;
-
-            MyProfileViewModel? updatedProfile = await _profileService.UpdateProfileAsync(loggedInUser.Id, myProfileViewModel);
+            MyProfileViewModel? updatedProfile = await _profileService.UpdateProfileAsync(userId, myProfileViewModel);
 
             if (updatedProfile is not null)
             {

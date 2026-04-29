@@ -8,7 +8,7 @@ public interface ICustomerRepository
     /// Retrieves all customers as queryable.
     /// </summary>
     /// <returns>All customers as queryable.</returns>
-    IQueryable<Customer> GetAllCustomersAsQuearyable();
+    IQueryable<Customer> GetAllCustomersAsQueryable();
 
     /// <summary>
     /// Retrieves a customer along with their associated orders by customer ID.

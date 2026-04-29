@@ -1,6 +1,6 @@
 using SliceCloud.Repository.ViewModels;
 
-namespace SliceCloud.Service.Implementations;
+namespace SliceCloud.Service.Interfaces;
 
 public interface ITableService
 {

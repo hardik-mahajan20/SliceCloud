@@ -13,21 +13,21 @@ public interface ITaxesFeesRepository
     /// <summary>
     /// Retrieves a tax by its ID asynchronously.
     /// </summary>
-    /// <param name="id">The ID of the tax to retrieve.</param>
-    /// <returns>A task that returns the tax if found, otherwise null.</returns>
+    /// <param name="taxId">The ID of the tax to retrieve.</param>
+    /// <returns>A task that returns the tax if found in the database, otherwise null.</returns>
     Task<Taxis?> GetTaxByIdAsync(int taxId);
 
     /// <summary>
-    /// Adds a new tax asynchronously.
+    /// Adds a new tax asynchronously in the database.
     /// </summary>
-    /// <param name="tax">The tax to add.</param>
-    /// <returns>A task that returns true if the addition was successful, otherwise false.</returns>
-    Task<bool> AddTaxAsync(Taxis tax);
+    /// <param name="tax">The tax entity to add.</param>
+    /// <returns>A task that returns the ID of the created tax.</returns>
+    Task<int> AddTaxAsync(Taxis tax);
 
     /// <summary>
-    /// Updates an existing tax.
+    /// Updates an existing tax asynchronously in the database.
     /// </summary>
     /// <param name="tax">The tax to update.</param>
-    /// <returns>True if the update was successful, otherwise false.</returns>
-    Task<bool> UpdateTaxAsync(Taxis tax);
+    /// <returns>A task that returns the ID of the updated tax.</returns>
+    Task<int> UpdateTaxAsync(Taxis tax);
 }

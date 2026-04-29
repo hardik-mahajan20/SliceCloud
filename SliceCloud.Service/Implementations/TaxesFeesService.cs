@@ -15,27 +15,6 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     private readonly IItemRepository _itemRepository = itemRepository;
 
-    #region GetAllTaxes
-
-    public async Task<List<TaxesFeesViewModel>> GetAllTaxesAsync()
-    {
-        // List<Taxis>? taxes = await _taxesFeesRepository.GetAllTaxesAsync();
-        List<Taxis>? taxes = await _taxesFeesRepository.GetAllTaxisAsQueryable().Where(t => !t.IsDeleted ?? false).ToListAsync();
-
-        return taxes.Select(t => new TaxesFeesViewModel
-        {
-            TaxId = t.TaxId,
-            TaxName = t.TaxName,
-            TaxType = t.TaxType,
-            IsEnabled = t.IsEnabled ?? false,
-            IsDefault = t.IsDefault ?? false,
-            IsInclusive = t.IsInclusive ?? false,
-            TaxValue = (decimal?)t.TaxValue
-        }).ToList();
-    }
-
-    #endregion
-
     #region GetTaxesAndFees
 
     public async Task<PaginatedList<TaxesFeesViewModel>> GetTaxesAndFeesAsync(string search, int page, int pageSize, string sortColumn, string sortDirection)
@@ -55,15 +34,15 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
         query = sortColumn switch
         {
             TaxConstants.TAX_NAME
-              => sortDirection == GenralConstants.ASCENDING
+              => sortDirection == GeneralConstants.ASCENDING
                   ? query.OrderBy(t => t.TaxName)
                   : query.OrderByDescending(t => t.TaxName),
             TaxConstants.TAX_VALUE
-              => sortDirection == GenralConstants.ASCENDING
+              => sortDirection == GeneralConstants.ASCENDING
                   ? query.OrderBy(t => t.TaxValue)
                   : query.OrderByDescending(t => t.TaxValue),
             _
-              => sortDirection == GenralConstants.ASCENDING
+              => sortDirection == GeneralConstants.ASCENDING
                   ? query.OrderBy(t => t.TaxId)
                   : query.OrderByDescending(t => t.TaxId),
         };
@@ -90,21 +69,21 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task<bool> IsDuplicateTaxNameAsync(string taxName, int? taxId = null)
     {
-        IQueryable<Taxis>? quary = _taxesFeesRepository.GetAllTaxisAsQueryable();
+        IQueryable<Taxis>? query = _taxesFeesRepository.GetAllTaxisAsQueryable();
 
         if (taxId is not null)
         {
-            return await quary.AnyAsync(t => t.TaxName == taxName && t.TaxId != taxId);
+            return await query.AnyAsync(t => t.TaxName == taxName && t.TaxId != taxId);
         }
         else
         {
-            return await quary.AnyAsync(t => t.TaxName == taxName);
+            return await query.AnyAsync(t => t.TaxName == taxName);
         }
     }
 
     #endregion
 
-    #region AddTaxAsync
+    #region AddTax
 
     public async Task<bool> AddTaxAsync(TaxesFeesViewModel model)
     {
@@ -118,7 +97,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
             CreatedBy = _currentUserService.UserId
         };
 
-        return await _taxesFeesRepository.AddTaxAsync(tax);
+        return await _taxesFeesRepository.AddTaxAsync(tax) > 0;
     }
 
     #endregion
@@ -158,7 +137,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
         tax.ModifiedBy = _currentUserService.UserId;
         tax.ModifiedAt = DateTime.UtcNow;
 
-        return await _taxesFeesRepository.UpdateTaxAsync(tax);
+        return await _taxesFeesRepository.UpdateTaxAsync(tax) > 0;
     }
 
     #endregion
@@ -173,7 +152,7 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
         taxis.ModifiedBy = _currentUserService.UserId;
         taxis.ModifiedAt = DateTime.UtcNow;
 
-        return await _taxesFeesRepository.UpdateTaxAsync(taxis);
+        return await _taxesFeesRepository.UpdateTaxAsync(taxis) > 0;
     }
 
     #endregion
@@ -209,9 +188,9 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
 
     public async Task<List<TaxViewModel>> GetEnabledTaxesAsync()
     {
-        List<Taxis>? quary = await _taxesFeesRepository.GetAllTaxisAsQueryable().Where(t => !t.IsDeleted ?? false).ToListAsync();
+        List<Taxis>? query = await _taxesFeesRepository.GetAllTaxisAsQueryable().Where(t => !t.IsDeleted ?? false).ToListAsync();
 
-        return quary
+        return query
             .Where(t => t.IsEnabled == true)
             .Select(t => new TaxViewModel
             {
@@ -251,4 +230,5 @@ public class TaxesFeesService(ITaxesFeesRepository taxesFeesRepository, ICurrent
     }
 
     #endregion
+
 }

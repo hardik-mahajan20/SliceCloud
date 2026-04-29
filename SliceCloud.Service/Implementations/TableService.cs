@@ -2,10 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using SliceCloud.Repository.Enums;
 using SliceCloud.Repository.Interfaces;
 using SliceCloud.Repository.ViewModels;
-using SliceCloud.Service.Implementations;
 using SliceCloud.Service.Interfaces;
 
-namespace SliceCloud.Service.Attributes;
+namespace SliceCloud.Service.Implementations;
 
 public class TableService(ITableRepository tableRepository, ICurrentUserService currentUserService) : ITableService
 {
@@ -101,7 +100,7 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
             CreatedBy = _currentUserService.UserId
         };
 
-        return await _tableRepository.AddTableAsync(table);
+        return await _tableRepository.AddTableAsync(table) > 0;
     }
 
     #endregion
@@ -130,7 +129,7 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
         table.ModifiedAt = DateTime.UtcNow;
         table.ModifiedBy = _currentUserService.UserId;
 
-        return await _tableRepository.UpdateTableAsync(table);
+        return await _tableRepository.UpdateTableAsync(table) > 0;
     }
 
     #endregion
@@ -146,7 +145,7 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
         table.ModifiedAt = DateTime.UtcNow;
         table.ModifiedBy = _currentUserService.UserId;
 
-        return await _tableRepository.UpdateTableAsync(table);
+        return await _tableRepository.UpdateTableAsync(table) > 0;
     }
 
     #endregion
@@ -181,4 +180,5 @@ public class TableService(ITableRepository tableRepository, ICurrentUserService 
     }
 
     #endregion
+
 }

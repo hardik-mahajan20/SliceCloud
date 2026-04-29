@@ -7,7 +7,7 @@ public interface ISectionService
     /// <summary>
     /// Retrieves all sections which is not deleted and order by section order.
     /// </summary>
-    /// <returns>A collection of all sections as list in the form of sectionviewmodel.</returns>
+    /// <returns>A collection of all sections as list in the form of sectionViewModel.</returns>
     Task<List<SectionViewModel>> GetAllSections();
 
     /// <summary>

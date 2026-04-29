@@ -8,7 +8,7 @@ public class ModifierGroupRepository(SliceCloudContext sliceCloudContext) : IMod
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllModifierGroups
+    #region GetAllModifierGroupsAsQueryable
 
     public IQueryable<ModifierGroup> GetAllModifierGroupsAsQueryable()
     {
@@ -40,10 +40,11 @@ public class ModifierGroupRepository(SliceCloudContext sliceCloudContext) : IMod
 
     #region UpdateModifierGroup
 
-    public async Task<bool> UpdateModifierGroupAsync(ModifierGroup modifierGroup)
+    public async Task<int> UpdateModifierGroupAsync(ModifierGroup modifierGroup)
     {
         _sliceCloudContext.ModifierGroups.Update(modifierGroup);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.SaveChangesAsync();
+        return modifierGroup.ModifierGroupId;
     }
 
     #endregion
@@ -56,4 +57,5 @@ public class ModifierGroupRepository(SliceCloudContext sliceCloudContext) : IMod
     }
 
     #endregion
+
 }

@@ -13,9 +13,9 @@ public class StateService(IStateRepository stateRepository) : IStateService
 
     public async Task<List<State>> GetStatesByCountryIdAsync(int countryId)
     {
-        IQueryable<State>? queary = _stateRepository.GetAllStatesAsQueryable();
+        IQueryable<State>? query = _stateRepository.GetAllStatesAsQueryable();
 
-        List<State>? states = await queary.Where(s => s.CountryId == countryId).ToListAsync();
+        List<State>? states = await query.Where(s => s.CountryId == countryId).ToListAsync();
 
         return states;
     }

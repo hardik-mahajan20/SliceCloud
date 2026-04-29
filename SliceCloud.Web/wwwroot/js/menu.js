@@ -49,7 +49,7 @@ $(document).ready(async function () {
       if (firstModifierGroupId) {
         selectedModifierGroupId = firstModifierGroupId;
         $("#modifierGroupIdHidden").val(selectedModifierGroupId);
-        await laodModifierGroupWiseModifies(
+        await loadModifierGroupWiseModifies(
           selectedModifierGroupId,
           currentPageModifier,
           pageSizeModifier
@@ -78,14 +78,14 @@ async function loadPartialView(url) {
   });
 }
 
-// Paginatin controls Starts
+// Pagination controls Starts
 async function updatePaginationControls() {
   totalPages = parseInt($("#totalPages").val()) || 1;
   $("#prevPageBtn").prop("disabled", currentPage <= 1);
   $("#nextPageBtn").prop("disabled", currentPage >= totalPages);
 }
 
-// Paginatin controls Starts
+// Pagination controls Starts
 async function updatePaginationControlsModifier() {
   totalPagesModifier = parseInt($("#totalPagesModifier").val()) || 1;
   $("#prevPageBtnModifier").prop("disabled", currentPageModifier <= 1);

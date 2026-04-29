@@ -18,14 +18,14 @@ public interface ICustomerService
     /// <param name="sortColumn">The column to sort the results by.</param>
     /// <param name="sortDirection">The direction of sorting (e.g., ascending or descending).</param>
     /// <returns>A task that returns a paginated list of customer view models.</returns>
-    public Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, DateTime? startDate, DateTime? endDate, int page, int pageSize, string sortColumn, string sortDirection);
+    public Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, string timeRange, DateTime? startDate, DateTime? endDate, string sortOrder = "asc", string sortColumn = "CustomerName", int page = 1, int pageSize = 5);
 
     /// <summary>
     /// Retrieves the history of a customer by their ID.
     /// </summary>
     /// <param name="customerId">The ID of the customer to retrieve the history for.</param>
     /// <returns>A view model containing the customer's history.</returns>
-    Task<CustomerHistoryViewModel> GetCustomerHistoryAsync(int customerId);
+    Task<object> GetCustomerHistoryAsync(int customerId);
 
     /// <summary>
     /// Retrieves a filtered list of customers based on search text, date range, order status, and sorting options.
@@ -37,7 +37,7 @@ public interface ICustomerService
     /// <param name="sortColumn">The column to sort the results by.</param>
     /// <param name="sortOrder">The direction of sorting (e.g., ascending or descending).</param>
     /// <returns>A collection of filtered customers.</returns>
-    Task<IEnumerable<Customer>> GetFilteredOrders(
+    Task<IEnumerable<Customer>> GetFilteredOrdersAsync(
         string searchText,
         DateTime? startDate,
         DateTime? endDate,
@@ -56,5 +56,5 @@ public interface ICustomerService
     /// <param name="sortOrder">The direction of sorting (e.g., ascending or descending).</param>
     /// <param name="webRootPath">The root path of the web application for file storage.</param>
     /// <returns>A task that returns a file result containing the exported Excel file.</returns>
-    Task<FileResult> ExportCustomersToExcel(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath);
+    Task<FileResult> ExportCustomersToExcelAsync(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath);
 }

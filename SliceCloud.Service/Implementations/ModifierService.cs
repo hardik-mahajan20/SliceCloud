@@ -41,7 +41,7 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
 
     #region GetPaginatedModifiersByModifierGroupId
 
-    public async Task<PaginatedList<ModifierViewModel>> GetPaginatedModifiersByModifierGroupId(int modifierGroupId, int pageNumber, int pageSize, string searchQuery = "")
+    public async Task<PaginatedList<ModifierViewModel>> GetPaginatedModifiersByModifierGroupIdAsync(int modifierGroupId, int pageNumber, int pageSize, string searchQuery = "")
     {
         IQueryable<Modifier>? query = _modifierGroupModifierMappingsRepository.GetAllModifierGroupModifierMappingAsQueryable()
                                                     .Where(mapping => mapping.ModifierGroupId == modifierGroupId && mapping.Modifier.IsDeleted == false)
@@ -96,7 +96,7 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
             CreatedBy = _currentUserService.UserId
         };
 
-        int newModifieId = await _modifierRepository.AddModifierAsync(menuItem);
+        int newModifiedId = await _modifierRepository.AddModifierAsync(menuItem);
 
         if (modifierSectionViewModel.ModifierGroupIds != null && modifierSectionViewModel.ModifierGroupIds.Any())
         {
@@ -113,8 +113,12 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
 
             await _modifierGroupModifierMappingsRepository.AddModifierGroupMappingsAsync(modifierGroupMappings);
         }
-        return newModifieId;
+        return newModifiedId;
     }
+
+    #endregion
+
+    #region GetModifierById
 
     public async Task<ModifierViewModel> GetModifierByIdAsync(int modifierId)
     {
@@ -159,7 +163,7 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
             ModifiedBy = _currentUserService.UserId
         };
 
-        int modifieId = await _modifierRepository.UpdateModifierAsync(modifier);
+        int modifiedId = await _modifierRepository.UpdateModifierAsync(modifier);
 
         if (modifierSectionViewModel.ModifierGroupIds != null && modifierSectionViewModel.ModifierGroupIds.Any())
         {
@@ -192,8 +196,12 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
             if (mappingsToAdd.Any())
                 await _modifierGroupModifierMappingsRepository.AddModifierGroupMappingsAsync(mappingsToAdd);
         }
-        return modifieId;
+        return modifiedId;
     }
+
+    #endregion
+
+    #region DeleteModifier
 
     public async Task<bool> DeleteModifierAsync(int modifierId)
     {
@@ -227,7 +235,7 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
 
     #endregion
 
-    #region DeleteMultipleMultipleModifier
+    #region DeleteMultipleModifier
 
     public async Task<bool> DeleteMultipleModifierAsync(List<int> modifiersIds)
     {
@@ -246,4 +254,5 @@ public class ModifierService(IModifierGroupModifierMappingsRepository modifierGr
     }
 
     #endregion
+
 }

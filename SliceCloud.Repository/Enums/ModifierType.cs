@@ -6,8 +6,6 @@ namespace SliceCloud.Repository.Enums;
 public enum ModifierType : int
 {
     Veg = 0,
-
     NonVeg = 1,
-
     Vegan = 2
 }

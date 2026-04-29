@@ -1,12 +1,3 @@
-document.addEventListener("DOMContentLoaded", function () {
-  if (window.TempData) {
-    if (TempData.ErrorMessage) toastr.error(TempData.ErrorMessage);
-    if (TempData.SuccessMessage) toastr.success(TempData.SuccessMessage);
-    if (TempData.WarningMessage) toastr.warning(TempData.WarningMessage);
-    if (TempData.InfoMessage) toastr.info(TempData.InfoMessage);
-  }
-});
-
 $(document).ready(function () {
   const currentUserRole = document.getElementById("currentUserRole").value;
   const targetRole = document.getElementById("targetRole").value;
@@ -53,50 +44,8 @@ $(document).ready(function () {
 
         $(this).prop("checked", false);
       }
-    }
+    },
   );
-
-  function updateModuleCheckboxState() {
-    $(".module-checkbox").each(function () {
-      var row = $(this).closest("tr");
-      var canView = row.find(".can-view");
-      var canAddEdit = row.find(".can-add-edit");
-      var canDelete = row.find(".can-delete");
-
-      var totalChecked =
-        canView.is(":checked") +
-        canAddEdit.is(":checked") +
-        canDelete.is(":checked");
-
-      if (totalChecked === 3) {
-        $(this).prop("checked", true).prop("indeterminate", false);
-      } else if (totalChecked > 0) {
-        $(this).prop("checked", false).prop("indeterminate", true);
-      } else {
-        $(this).prop("checked", false).prop("indeterminate", false);
-      }
-    });
-
-    var totalModules = $(".module-checkbox").length;
-    var checkedModules = $(".module-checkbox:checked").length;
-    var indeterminateModules = $(".module-checkbox").filter(function () {
-      return $(this).prop("indeterminate");
-    }).length;
-
-    if (checkedModules === totalModules) {
-      $("#permissions-checkbox")
-        .prop("checked", true)
-        .prop("indeterminate", false);
-    } else if (checkedModules > 0 || indeterminateModules > 0) {
-      $("#permissions-checkbox")
-        .prop("checked", false)
-        .prop("indeterminate", true);
-    } else {
-      $("#permissions-checkbox")
-        .prop("checked", false)
-        .prop("indeterminate", false);
-    }
-  }
 
   updateModuleCheckboxState();
 
@@ -163,7 +112,7 @@ $(document).ready(function () {
       $(this).prop("checked", false).prop("indeterminate", false);
       $(".module-checkbox, .can-view, .can-add-edit, .can-delete").prop(
         "checked",
-        false
+        false,
       );
     }
 
@@ -179,3 +128,45 @@ $(document).ready(function () {
     }
   });
 });
+
+function updateModuleCheckboxState() {
+  $(".module-checkbox").each(function () {
+    var row = $(this).closest("tr");
+    var canView = row.find(".can-view");
+    var canAddEdit = row.find(".can-add-edit");
+    var canDelete = row.find(".can-delete");
+
+    var totalChecked =
+      canView.is(":checked") +
+      canAddEdit.is(":checked") +
+      canDelete.is(":checked");
+
+    if (totalChecked === 3) {
+      $(this).prop("checked", true).prop("indeterminate", false);
+    } else if (totalChecked > 0) {
+      $(this).prop("checked", false).prop("indeterminate", true);
+    } else {
+      $(this).prop("checked", false).prop("indeterminate", false);
+    }
+  });
+
+  var totalModules = $(".module-checkbox").length;
+  var checkedModules = $(".module-checkbox:checked").length;
+  var indeterminateModules = $(".module-checkbox").filter(function () {
+    return $(this).prop("indeterminate");
+  }).length;
+
+  if (checkedModules === totalModules) {
+    $("#permissions-checkbox")
+      .prop("checked", true)
+      .prop("indeterminate", false);
+  } else if (checkedModules > 0 || indeterminateModules > 0) {
+    $("#permissions-checkbox")
+      .prop("checked", false)
+      .prop("indeterminate", true);
+  } else {
+    $("#permissions-checkbox")
+      .prop("checked", false)
+      .prop("indeterminate", false);
+  }
+}

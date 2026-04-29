@@ -10,9 +10,9 @@ public class UsersLoginService(IUsersLoginRepository usersLoginRepository) : IUs
 {
     private readonly IUsersLoginRepository _usersLoginRepository = usersLoginRepository;
 
-    #region CreateUserLogin
+    #region AddUserLogin
 
-    public async Task CreateUserLoginAsync(UsersLoginViewModel usersLoginViewModel)
+    public async Task AddUserLoginAsync(UsersLoginViewModel usersLoginViewModel)
     {
         try
         {
@@ -24,7 +24,7 @@ public class UsersLoginService(IUsersLoginRepository usersLoginRepository) : IUs
                 RoleId = usersLoginViewModel.RoleId,
                 IsFirstLogin = true
             };
-            await _usersLoginRepository.CreateUserLoginAsync(usersLogin);
+            await _usersLoginRepository.AddUserLoginAsync(usersLogin); ;
         }
         catch (Exception ex)
         {
@@ -34,4 +34,5 @@ public class UsersLoginService(IUsersLoginRepository usersLoginRepository) : IUs
     }
 
     #endregion
+
 }

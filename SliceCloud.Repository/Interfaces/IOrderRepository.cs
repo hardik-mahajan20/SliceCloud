@@ -5,21 +5,22 @@ namespace SliceCloud.Repository.Interfaces;
 public interface IOrderRepository
 {
     /// <summary>
-    /// Retrieves all orders as an IQueryable for further filtering or querying.
+    /// Retrieves all orders as queryable.
     /// </summary>
-    /// <returns>An IQueryable of all orders.</returns>
+    /// <returns>All orders as queryable.</returns>
     IQueryable<Order> GetAllOrderAsQueryable();
 
     /// <summary>
-    /// Retrieves an order along with its details by order ID asynchronously.
+    /// Retrieves a order with details by its ID asynchronously.
     /// </summary>
     /// <param name="orderId">The ID of the order to retrieve.</param>
-    /// <returns>A task that returns the order with its details if found, otherwise null.</returns>
+    /// <returns>A task that returns the order with details if found in the database, otherwise null.</returns>
     Task<Order?> GetOrderWithDetailsAsync(int orderId);
 
     /// <summary>
-    /// Retrieves a list of order items for a specific order as queryable.
+    /// Retrieves all orderedItem by its orderId as queryable.
     /// </summary>
-    /// <returns>A list of order items as queryable.</returns>
+    /// <param name="orderId">The ID of the orderedItem to retrieve.</param>
+    /// <returns>A task that returns the orderedItem if found in the database, otherwise null.</returns>
     IQueryable<OrderedItem> GetOrderItemsDetailsAsQueryable(int orderId);
 }

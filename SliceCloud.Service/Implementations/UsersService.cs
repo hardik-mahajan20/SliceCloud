@@ -26,7 +26,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
     public async Task<PaginatedList<User>> GetAllUsersAsync(int pageNumber, int pageSize, string query, string sortOrder, string sortColumn, string search)
     {
-        IQueryable<User>? usersQuery = _usersRepository.GetAllUsersAsQuearyable().Where(u => u.IsDeleted == false);
+        IQueryable<User>? usersQuery = _usersRepository.GetAllUsersAsQueryable().Where(u => u.IsDeleted == false);
 
         if (!string.IsNullOrEmpty(search))
         {
@@ -40,23 +40,22 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
         usersQuery = sortColumn switch
         {
-            UserConstants.CREATEDATE
-              => sortOrder == GenralConstants.ASCENDING
+            UserConstants.CREATE_DATE
+              => sortOrder == GeneralConstants.ASCENDING
                   ? usersQuery.OrderBy(o => o.CreatedAt)
                   : usersQuery.OrderByDescending(o => o.CreatedAt),
             UserConstants.EMAIL
-              => sortOrder == GenralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? usersQuery.OrderBy(o => o.Email).ThenBy(o => o.UserId)
                   : usersQuery
                     .OrderByDescending(o => o.Email)
                     .ThenByDescending(o => o.UserId),
             UserConstants.PHONE
-              => sortOrder == GenralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? usersQuery.OrderBy(o => o.PhoneNumber)
                   : usersQuery.OrderByDescending(o => o.PhoneNumber),
             _ => usersQuery.OrderByDescending(o => o.CreatedAt)
         };
-
 
         PaginatedList<User> paginatedUsers = await PaginatedList<User>.CreateAsync(usersQuery, pageNumber, pageSize);
 
@@ -78,19 +77,19 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
     {
         Dictionary<string, string> errors = [];
 
-        bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == createUserViewModel.Email);
+        bool isEmailExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.Email == createUserViewModel.Email);
         if (isEmailExists)
         {
             errors.Add(nameof(createUserViewModel.Email), ErrorConstants.EMAIL_ALREADY_EXISTS);
         }
 
-        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == createUserViewModel.UserName);
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.UserName == createUserViewModel.UserName);
         if (isUsernameExists)
         {
             errors.Add(nameof(createUserViewModel.UserName), ErrorConstants.USERNAME_ALREADY_EXISTS);
         }
 
-        bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == createUserViewModel.Phone);
+        bool isPhoneExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.PhoneNumber == createUserViewModel.Phone);
 
         if (isPhoneExists)
         {
@@ -108,19 +107,19 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
     {
         Dictionary<string, string> errors = [];
 
-        bool isEmailExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.Email == updateUserViewModel.Email && u.UserId == updateUserViewModel.Id);
+        bool isEmailExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.Email == updateUserViewModel.Email && u.UserId == updateUserViewModel.Id);
         if (isEmailExists)
         {
             errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.EMAIL_ALREADY_EXISTS);
         }
 
-        bool isUsernameExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.UserName == updateUserViewModel.UserName && u.UserId == updateUserViewModel.Id);
+        bool isUsernameExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.UserName == updateUserViewModel.UserName && u.UserId == updateUserViewModel.Id);
         if (isUsernameExists)
         {
             errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.USERNAME_ALREADY_EXISTS);
         }
 
-        bool isPhoneExists = await _usersRepository.GetAllUsersAsQuearyable().AnyAsync(u => u.PhoneNumber == updateUserViewModel.PhoneNumber && u.UserId == updateUserViewModel.Id);
+        bool isPhoneExists = await _usersRepository.GetAllUsersAsQueryable().AnyAsync(u => u.PhoneNumber == updateUserViewModel.PhoneNumber && u.UserId == updateUserViewModel.Id);
         if (isPhoneExists)
         {
             errors.Add(nameof(updateUserViewModel.Email), ErrorConstants.PHONE_NUMBER_ALREADY_EXISTS);
@@ -162,7 +161,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
             ProfileImage = itemImgPath
         };
 
-        bool isUserCreated = await _usersRepository.CreateUserAsync(user);
+        bool isUserCreated = await _usersRepository.AddUserAsync(user) > 0;
         if (isUserCreated)
         {
             int userId = user.UserId;
@@ -176,7 +175,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
                 Status = (UserStatus)1,
             };
 
-            await _usersLoginService.CreateUserLoginAsync(login);
+            await _usersLoginService.AddUserLoginAsync(login);
             return true;
         }
         return false;
@@ -224,7 +223,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
     #endregion UpdateExitingUser
 
-    #region 
+    #region UpdateExitingUser
 
     public async Task<bool> UpdateExitingUserAsync(UpdateUserViewModel updateUserViewModel, int id, IFormFile itemImage)
     {
@@ -238,7 +237,6 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         {
             user!.ProfileImage = updateUserViewModel.ProfileImage;
         }
-
 
         if (user != null)
         {
@@ -275,7 +273,7 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
         if (user is not null)
         {
             user.IsDeleted = true;
-            return await _usersRepository.UpdateUserAsync(user);
+            return await _usersRepository.UpdateUserAsync(user) > 0;
         }
         return false;
     }
@@ -306,8 +304,6 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
             .ToList();
     }
 
-
-
     #region DeleteProfileImage
 
     public bool DeleteProfileImage(string imagePath)
@@ -336,4 +332,5 @@ public class UsersService(IUsersRepository usersRepository, IRolesRepository rol
 
 
     #endregion
+
 }

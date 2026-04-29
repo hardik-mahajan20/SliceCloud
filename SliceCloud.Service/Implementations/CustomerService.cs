@@ -13,12 +13,40 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 {
     private readonly ICustomerRepository _customerRepository = customerRepository;
 
-
     #region GetPaginatedCustomers
 
-    public async Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, DateTime? startDate, DateTime? endDate, int page, int pageSize, string sortColumn, string sortDirection)
+    public async Task<PaginatedList<CustomerViewModel>> GetPaginatedCustomersAsync(string search, string status, string timeRange, DateTime? startDate, DateTime? endDate, string sortOrder = "asc", string sortColumn = "CustomerName", int page = 1, int pageSize = 5)
     {
-        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQuearyable();
+
+        if (!startDate.HasValue || !endDate.HasValue)
+        {
+            DateTime today = DateTime.Today;
+
+            switch (timeRange)
+            {
+                case CustomerConstants.DATE_RANGE_7:
+                    startDate = today.AddDays(-7);
+                    endDate = today;
+                    break;
+                case CustomerConstants.DATE_RANGE_30:
+                    startDate = today.AddDays(-30);
+                    endDate = today;
+                    break;
+                case CustomerConstants.DATE_RANGE_MONTH:
+                    startDate = new DateTime(today.Year, today.Month, 1);
+                    endDate = today;
+                    break;
+                case CustomerConstants.DATE_RANGE_YEAR:
+                    startDate = new DateTime(today.Year, 1, 1);
+                    endDate = today;
+                    break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(sortColumn)) sortColumn = CustomerConstants.CUSTOMER_NAME;
+        if (string.IsNullOrEmpty(sortOrder)) sortOrder = GeneralConstants.ASCENDING;
+
+        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQueryable();
 
         DateTime? startUtc = startDate?.ToUniversalTime();
         DateTime? endUtc = endDate?.ToUniversalTime();
@@ -48,18 +76,18 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
         query = sortColumn switch
         {
-            CustomerConstants.CREATEDATE
-              => sortDirection == GenralConstants.ASCENDING
+            CustomerConstants.CREATE_DATE
+              => sortOrder == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.CreatedAt)
                   : query.OrderByDescending(o => o.CreatedAt),
             CustomerConstants.TOTAL_ORDER
-               => sortDirection == GenralConstants.ASCENDING
+               => sortOrder == GeneralConstants.ASCENDING
                    ? query.OrderBy(o => o.TotalOrder).ThenBy(o => o.CustomerId)
                    : query
                      .OrderByDescending(o => o.TotalOrder)
                      .ThenByDescending(o => o.CustomerId),
             CustomerConstants.CUSTOMER_NAME
-              => sortDirection == GenralConstants.ASCENDING
+              => sortOrder == GeneralConstants.ASCENDING
                   ? query.OrderBy(o => o.CustomerName)
                   : query.OrderByDescending(o => o.CustomerName),
             _ => query.OrderByDescending(o => o.CreatedAt)
@@ -84,27 +112,31 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     #region GetCustomerHistory
 
-    public async Task<CustomerHistoryViewModel> GetCustomerHistoryAsync(int customerId)
+    public async Task<object> GetCustomerHistoryAsync(int customerId)
     {
         Customer? customer = await _customerRepository.GetCustomerWithOrdersAsync(customerId);
-        if (customer == null) return new CustomerHistoryViewModel();
+        if (customer == null) return new { success = false, message = "Customer not found" };
 
-        return new CustomerHistoryViewModel
+        return new
         {
-            Name = customer.CustomerName,
-            PhoneNumber = customer.PhoneNo,
-            MaxOrder = customer.Orders.Count != 0 ? customer.Orders.Max(o => o.TotalAmount) : 0,
-            AvgBill = customer.Orders.Any() ? Math.Round(customer.Orders.Average(o => o.TotalAmount), 2) : 0,
-            ComingSince = customer.CreatedAt ?? DateTime.Now,
-            Visits = customer.Orders.Count,
-            Orders = customer.Orders.Select(o => new OrderViewModel
+            success = true,
+            data = new
             {
-                OrderDate = o.OrderDate ?? DateTime.Now,
-                OrderType = o.OrderType ?? GenralConstants.NA,
-                PaymentMode = o.PaymentMode ?? GenralConstants.NA,
-                ItemsCount = o.OrderedItems.Count,
-                TotalAmount = o.TotalAmount
-            }).ToList()
+                name = customer.CustomerName,
+                phoneNumber = customer.PhoneNo,
+                maxOrder = customer.Orders.Count != 0 ? customer.Orders.Max(o => o.TotalAmount) : 0,
+                avgBill = customer.Orders.Count != 0 ? Math.Round(customer.Orders.Average(o => o.TotalAmount), 2) : 0,
+                comingSince = customer.CreatedAt ?? DateTime.Now,
+                visits = customer.Orders.Count,
+                orders = customer.Orders.Select(o => new OrderViewModel
+                {
+                    OrderDate = o.OrderDate ?? DateTime.Now,
+                    OrderType = o.OrderType ?? GeneralConstants.NA,
+                    PaymentMode = o.PaymentMode ?? GeneralConstants.NA,
+                    ItemsCount = o.OrderedItems.Count,
+                    TotalAmount = o.TotalAmount
+                }).ToList()
+            }
         };
     }
 
@@ -112,14 +144,13 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     #region  GetFilteredOrders
 
-    public async Task<IEnumerable<Customer>> GetFilteredOrders(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
+    public async Task<IEnumerable<Customer>> GetFilteredOrdersAsync(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder)
     {
-        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQuearyable();
+        IQueryable<Customer>? query = _customerRepository.GetAllCustomersAsQueryable();
 
         DateTime? startUtc = startDate?.ToUniversalTime();
 
         DateTime? endUtc = endDate?.ToUniversalTime();
-
 
         if (!string.IsNullOrWhiteSpace(searchText))
         {
@@ -145,16 +176,16 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
         switch (sortColumn)
         {
             case CustomerConstants.CUSTOMER_NAME:
-                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CustomerName) : query.OrderByDescending(o => o.CustomerName);
+                query = sortOrder == GeneralConstants.ASCENDING ? query.OrderBy(o => o.CustomerName) : query.OrderByDescending(o => o.CustomerName);
                 break;
             case CustomerConstants.ORDER_DATE:
-                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
+                query = sortOrder == GeneralConstants.ASCENDING ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
                 break;
             case CustomerConstants.TOTAL_AMOUNT:
-                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.TotalOrder) : query.OrderByDescending(o => o.TotalOrder);
+                query = sortOrder == GeneralConstants.ASCENDING ? query.OrderBy(o => o.TotalOrder) : query.OrderByDescending(o => o.TotalOrder);
                 break;
             default:
-                query = sortOrder == GenralConstants.ASCENDING ? query.OrderBy(o => o.CustomerId) : query.OrderByDescending(o => o.CustomerId);
+                query = sortOrder == GeneralConstants.ASCENDING ? query.OrderBy(o => o.CustomerId) : query.OrderByDescending(o => o.CustomerId);
                 break;
         }
 
@@ -167,9 +198,9 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
     #region ExportCustomersToExcel
 
-    public async Task<FileResult> ExportCustomersToExcel(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath)
+    public async Task<FileResult> ExportCustomersToExcelAsync(string searchText, DateTime? startDate, DateTime? endDate, int? orderStatus, string sortColumn, string sortOrder, string webRootPath)
     {
-        IEnumerable<Customer>? customers = await GetFilteredOrders(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
+        IEnumerable<Customer>? customers = await GetFilteredOrdersAsync(searchText, startDate, endDate, orderStatus, sortColumn, sortOrder);
 
         using var workbook = new XLWorkbook();
         IXLWorksheet? worksheet = workbook.Worksheets.Add(CustomerConstants.CUSTOMERS);
@@ -201,9 +232,9 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
         string statusTextOrder = orderStatus switch
         {
-            0 => "Account Manager",
-            1 => "Chef",
-            _ => "Admin"
+            0 => RolesConstants.MANAGER,
+            1 => RolesConstants.CHEF,
+            _ => RolesConstants.ADMIN
         };
 
         IXLRange allStatusRange = worksheet.Range("C2:F3");
@@ -322,7 +353,9 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
 
         }
     }
+
     #endregion
+
 }
 
 

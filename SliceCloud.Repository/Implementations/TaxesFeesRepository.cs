@@ -8,7 +8,7 @@ public class TaxesFeesRepository(SliceCloudContext sliceCloudContext) : ITaxesFe
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region GetAllTaxes
+    #region GetAllTaxisAsQueryable
 
     public IQueryable<Taxis> GetAllTaxisAsQueryable()
     {
@@ -28,21 +28,24 @@ public class TaxesFeesRepository(SliceCloudContext sliceCloudContext) : ITaxesFe
 
     #region AddTax
 
-    public async Task<bool> AddTaxAsync(Taxis tax)
+    public async Task<int> AddTaxAsync(Taxis tax)
     {
-        _sliceCloudContext.Taxes.Add(tax);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.Taxes.AddAsync(tax);
+        await _sliceCloudContext.SaveChangesAsync();
+        return tax.TaxId;
     }
 
     #endregion
 
     #region UpdateTax
 
-    public async Task<bool> UpdateTaxAsync(Taxis tax)
+    public async Task<int> UpdateTaxAsync(Taxis tax)
     {
         _sliceCloudContext.Taxes.Update(tax);
-        return await _sliceCloudContext.SaveChangesAsync() > 0;
+        await _sliceCloudContext.SaveChangesAsync();
+        return tax.TaxId;
     }
 
     #endregion
+
 }

@@ -30,7 +30,7 @@ public class TableViewModel
 
     public int? SelectedSectionId { get; set; }
 
-    public decimal? TotoaAmount { get; set; }
+    public decimal? TotalAmount { get; set; }
 
     public string? SelectedSectionName { get; set; }
 

@@ -100,7 +100,7 @@ $(document).ready(function () {
           loadTaxes(currentPage, pageSize)
         } else if (response.errors) {
           $.each(response.errors, function (key, messages) {
-            $(`[data-valmsg-for="${key}"]`).text(messages[0])
+            $(`[data-val-msg-for="${key}"]`).text(messages[0])
           })
         } else {
           toastr.error(response.message || 'Something went wrong.')

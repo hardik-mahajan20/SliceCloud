@@ -1,35 +1,16 @@
-$(document).ready(function () {
-  let currentPage = 1;
-  let totalPages = parseInt($("#totalPages").val()) || 1;
-  let pageSize = parseInt($("#pageSizeDropdown").val()) || 5;
-  let sortColumn = "OrderDate";
-  let sortOrder = "ac";
+let currentPage = 1;
+let totalPages = 1;
+let pageSize = 5;
+let sortColumn = "";
+let sortOrder = "";
 
-  function loadOrders() {
-    $.ajax({
-      url: "/Orders/LoadOrders",
-      type: "GET",
-      data: {
-        search: $("#search").val(),
-        status: $("#statusFilter").val(),
-        timeRange: $("#timeFilter").val(),
-        startDate: $("#startDate").val(),
-        endDate: $("#endDate").val(),
-        sortColumn: sortColumn,
-        sortOrder: sortOrder,
-        page: currentPage,
-        pageSize: pageSize,
-      },
-      success: function (response) {
-        $("#ordersContainer").html(response);
-        totalPages = parseInt($("#totalPages").val()) || 1;
-        updatePaginationControls();
-      },
-      error: function (xhr, status, error) {
-        toastr.error("AJAX Error: " + xhr.responseText, "Request Failed");
-      },
-    });
-  }
+$(document).ready(function () {
+  currentPage = 1;
+  totalPages = parseInt($("#totalPages").val()) || 1;
+  pageSize = parseInt($("#pageSizeDropdown").val()) || 5;
+  sortColumn = "OrderDate";
+  sortOrder = "ac";
+
   loadOrders();
 
   $(document).on("click", ".sortable-column", function () {
@@ -56,24 +37,11 @@ $(document).ready(function () {
       startDate,
       endDate,
       currentPage,
-      pageSize
+      pageSize,
     );
   });
 
-  function updateSortingIcons() {
-    $(".sortable-column i").css("color", "#ccc");
-    $(".sortable-column").each(function () {
-      let column = $(this).data("column");
-      if (column === sortColumn) {
-        $(this)
-          .find(sortOrder === "asc" ? ".bi-arrow-up" : ".bi-arrow-down")
-          .css("color", "black");
-      }
-    });
-  }
-
   $("#startDate").on("change", function () {
-    let startDate = new Date($("#startDate").val());
     let today = new Date();
 
     if ($("#startDate").val()) {
@@ -83,39 +51,10 @@ $(document).ready(function () {
   });
 
   $("#endDate").on("change", function () {
-    let endDate = new Date($("#endDate").val());
-
     if ($("#endDate").val()) {
       $("#startDate").attr("max", $("#endDate").val());
     }
   });
-
-  function updateDateRange() {
-    let timeRange = $("#timeFilter").val();
-    let today = new Date();
-    let pastDate = new Date();
-
-    if (timeRange === "all") {
-      $("#startDate").val("");
-      $("#endDate").val("");
-    }
-    if (timeRange === "7") {
-      pastDate.setDate(today.getDate() - 7);
-    } else if (timeRange === "30") {
-      pastDate.setDate(today.getDate() - 30);
-    } else if (timeRange === "month") {
-      pastDate = new Date(today.getFullYear(), today.getMonth(), 2);
-      today = new Date();
-    } else if (timeRange === "year") {
-      pastDate = new Date(today.getFullYear(), 0, 2);
-      today = new Date();
-    } else {
-      return;
-    }
-
-    $("#startDate").val(pastDate.toISOString().split("T")[0]);
-    $("#endDate").val(today.toISOString().split("T")[0]);
-  }
 
   $("#search, #statusFilter, #timeFilter").on("change keyup", function () {
     updateDateRange();
@@ -189,7 +128,7 @@ $(document).ready(function () {
       error: function (xhr) {
         if (xhr.status === 403) {
           toastr.error(
-            "Access Denied: You don't have permission to perform this action."
+            "Access Denied: You don't have permission to perform this action.",
           );
         } else {
           toastr.error("An error occurred while exporting orders.");
@@ -236,11 +175,6 @@ $(document).ready(function () {
     });
   });
 
-  function updatePaginationControls() {
-    $("#prevPageBtn").prop("disabled", currentPage <= 1);
-    $("#nextPageBtn").prop("disabled", currentPage >= totalPages);
-  }
-
   $(document).on("click", "#nextPageBtn", function () {
     if (currentPage < totalPages) {
       currentPage++;
@@ -261,3 +195,70 @@ $(document).ready(function () {
     loadOrders();
   });
 });
+function loadOrders() {
+  $.ajax({
+    url: "/Orders/LoadOrders",
+    type: "GET",
+    data: {
+      search: $("#search").val(),
+      status: $("#statusFilter").val(),
+      timeRange: $("#timeFilter").val(),
+      startDate: $("#startDate").val(),
+      endDate: $("#endDate").val(),
+      sortColumn: sortColumn,
+      sortOrder: sortOrder,
+      page: currentPage,
+      pageSize: pageSize,
+    },
+    success: function (response) {
+      $("#ordersContainer").html(response);
+      totalPages = parseInt($("#totalPages").val()) || 1;
+      updatePaginationControls();
+    },
+    error: function (xhr, status, error) {
+      toastr.error("AJAX Error: " + xhr.responseText, "Request Failed");
+    },
+  });
+}
+function updateSortingIcons() {
+  $(".sortable-column i").css("color", "#ccc");
+  $(".sortable-column").each(function () {
+    let column = $(this).data("column");
+    if (column === sortColumn) {
+      $(this)
+        .find(sortOrder === "asc" ? ".bi-arrow-up" : ".bi-arrow-down")
+        .css("color", "black");
+    }
+  });
+}
+function updateDateRange() {
+  let timeRange = $("#timeFilter").val();
+  let today = new Date();
+  let pastDate = new Date();
+
+  if (timeRange === "all") {
+    $("#startDate").val("");
+    $("#endDate").val("");
+  }
+  if (timeRange === "7") {
+    pastDate.setDate(today.getDate() - 7);
+  } else if (timeRange === "30") {
+    pastDate.setDate(today.getDate() - 30);
+  } else if (timeRange === "month") {
+    pastDate = new Date(today.getFullYear(), today.getMonth(), 2);
+    today = new Date();
+  } else if (timeRange === "year") {
+    pastDate = new Date(today.getFullYear(), 0, 2);
+    today = new Date();
+  } else {
+    return;
+  }
+
+  $("#startDate").val(pastDate.toISOString().split("T")[0]);
+  $("#endDate").val(today.toISOString().split("T")[0]);
+}
+
+function updatePaginationControls() {
+  $("#prevPageBtn").prop("disabled", currentPage <= 1);
+  $("#nextPageBtn").prop("disabled", currentPage >= totalPages);
+}

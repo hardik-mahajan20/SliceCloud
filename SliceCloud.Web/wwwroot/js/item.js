@@ -391,7 +391,7 @@ $(document).ready(function () {
   });
 
   // === Main Checkbox Change Event ===
-  $(document).on("change", "#maincheckbox", function () {
+  $(document).on("change", "#main-checkbox", function () {
     const isChecked = this.checked;
     mainCheckboxState.isChecked = isChecked;
     mainCheckboxState.isIndeterminate = false;
@@ -462,7 +462,7 @@ $(document).ready(function () {
           mainCheckboxState = { isChecked: false, isIndeterminate: false };
 
           // Uncheck all checkboxes
-          $("#maincheckbox")
+          $("#main-checkbox")
             .prop("checked", false)
             .prop("indeterminate", false);
           $(".item-checkbox").prop("checked", false);
@@ -514,7 +514,7 @@ function updateMainCheckboxState() {
 
 // === Apply Main Checkbox State ===
 async function applyMainCheckboxState() {
-  $("#maincheckbox")
+  $("#main-checkbox")
     .prop("checked", mainCheckboxState.isChecked)
     .prop("indeterminate", mainCheckboxState.isIndeterminate);
 }
@@ -868,7 +868,7 @@ async function loadCategoryWiseItems(
         $(this).prop("checked", selectedItems.has(itemId));
       });
       if (searchQuery !== "") {
-        $("#maincheckbox").addClass("d-none");
+        $("#main-checkbox").addClass("d-none");
       }
 
       await applyMainCheckboxState();

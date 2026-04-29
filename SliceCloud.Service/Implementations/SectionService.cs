@@ -84,7 +84,7 @@ public class SectionService(ISectionRepository sectionRepository, ICurrentUserSe
             CreatedBy = _currentUserService.UserId
         };
 
-        return await _sectionRepository.AddSectionAsync(section);
+        return await _sectionRepository.AddSectionAsync(section) > 0;
     }
 
     #endregion
@@ -101,7 +101,7 @@ public class SectionService(ISectionRepository sectionRepository, ICurrentUserSe
         section.ModifiedAt = DateTime.UtcNow;
         section.ModifiedBy = _currentUserService.UserId;
 
-        return await _sectionRepository.UpdateSectionAsync(section);
+        return await _sectionRepository.UpdateSectionAsync(section) > 0;
     }
 
     #endregion
@@ -120,7 +120,7 @@ public class SectionService(ISectionRepository sectionRepository, ICurrentUserSe
         section.ModifiedAt = DateTime.UtcNow;
         section.ModifiedBy = _currentUserService.UserId;
 
-        return await _sectionRepository.UpdateSectionAsync(section);
+        return await _sectionRepository.UpdateSectionAsync(section) > 0;
     }
 
     #endregion

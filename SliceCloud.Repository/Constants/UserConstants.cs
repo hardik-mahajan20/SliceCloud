@@ -6,7 +6,7 @@ namespace SliceCloud.Repository.Constants;
 /// </summary>
 public static class UserConstants
 {
-    public const string CREATEDATE = "CreateDate";
+    public const string CREATE_DATE = "CreateDate";
     public const string EMAIL = "Email";
     public const string PHONE = "Phone";
     public const string PASSWORD = "Password";

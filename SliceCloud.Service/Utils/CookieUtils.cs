@@ -14,7 +14,7 @@ public static class CookieUtils
     /// <param name="token">The JWT token to save.</param>
     public static void SaveJWTToken(HttpResponse response, string token)
     {
-        response.Cookies.Append(GenralConstants.AUTH_TOKEN, token, new CookieOptions
+        response.Cookies.Append(GeneralConstants.AUTH_TOKEN, token, new CookieOptions
         {
             HttpOnly = false,
             Secure = true,
@@ -29,7 +29,7 @@ public static class CookieUtils
     /// <returns>The JWT token if found, otherwise null.</returns>
     public static string? GetJWTToken(HttpRequest request)
     {
-        _ = request.Cookies.TryGetValue(GenralConstants.AUTH_TOKEN, out string? token);
+        _ = request.Cookies.TryGetValue(GeneralConstants.AUTH_TOKEN, out string? token);
         return token;
     }
 
@@ -49,7 +49,7 @@ public static class CookieUtils
             Secure = true,
             IsEssential = true
         };
-        response.Cookies.Append(GenralConstants.USER_DATA, userData, cookieOptions);
+        response.Cookies.Append(GeneralConstants.USER_DATA, userData, cookieOptions);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public static class CookieUtils
     /// <param name="httpContext">The HTTP context to delete the cookies from.</param>
     public static void ClearCookies(HttpContext httpContext)
     {
-        httpContext.Response.Cookies.Delete(GenralConstants.AUTH_TOKEN);
-        httpContext.Response.Cookies.Delete(GenralConstants.USER_DATA);
+        httpContext.Response.Cookies.Delete(GeneralConstants.AUTH_TOKEN);
+        httpContext.Response.Cookies.Delete(GeneralConstants.USER_DATA);
     }
 }

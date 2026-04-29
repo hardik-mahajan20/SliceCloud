@@ -8,12 +8,11 @@ public class ItemModifierGroupMapRepository(SliceCloudContext sliceCloudContext)
 {
     private readonly SliceCloudContext _sliceCloudContext = sliceCloudContext;
 
-    #region AddItemModifierGroupMap
+    #region GetAllItemModifierGroupMapsAsQueryable
 
-    public async Task AddItemModifierGroupMapAsync(ItemModifierGroupMap itemModifierGroupMap)
+    public IQueryable<ItemModifierGroupMap> GetAllItemModifierGroupMapsAsQueryable()
     {
-        await _sliceCloudContext.ItemModifierGroupMaps.AddAsync(itemModifierGroupMap);
-        await _sliceCloudContext.SaveChangesAsync();
+        return _sliceCloudContext.ItemModifierGroupMaps.AsQueryable();
     }
 
     #endregion
@@ -29,11 +28,13 @@ public class ItemModifierGroupMapRepository(SliceCloudContext sliceCloudContext)
 
     #endregion
 
-    #region GetAllItemModifierGroupMaps
+    #region AddItemModifierGroupMap
 
-    public IQueryable<ItemModifierGroupMap> GetAllItemModifierGroupMapsAsQueryable()
+    public async Task<int> AddItemModifierGroupMapAsync(ItemModifierGroupMap itemModifierGroupMap)
     {
-        return _sliceCloudContext.ItemModifierGroupMaps.AsQueryable();
+        await _sliceCloudContext.ItemModifierGroupMaps.AddAsync(itemModifierGroupMap);
+        await _sliceCloudContext.SaveChangesAsync();
+        return itemModifierGroupMap.ItemModifierGroupId;
     }
 
     #endregion
@@ -55,4 +56,5 @@ public class ItemModifierGroupMapRepository(SliceCloudContext sliceCloudContext)
     }
 
     #endregion
+
 }

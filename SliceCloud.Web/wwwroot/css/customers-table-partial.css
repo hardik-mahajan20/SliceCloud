@@ -58,19 +58,3 @@
 .table th:nth-child(8) {
     width: 10%;
 }
-
-.rating-stars i {
-    font-size: 18px;
-    margin-right: 2px;
-}
-
-.action-icons a {
-    text-decoration: none;
-    font-size: 20px;
-    margin: 0 5px;
-    color: #555;
-}
-
-.action-icons a:hover {
-    color: #ff9800;
-}

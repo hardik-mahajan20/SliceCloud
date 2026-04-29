@@ -2,10 +2,10 @@
 @model SliceCloud.Repository.ViewModels.PaginatedList<ItemViewModel>
 <div class="item-wrapper">
     <table class="table">
-        <tr class="tableheader">
+        <tr class="table-header">
             <td class="align-middle">
                 <div class="d-flex ">
-                    <input class="form-check-input me-3" type="checkbox" id="maincheckbox" />
+                    <input class="form-check-input me-3" type="checkbox" id="main-checkbox" />
                     Name
                 </div>
             </td>
@@ -38,7 +38,7 @@
                                 <input class="form-check-input me-3 item-checkbox" type="checkbox"
                                     name="item-checkbox-@itemViewModel.ItemId" id="item-checkbox-@itemViewModel.ItemId" />
                                 <input type="hidden" name="ItemId" value="@itemViewModel.ItemId">
-                                <img class="profilephotosmall me-3" src="@itemViewModel.ItemImg" alt="This is image"
+                                <img class="me-3" src="@itemViewModel.ItemImg" alt="This is image"
                                     height="50px" width="50px" />
                                 <span class="truncate-text" style="min-width: 190px;"
                                     title="@itemViewModel.ItemName">@itemViewModel.ItemName</span>
